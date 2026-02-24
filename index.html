@@ -14,47 +14,73 @@
         min-height: 100vh; overflow-x: hidden;
     }
 
-    .header { text-align: center; margin-top: 15px; margin-bottom: 15px; }
+    /* --- [신규] 요원 등록(로그인) 화면 --- */
+    #login-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: #050a05; background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        z-index: 9999;
+    }
+    .login-title { font-family: 'Black Ops One', cursive; font-size: 36px; color: #ffffff; margin-bottom: 5px; text-shadow: 0 0 15px rgba(57,255,20,0.5); }
+    .login-sub { color: #4ade80; font-weight: 700; letter-spacing: 2px; margin-bottom: 40px; }
+    .name-input {
+        background: #0a0f0a; border: 2px solid #1a2f1a; border-radius: 8px;
+        color: #ffffff; font-family: 'Chakra Petch', sans-serif; font-size: 20px; font-weight: 700;
+        padding: 15px; width: 80%; max-width: 300px; text-align: center; outline: none;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); transition: border-color 0.3s;
+    }
+    .name-input:focus { border-color: #39FF14; box-shadow: 0 0 10px rgba(57,255,20,0.3); }
+    .name-input::placeholder { color: #555; font-size: 16px; }
+    
+    /* --- 기존 메인 UI --- */
+    #main-app { display: none; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    
+    .header { text-align: center; margin-top: 15px; margin-bottom: 15px; width: 100%; }
     .title { font-family: 'Black Ops One', cursive; font-size: 26px; margin: 0; text-transform: uppercase; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-    .subtitle { font-size: 11px; letter-spacing: 1.5px; color: #4ade80; opacity: 0.9; margin-top: 5px; font-weight: 700; white-space: nowrap; }
+    
+    /* [신규] 참가자 이름 표시 영역 */
+    .operator-bar {
+        background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a;
+        width: 100%; padding: 6px 0; margin-top: 5px;
+        color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center;
+    }
 
     .main-container {
         width: 90%; max-width: 420px; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
-        padding: 20px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); position: relative;
+        padding: 20px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); position: relative; margin-top: 10px;
     }
 
     .heading-display {
-        position: absolute; top: -35px; left: 50%; transform: translateX(-50%);
+        position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
         background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px;
         font-family: 'Black Ops One', cursive; font-size: 24px; color: #ffffff;
         text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); display: flex; align-items: baseline; justify-content: center; z-index: 20;
     }
     .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
 
-    /* 나침반 크기 약간 축소하여 리스트 공간 확보 */
     .compass-ui {
-        position: relative; width: 220px; height: 220px; margin: 20px auto 20px;
-        border-radius: 50%; border: 10px solid #142014;
+        position: relative; width: 180px; height: 180px; margin: 25px auto 15px;
+        border-radius: 50%; border: 8px solid #142014;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(74, 222, 128, 0.3);
         background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
     .compass-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-    .dial-mark { position: absolute; font-weight: 700; font-size: 16px; color: #3a5f3a; }
-    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #d32f2f; font-size: 20px; text-shadow: 0 0 10px rgba(211, 47, 47, 0.4); }
-    .mark-s { bottom: 10px; left: 50%; transform: translateX(-50%); color: #ffffff; }
-    .mark-e { right: 10px; top: 50%; transform: translateY(-50%); color: #ffffff; }
-    .mark-w { left: 10px; top: 50%; transform: translateY(-50%); color: #ffffff; }
+    .dial-mark { position: absolute; font-weight: 700; font-size: 14px; color: #3a5f3a; }
+    .mark-n { top: 5px; left: 50%; transform: translateX(-50%); color: #d32f2f; font-size: 18px; text-shadow: 0 0 10px rgba(211, 47, 47, 0.4); }
+    .mark-s { bottom: 5px; left: 50%; transform: translateX(-50%); color: #ffffff; }
+    .mark-e { right: 8px; top: 50%; transform: translateY(-50%); color: #ffffff; }
+    .mark-w { left: 8px; top: 50%; transform: translateY(-50%); color: #ffffff; }
     
     .tick { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
-    .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 8px; background: #2a402a; }
-    .tick::before { top: 5px; } .tick::after { bottom: 5px; }
+    .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 6px; background: #2a402a; }
+    .tick::before { top: 3px; } .tick::after { bottom: 3px; }
     .t-30 { transform: translateX(-50%) rotate(30deg); } .t-60 { transform: translateX(-50%) rotate(60deg); }
     .t-120 { transform: translateX(-50%) rotate(120deg); } .t-150 { transform: translateX(-50%) rotate(150deg); }
     .t-210 { transform: translateX(-50%) rotate(210deg); } .t-240 { transform: translateX(-50%) rotate(240deg); }
     .t-300 { transform: translateX(-50%) rotate(300deg); } .t-330 { transform: translateX(-50%) rotate(330deg); }
 
     .needle-container {
-        position: absolute; top: 50%; left: 50%; width: 16px; height: 190px;
+        position: absolute; top: 50%; left: 50%; width: 14px; height: 160px;
         transform-origin: center center; transform: translate(-50%, -50%) rotate(0deg); 
         z-index: 10; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
     }
@@ -63,111 +89,149 @@
         background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 50%, #0d47a1 50%, #1565c0 100%);
     }
     .center-pin {
-        position: absolute; top: 50%; left: 50%; width: 14px; height: 14px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f);
+        position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f);
         border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
 
-    /* 컴팩트한 상단 데이터 바 */
     .compact-data {
         display: flex; justify-content: space-between; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 10px 15px; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
     }
-    .data-item { display: flex; flex-direction: column; align-items: center; }
-    .data-label { font-size: 11px; color: #80a080; margin-bottom: 3px; font-weight: 700; letter-spacing: 1px;}
-    .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; color: #ffffff; }
+    .data-item { display: flex; flex-direction: column; align-items: center; width: 33%;}
+    .data-label { font-size: 10px; color: #80a080; margin-bottom: 3px; font-weight: 700; letter-spacing: 1px; text-align: center;}
+    .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 15px; color: #ffffff; text-align: center;}
 
-    /* [신규] 미션 체크포인트 관제 패널 */
+    /* 미션 체크포인트 스크롤 패널 */
     .mission-panel {
         background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
     }
     .panel-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid #1a2f1a; padding-bottom: 5px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
     
-    .cp-list { list-style: none; padding: 0; margin: 0; }
-    .cp-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #1a2f1a; font-size: 13px; }
-    .cp-item:last-child { border-bottom: none; }
+    /* [핵심] 리스트가 길어지면 안에서 스크롤 되도록 설정 */
+    .cp-list { list-style: none; padding: 0; margin: 0; max-height: 180px; overflow-y: auto; padding-right: 5px;}
     
+    /* 커스텀 스크롤바 디자인 */
+    .cp-list::-webkit-scrollbar { width: 4px; }
+    .cp-list::-webkit-scrollbar-track { background: #050a05; }
+    .cp-list::-webkit-scrollbar-thumb { background: #1a2f1a; border-radius: 2px; }
+
+    .cp-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #1a2f1a; font-size: 12px; }
+    .cp-item:last-child { border-bottom: none; }
     .cp-name { color: #aaaaaa; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    /* 상태 표시등 (🔴대기, 🟡추적중, 🟢통과) */
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #555; box-shadow: 0 0 5px #000; }
+    
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #555; box-shadow: 0 0 5px #000; flex-shrink: 0;}
     .status-dot.active { background-color: #fbc02d; box-shadow: 0 0 10px #fbc02d; animation: blink 1s infinite; }
     .status-dot.cleared { background-color: #39FF14; box-shadow: 0 0 10px #39FF14; }
+    @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
     
-    .cp-status-text { font-family: 'Black Ops One', cursive; font-size: 12px; letter-spacing: 1px; }
+    .cp-status-text { font-family: 'Black Ops One', cursive; font-size: 11px; letter-spacing: 1px; }
     .text-cleared { color: #39FF14; }
     .text-active { color: #fbc02d; }
     .text-pending { color: #555; }
-
-    @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
 
     .tactical-btn {
         width: 100%; padding: 16px; background: linear-gradient(180deg, #2e4e2e, #1a2f1a);
         border: 2px solid #142014; border-bottom: 4px solid #0a0f0a; border-radius: 6px;
         color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 2px;
-        cursor: pointer; transition: all 0.1s; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        cursor: pointer; transition: all 0.1s; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-top: 10px;
     }
     .tactical-btn:active { transform: translateY(3px); border-bottom: 1px solid #0a0f0a; }
     .tactical-btn.active { background: linear-gradient(180deg, #d32f2f, #b71c1c); color: #ffffff; border-color: #8e0000; }
     .tactical-btn.completed { background: linear-gradient(180deg, #004d40, #00251a); color: #39FF14; border-color: #39FF14; }
 
-    .footer { margin-top: 15px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; }
-    .reset-link { color: #3a5f3a; text-decoration: underline; cursor: pointer; margin-top: 5px; display: inline-block; }
+    .footer { margin-top: 15px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; padding-bottom: 20px;}
+    .reset-link { color: #3a5f3a; text-decoration: underline; cursor: pointer; margin-top: 10px; display: inline-block; }
 </style>
 </head>
 <body>
 
-<div class="header">
-    <h1 class="title">APEX NAVIGATOR</h1>
-    <p class="subtitle">TACTICAL CP TRACKING SYSTEM</p>
+<div id="login-screen">
+    <h1 class="login-title">APEX SUMMIT</h1>
+    <p class="login-sub">KOREA ACTION TRAIL</p>
+    <input type="text" id="participant-name" class="name-input" placeholder="참가자 성명 입력" autocomplete="off">
+    <button class="tactical-btn" id="btn-login" style="width: 80%; max-width: 300px; margin-top: 20px;">시스템 접속 (ENTER)</button>
 </div>
 
-<div class="main-container">
-    <div class="heading-display">
-        <span id="heading-value">---</span><span class="heading-unit">°DEG</span>
+<div id="main-app">
+    <div class="header">
+        <h1 class="title">APEX NAVIGATOR</h1>
+        <div class="operator-bar">OPERATOR : <span id="display-op-name"></span></div>
     </div>
 
-    <div class="compass-ui">
-        <div class="compass-face">
-            <span class="dial-mark mark-n">N</span><span class="dial-mark mark-e">E</span>
-            <span class="dial-mark mark-s">S</span><span class="dial-mark mark-w">W</span>
-            <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div>
-            <div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
+    <div class="main-container">
+        <div class="heading-display"><span id="heading-value">---</span><span class="heading-unit">°DEG</span></div>
+
+        <div class="compass-ui">
+            <div class="compass-face">
+                <span class="dial-mark mark-n">N</span><span class="dial-mark mark-e">E</span>
+                <span class="dial-mark mark-s">S</span><span class="dial-mark mark-w">W</span>
+                <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div>
+                <div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
+            </div>
+            <div class="needle-container" id="compass-needle"><div class="needle-body"></div></div>
+            <div class="center-pin"></div>
         </div>
-        <div class="needle-container" id="compass-needle">
-            <div class="needle-body"></div>
+
+        <div class="compact-data">
+            <div class="data-item"><span class="data-label">TARGET DIST</span><span class="data-value" id="dist-to-target">대기 중...</span></div>
+            <div class="data-item" style="border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a; padding: 0 10px;"><span class="data-label">TOTAL DIST</span><span class="data-value" id="dist-total">0 m</span></div>
+            <div class="data-item"><span class="data-label">ALTITUDE</span><span class="data-value" id="alt-current">N/A</span></div>
         </div>
-        <div class="center-pin"></div>
+
+        <div class="mission-panel">
+            <div class="panel-title"><span>MISSION WAYPOINTS</span> <span id="mission-status">STANDBY</span></div>
+            <ul class="cp-list" id="cp-list-container"></ul>
+        </div>
+
+        <button class="tactical-btn" id="activate-btn">SYSTEM ENGAGE (가동)</button>
     </div>
 
-    <div class="compact-data">
-        <div class="data-item"><span class="data-label">TARGET DIST</span><span class="data-value" id="dist-to-target">대기 중...</span></div>
-        <div class="data-item" style="border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a; padding: 0 15px;"><span class="data-label">TOTAL DIST</span><span class="data-value" id="dist-total">0 m</span></div>
-        <div class="data-item"><span class="data-label">ALTITUDE</span><span class="data-value" id="alt-current">N/A</span></div>
+    <div class="footer">
+        © 2026 APEX SUMMIT. ALL RIGHTS RESERVED.<br>
+        <span class="reset-link" onclick="resetMission()">기록 및 이름 초기화 (테스트용)</span>
     </div>
-
-    <div class="mission-panel">
-        <div class="panel-title"><span>MISSION WAYPOINTS</span> <span id="mission-status">STANDBY</span></div>
-        <ul class="cp-list" id="cp-list-container">
-            </ul>
-    </div>
-
-    <button class="tactical-btn" id="activate-btn">SYSTEM ENGAGE (가동)</button>
-</div>
-
-<div class="footer">
-    © 2026 APEX SUMMIT. ALL RIGHTS RESERVED.<br>
-    <span class="reset-link" onclick="resetMission()">초기화 (테스트용)</span>
 </div>
 
 <script>
-    // --- [핵심] APEX SUMMIT 코스 체크포인트 배열 세팅 ---
-    // 현장 테스트를 위해 대표님이 계신 곳 주변이나 실제 CP 좌표를 입력하세요.
+    /* ==========================================================
+       [핵심] APEX SUMMIT 24개 풀코스 웨이포인트 데이터베이스
+       *현재 좌표(lat, lon)는 서울 중심의 '임시 테스트용' 좌표입니다.
+       *실제 행사 전 구글 지도에서 정확한 위도/경도를 찾아 덮어쓰셔야 합니다!
+    ========================================================== */
     const WAYPOINTS = [
-        { id: 1, name: "START (출발지)", lat: 37.5512, lon: 126.9882 }, // 예: 남산
-        { id: 2, name: "CP 1 (제1보급소)", lat: 37.5665, lon: 126.9780 }, // 예: 시청
-        { id: 3, name: "CP 2 (정상 통과)", lat: 37.5796, lon: 126.9770 }, // 예: 경복궁
-        { id: 4, name: "DESTINATION (완주)", lat: 37.5826, lon: 126.9830 } // 예: 북촌
+        { id: 1, name: "START: 용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 }, // 예시 좌표 
+        { id: 2, name: "박달나무쉼터", lat: 38.2050, lon: 128.3900 },
+        { id: 3, name: "미시령옛길", lat: 38.2100, lon: 128.4200 },
+        { id: 4, name: "금강산성인대", lat: 38.2200, lon: 128.4500 },
+        { id: 5, name: "금강산화암사", lat: 38.2300, lon: 128.4800 },
+        { id: 6, name: "신평골길 8", lat: 38.2400, lon: 128.5000 },
+        { id: 7, name: "천진해수욕장", lat: 38.2500, lon: 128.5300 },
+        { id: 8, name: "청간정", lat: 38.2600, lon: 128.5400 },
+        { id: 9, name: "아야진해수욕장", lat: 38.2700, lon: 128.5500 },
+        { id: 10, name: "교암항", lat: 38.2800, lon: 128.5450 },
+        { id: 11, name: "교암리해수욕장", lat: 38.2850, lon: 128.5400 },
+        { id: 12, name: "능파대 (지질공원)", lat: 38.2900, lon: 128.5350 },
+        { id: 13, name: "문암항", lat: 38.3000, lon: 128.5300 },
+        { id: 14, name: "삼포해수욕장", lat: 38.3100, lon: 128.5250 },
+        { id: 15, name: "송지호철새도래지", lat: 38.3300, lon: 128.5150 },
+        { id: 16, name: "왕곡마을", lat: 38.3400, lon: 128.5100 },
+        { id: 17, name: "수뭇개바위", lat: 38.3500, lon: 128.5050 },
+        { id: 18, name: "동호리해변", lat: 38.3800, lon: 128.4900 },
+        { id: 19, name: "거진해수욕장", lat: 38.4400, lon: 128.4600 },
+        { id: 20, name: "화진포", lat: 38.4700, lon: 128.4400 },
+        { id: 21, name: "화진포의성", lat: 38.4750, lon: 128.4450 },
+        { id: 22, name: "화진포소나무숲", lat: 38.4800, lon: 128.4500 },
+        { id: 23, name: "마차진 (수송 구간)", lat: 38.5000, lon: 128.4300 },
+        { id: 24, name: "FINISH: 고성통일전망타워", lat: 38.5833, lon: 128.3833 }
     ];
     
-    const RADIUS_METER = 50; // 통과 인정 반경 (50미터 이내 진입 시 자동 통과)
+    const RADIUS_METER = 50; // 통과 인정 반경 50m
+
+    // --- 변수 및 DOM ---
+    const loginScreen = document.getElementById('login-screen');
+    const mainApp = document.getElementById('main-app');
+    const inputName = document.getElementById('participant-name');
+    const btnLogin = document.getElementById('btn-login');
+    const displayOpName = document.getElementById('display-op-name');
 
     const btnActivate = document.getElementById('activate-btn');
     const needle = document.getElementById('compass-needle'); 
@@ -182,38 +246,63 @@
     let lastPos = null;
     let totalDistance = 0;
     
-    // 블랙박스 메모리: 브라우저에 저장된 통과 기록 불러오기
+    // 로컬 스토리지 데이터 불러오기
+    let savedName = localStorage.getItem('apex_operator_name');
     let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
 
-    // CP 리스트 UI 렌더링 함수
+    // --- 로그인 로직 ---
+    function checkLogin() {
+        if (savedName) {
+            loginScreen.style.display = 'none';
+            mainApp.style.display = 'flex';
+            displayOpName.innerText = savedName;
+            renderCPList();
+        } else {
+            loginScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
+        }
+    }
+
+    btnLogin.addEventListener('click', () => {
+        const name = inputName.value.trim();
+        if (name.length < 2) {
+            alert("정확한 참가자 성명을 입력해주십시오.");
+            return;
+        }
+        localStorage.setItem('apex_operator_name', name);
+        savedName = name;
+        checkLogin();
+    });
+
+    // --- UI 렌더링 로직 ---
     function renderCPList() {
         cpListContainer.innerHTML = '';
         WAYPOINTS.forEach((wp, index) => {
-            let statusClass = 'text-pending';
-            let dotClass = '';
-            let statusText = 'PENDING';
+            let statusClass = 'text-pending'; let dotClass = ''; let statusText = 'PENDING';
 
             if (index < currentCpIndex) {
-                statusClass = 'text-cleared';
-                dotClass = 'cleared';
-                statusText = 'PASSED';
+                statusClass = 'text-cleared'; dotClass = 'cleared'; statusText = 'PASSED';
             } else if (index === currentCpIndex) {
-                statusClass = 'text-active';
-                dotClass = 'active';
-                statusText = 'TRACKING..';
+                statusClass = 'text-active'; dotClass = 'active'; statusText = 'TRACKING..';
             }
 
             const li = document.createElement('li');
             li.className = 'cp-item';
+            // 현재 타겟팅 중인 아이템으로 스크롤 이동을 위한 ID 부여
+            if(index === currentCpIndex) li.id = "current-target-cp";
+            
             li.innerHTML = `
-                <div class="cp-name">
-                    <div class="status-dot ${dotClass}"></div>
-                    ${wp.name}
-                </div>
+                <div class="cp-name"><div class="status-dot ${dotClass}"></div>${wp.name}</div>
                 <div class="cp-status-text ${statusClass}">${statusText}</div>
             `;
             cpListContainer.appendChild(li);
         });
+
+        // 현재 진행 중인 CP가 항상 리스트 가운데에 오도록 스크롤 자동 이동
+        const targetEl = document.getElementById("current-target-cp");
+        if(targetEl) {
+            cpListContainer.scrollTop = targetEl.offsetTop - 50;
+        }
 
         if (currentCpIndex >= WAYPOINTS.length) {
             missionStatus.innerText = "ALL CLEARED";
@@ -222,28 +311,24 @@
             btnActivate.classList.add('completed');
             elDistTarget.innerText = "완주 완료";
         } else {
-            missionStatus.innerText = `TARGET: CP ${currentCpIndex + 1}`;
+            missionStatus.innerText = `TARGET: ${currentCpIndex + 1} / 24`;
             missionStatus.style.color = "#fbc02d";
         }
     }
 
-    // 거리 계산 함수
+    // --- 거리 계산 로직 ---
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3; const rad = Math.PI / 180;
         const dLat = (lat2 - lat1) * rad; const dLon = (lon2 - lon1) * rad;
         const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2) * Math.sin(dLon/2);
         return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
-    
     function formatDistance(meters) {
         if (meters >= 1000) return (meters / 1000).toFixed(2) + ' km';
         return Math.round(meters) + ' m';
     }
 
-    // 초기 화면 렌더링
-    renderCPList();
-
-    // 시스템 가동
+    // --- 센서 가동 로직 ---
     btnActivate.addEventListener('click', () => {
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)';
@@ -252,11 +337,8 @@
 
         const handleCompass = (e) => {
             let heading = null;
-            if (e.webkitCompassHeading !== undefined) {
-                heading = e.webkitCompassHeading;
-            } else if (e.absolute === true || e.alpha !== null) {
-                heading = 360 - e.alpha;
-            }
+            if (e.webkitCompassHeading !== undefined) { heading = e.webkitCompassHeading; } 
+            else if (e.absolute === true || e.alpha !== null) { heading = 360 - e.alpha; }
 
             if (heading !== null) {
                 heading = heading % 360;
@@ -272,59 +354,48 @@
         }
 
         if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(updatePosition, (err) => console.warn('GPS Error'), {
-                enableHighAccuracy: true, maximumAge: 0, timeout: 10000
-            });
+            navigator.geolocation.watchPosition(updatePosition, (err) => console.warn('GPS Error'), { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
         }
     });
 
-    // 위치 추적 및 지오펜싱(자동 통과) 로직
+    // --- GPS 추적 및 자동 통과 로직 ---
     function updatePosition(pos) {
-        if (currentCpIndex >= WAYPOINTS.length) return; // 이미 다 통과했으면 계산 중지
+        if (currentCpIndex >= WAYPOINTS.length) return; 
 
         const lat = pos.coords.latitude; const lon = pos.coords.longitude; const alt = pos.coords.altitude;
-        
-        // 현재 추적 중인 타겟 CP
         const targetWP = WAYPOINTS[currentCpIndex];
         const distToTarget = calculateDistance(lat, lon, targetWP.lat, targetWP.lon);
         
         elDistTarget.innerText = formatDistance(distToTarget);
         if (alt !== null) elAltCurrent.innerText = Math.round(alt) + ' m';
 
-        // 총 누적 거리 계산
         if (!lastPos) { lastPos = { lat, lon }; }
         const distStep = calculateDistance(lastPos.lat, lastPos.lon, lat, lon);
         if (distStep > 1) { totalDistance += distStep; lastPos = { lat, lon }; }
         elDistTotal.innerText = formatDistance(totalDistance);
 
-        // [핵심] 지오펜싱: 타겟 반경 50m 이내 진입 시 자동 통과 처리
+        // 지오펜싱: 타겟 반경 50m 이내 진입 시 자동 통과
         if (distToTarget <= RADIUS_METER) {
-            // 스마트폰 진동 울림 (햅틱 피드백)
             if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
+            alert(`[인증 완료] ${targetWP.name} 통과!\n다음 목표 지점으로 나침반을 재설정합니다.`);
             
-            alert(`[통과 인증] ${targetWP.name}에 도착했습니다! 다음 목표로 타겟을 변경합니다.`);
-            
-            // 다음 CP로 인덱스 증가 및 영구 저장
             currentCpIndex++;
             localStorage.setItem('apex_cp_index', currentCpIndex);
-            
-            // UI 업데이트
             renderCPList();
         }
     }
 
-    // 테스트용 초기화 함수 (맨 아래 텍스트 클릭 시)
+    // --- 시스템 초기화 ---
     function resetMission() {
-        if(confirm("모든 통과 기록을 삭제하고 처음부터 다시 시작하시겠습니까?")) {
+        if(confirm("요원 등록 정보와 모든 통과 기록이 삭제됩니다. 초기화하시겠습니까?")) {
+            localStorage.removeItem('apex_operator_name');
             localStorage.removeItem('apex_cp_index');
-            currentCpIndex = 0;
-            totalDistance = 0;
-            lastPos = null;
-            renderCPList();
-            alert("초기화 완료. 다시 가동 버튼을 눌러주세요.");
             location.reload();
         }
     }
+
+    // 초기 실행
+    checkLogin();
 </script>
 </body>
 </html>
