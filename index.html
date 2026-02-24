@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>APEX TACTICAL NAVIGATOR</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
     body {
         margin: 0; padding: 0; background-color: #050a05;
@@ -30,28 +31,23 @@
 
     /* 메인 앱 공통 */
     #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
-    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; }
+    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer;}
     .title { font-family: 'Black Ops One', cursive; font-size: 26px; margin: 0; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
     .operator-bar { background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a; width: 100%; padding: 6px 0; margin-top: 10px; color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center; }
 
-    /* 메인 컨테이너 */
+    /* 나침반 메인 화면 */
     .main-container {
         width: 90%; max-width: 420px; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
         padding: 20px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); margin-top: 15px; display: flex; flex-direction: column; align-items: center;
     }
-
-    /* 방위각 숫자를 안으로 내리고 안정화 */
     .heading-display {
-        background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px;
-        font-family: 'Black Ops One', cursive; font-size: 28px; color: #ffffff;
+        background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px; font-family: 'Black Ops One', cursive; font-size: 28px; color: #ffffff;
         text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); display: flex; align-items: baseline; justify-content: center; margin-bottom: 20px;
     }
     .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
 
-    /* 나침반 대폭 확대 (180px -> 280px) */
     .compass-ui {
-        position: relative; width: 280px; height: 280px; margin-bottom: 25px;
-        border-radius: 50%; border: 12px solid #142014;
+        position: relative; width: 280px; height: 280px; margin-bottom: 25px; border-radius: 50%; border: 12px solid #142014;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(74, 222, 128, 0.3);
         background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
@@ -61,7 +57,6 @@
     .mark-s { bottom: 15px; left: 50%; transform: translateX(-50%); color: #ffffff; }
     .mark-e { right: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
     .mark-w { left: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
-    
     .tick { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
     .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 10px; background: #2a402a; }
     .tick::before { top: 5px; } .tick::after { bottom: 5px; }
@@ -70,26 +65,16 @@
     .t-210 { transform: translateX(-50%) rotate(210deg); } .t-240 { transform: translateX(-50%) rotate(240deg); }
     .t-300 { transform: translateX(-50%) rotate(300deg); } .t-330 { transform: translateX(-50%) rotate(330deg); }
 
-    .needle-container {
-        position: absolute; top: 50%; left: 50%; width: 18px; height: 240px;
-        transform-origin: center center; transform: translate(-50%, -50%) rotate(0deg); 
-        z-index: 10; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.6));
-    }
+    .needle-container { position: absolute; top: 50%; left: 50%; width: 18px; height: 240px; transform-origin: center center; transform: translate(-50%, -50%) rotate(0deg); z-index: 10; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.6)); }
     .needle-body { width: 100%; height: 100%; clip-path: polygon(50% 0, 85% 50%, 50% 100%, 15% 50%); background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 50%, #0d47a1 50%, #1565c0 100%); }
     .center-pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f); border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8); }
 
-    /* 실시간 데이터 요약 바 */
-    .compact-data {
-        display: flex; justify-content: space-between; width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 15px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box;
-    }
+    .compact-data { display: flex; justify-content: space-between; width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 15px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .data-item { display: flex; flex-direction: column; align-items: center; width: 33%;}
     .data-label { font-size: 11px; color: #80a080; margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; text-align: center;}
     .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; color: #ffffff; text-align: center;}
 
-    /* 하단 스크롤 미션 패널 */
-    .mission-panel {
-        width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box;
-    }
+    .mission-panel { width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .panel-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid #1a2f1a; padding-bottom: 5px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
     .cp-list { list-style: none; padding: 0; margin: 0; max-height: 180px; overflow-y: auto; padding-right: 5px;}
     .cp-list::-webkit-scrollbar { width: 4px; } .cp-list::-webkit-scrollbar-track { background: #050a05; } .cp-list::-webkit-scrollbar-thumb { background: #1a2f1a; border-radius: 2px; }
@@ -101,27 +86,54 @@
     @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
     .cp-status-text { font-family: 'Black Ops One', cursive; font-size: 11px; letter-spacing: 1px; }
 
-    /* [신규] 완주 인증서 캡처 화면 (초기엔 숨김) */
-    #certificate-screen {
-        display: none; width: 90%; max-width: 420px; background: #051a05; border: 3px solid #39FF14; border-radius: 12px;
-        padding: 30px 20px; box-shadow: 0 0 30px rgba(57,255,20,0.3), inset 0 0 20px rgba(57,255,20,0.1); margin-top: 15px; flex-direction: column; align-items: center; text-align: center;
-    }
-    .cert-badge { width: 60px; height: 60px; background: #39FF14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; margin-bottom: 15px; box-shadow: 0 0 20px rgba(57,255,20,0.6);}
-    .cert-title { font-family: 'Black Ops One', cursive; font-size: 26px; color: #39FF14; margin-bottom: 5px; }
-    .cert-sub { font-size: 12px; color: #ffffff; letter-spacing: 2px; margin-bottom: 20px; opacity: 0.8;}
-    .cert-info { background: #0a0f0a; border: 1px solid #1a2f1a; width: 100%; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-sizing: border-box; }
-    .cert-info-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; border-bottom: 1px dashed #1a2f1a; padding-bottom: 8px;}
-    .cert-info-row:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0;}
-    /* 24개 체크포인트 한 화면 압축 그리드 */
-    .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; font-size: 10px; color: #aaa; text-align: left;}
-    .cert-item { display: flex; align-items: center; gap: 5px; background: rgba(0,40,0,0.3); padding: 5px; border-radius: 4px; border: 1px solid #1a2f1a;}
-    .cert-check { color: #39FF14; font-weight: bold; }
-
     .tactical-btn {
         width: 100%; padding: 16px; background: linear-gradient(180deg, #2e4e2e, #1a2f1a); border: 2px solid #142014; border-bottom: 4px solid #0a0f0a; border-radius: 6px;
         color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-top: 10px;
     }
     .tactical-btn.active { background: linear-gradient(180deg, #d32f2f, #b71c1c); color: #ffffff; border-color: #8e0000; }
+    
+    /* [신규] 하이엔드 디지털 인증서 포스터 스타일 (캡처 영역) */
+    #certificate-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; margin-top: 10px;}
+    
+    #certificate-card {
+        width: 100%; max-width: 450px; background-color: #030803; 
+        background-image: 
+            linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+        border: 4px solid #1a2f1a; border-radius: 0; /* 군용 스펙 문서 느낌으로 각진 모서리 */
+        padding: 30px 20px 40px; box-sizing: border-box;
+        display: flex; flex-direction: column; align-items: center; text-align: center;
+        position: relative; overflow: hidden;
+    }
+    /* 모서리 코너 프레임 */
+    #certificate-card::before, #certificate-card::after { content: ''; position: absolute; width: 30px; height: 30px; border: 3px solid #39FF14; pointer-events: none; }
+    #certificate-card::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+    #certificate-card::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+    .cert-logo { font-family: 'Black Ops One', cursive; font-size: 32px; color: #ffffff; margin-bottom: 0; letter-spacing: 2px;}
+    .cert-logo span { color: #39FF14; }
+    .cert-sub { font-size: 11px; color: #80a080; letter-spacing: 4px; margin-bottom: 25px; border-bottom: 1px solid #1a2f1a; padding-bottom: 10px; width: 100%;}
+    
+    .cert-badge { width: 80px; height: 80px; background: rgba(57,255,20,0.1); border: 2px solid #39FF14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #39FF14; margin-bottom: 15px; box-shadow: 0 0 30px rgba(57,255,20,0.3);}
+    .cert-title { font-family: 'Black Ops One', cursive; font-size: 24px; color: #ffffff; margin-bottom: 20px; text-shadow: 0 0 10px #39FF14;}
+    
+    .cert-info { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
+    .cert-info-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 12px 15px; border-left: 3px solid #39FF14; font-size: 15px;}
+    .cert-info-row span:first-child { color: #80a080; font-weight: 700; font-size: 12px; letter-spacing: 1px;}
+    
+    .cert-grid-title { width: 100%; text-align: left; font-size: 12px; color: #39FF14; font-weight: 700; border-bottom: 1px dashed #1a2f1a; padding-bottom: 5px; margin-bottom: 10px;}
+    .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; font-size: 11px; color: #ddd; text-align: left;}
+    .cert-item { display: flex; align-items: center; gap: 6px; background: rgba(10,20,10,0.8); padding: 6px; border: 1px solid #1a2f1a;}
+    .cert-check { color: #39FF14; font-size: 12px; }
+
+    /* 다운로드 버튼 */
+    .download-btn {
+        width: 100%; max-width: 450px; padding: 18px; background: #39FF14; color: #000;
+        font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 1px;
+        border: none; border-radius: 8px; cursor: pointer; margin-top: 20px;
+        box-shadow: 0 5px 20px rgba(57,255,20,0.4); text-transform: uppercase;
+    }
 
     .footer { margin-top: 25px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; padding-bottom: 30px;}
     .reset-link { color: #3a5f3a; text-decoration: underline; cursor: pointer; margin-top: 10px; display: inline-block; }
@@ -137,7 +149,7 @@
 </div>
 
 <div id="main-app">
-    <div class="header">
+    <div class="header" id="main-title-header">
         <h1 class="title">APEX NAVIGATOR</h1>
         <div class="operator-bar">OPERATOR : <span id="display-op-name"></span></div>
     </div>
@@ -166,20 +178,26 @@
         <button class="tactical-btn" id="activate-btn">SYSTEM ENGAGE (가동)</button>
     </div>
 
-    <div id="certificate-screen">
-        <div class="cert-badge">✔</div>
-        <h2 class="cert-title">MISSION ACCOMPLISHED</h2>
-        <div class="cert-sub">APEX KOREA ACTION TRAIL FINISHER</div>
-        
-        <div class="cert-info">
-            <div class="cert-info-row"><span style="color:#80a080;">OPERATOR</span> <span id="cert-op-name" style="color:#fff; font-weight:bold;"></span></div>
-            <div class="cert-info-row"><span style="color:#80a080;">TOTAL DISTANCE</span> <span id="cert-total-dist" style="color:#39FF14; font-weight:bold;"></span></div>
-            <div class="cert-info-row"><span style="color:#80a080;">CLEAR TIME</span> <span id="cert-time" style="color:#fff;"></span></div>
-        </div>
-
-        <div style="width:100%; border-bottom:1px solid #1a2f1a; margin-bottom:10px; padding-bottom:5px; text-align:left; font-size:11px; color:#80a080;">24 CHECKPOINTS CLEARED</div>
-        <div class="cert-grid" id="cert-grid-container">
+    <div id="certificate-wrapper">
+        <div id="certificate-card">
+            <h1 class="cert-logo">APEX <span>SUMMIT</span></h1>
+            <div class="cert-sub">KOREA ACTION TRAIL 2026</div>
+            
+            <div class="cert-badge">✔</div>
+            <h2 class="cert-title">MISSION ACCOMPLISHED</h2>
+            
+            <div class="cert-info">
+                <div class="cert-info-row"><span>OPERATOR</span> <span id="cert-op-name" style="color:#fff; font-weight:bold; font-size: 18px;"></span></div>
+                <div class="cert-info-row"><span>TOTAL DISTANCE</span> <span id="cert-total-dist" style="color:#39FF14; font-weight:bold; font-family: 'Chakra Petch', sans-serif;"></span></div>
+                <div class="cert-info-row"><span>CLEAR TIME</span> <span id="cert-time" style="color:#fff; font-family: 'Chakra Petch', sans-serif;"></span></div>
             </div>
+
+            <div class="cert-grid-title">24 CHECKPOINTS CLEARED</div>
+            <div class="cert-grid" id="cert-grid-container">
+                </div>
+        </div>
+        
+        <button class="download-btn" id="btn-download-cert">📷 디지털 인증서 갤러리 저장</button>
     </div>
 
     <div class="footer">
@@ -190,7 +208,7 @@
 
 <script>
     const WAYPOINTS = [
-        { id: 1, name: "START: 용대휴양림", lat: 38.2045, lon: 128.3842 }, 
+        { id: 1, name: "용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 }, 
         { id: 2, name: "박달나무쉼터", lat: 38.2050, lon: 128.3900 },
         { id: 3, name: "미시령옛길", lat: 38.2100, lon: 128.4200 },
         { id: 4, name: "금강산성인대", lat: 38.2200, lon: 128.4500 },
@@ -212,19 +230,18 @@
         { id: 20, name: "화진포", lat: 38.4700, lon: 128.4400 },
         { id: 21, name: "화진포의성", lat: 38.4750, lon: 128.4450 },
         { id: 22, name: "화진포소나무숲", lat: 38.4800, lon: 128.4500 },
-        { id: 23, name: "마차진 (수송구간)", lat: 38.5000, lon: 128.4300 },
-        { id: 24, name: "FINISH: 통일전망타워", lat: 38.5833, lon: 128.3833 }
+        { id: 23, name: "마차진 (수송)", lat: 38.5000, lon: 128.4300 },
+        { id: 24, name: "고성통일전망타워", lat: 38.5833, lon: 128.3833 }
     ];
     
     const RADIUS_METER = 50; 
     const trackingUI = document.getElementById('tracking-ui');
-    const certificateScreen = document.getElementById('certificate-screen');
+    const certWrapper = document.getElementById('certificate-wrapper');
 
     let isTracking = false; let lastPos = null; let totalDistance = 0;
     let savedName = localStorage.getItem('apex_operator_name');
     let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
 
-    // --- 로그인 ---
     function checkLogin() {
         if (savedName) {
             document.getElementById('login-screen').style.display = 'none';
@@ -239,7 +256,6 @@
         localStorage.setItem('apex_operator_name', name); savedName = name; checkLogin();
     });
 
-    // --- 거리 계산 ---
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371e3; const rad = Math.PI / 180;
         const dLat = (lat2 - lat1) * rad; const dLon = (lon2 - lon1) * rad;
@@ -248,19 +264,18 @@
     }
     function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m'; }
 
-    // --- 완주 인증서 화면 전환 ---
+    // --- [핵심] 디지털 인증서 화면 출력 ---
     function showCertificate() {
         trackingUI.style.display = 'none';
-        certificateScreen.style.display = 'flex';
+        certWrapper.style.display = 'flex';
         
         document.getElementById('cert-op-name').innerText = savedName;
-        document.getElementById('cert-total-dist').innerText = formatDistance(totalDistance);
+        // 치트키로 바로 들어왔을 경우를 대비한 총거리 표기 예외처리
+        document.getElementById('cert-total-dist').innerText = totalDistance > 0 ? formatDistance(totalDistance) : "108.00 km (완주)";
         
-        // 현재 시각 기록
         const now = new Date();
         document.getElementById('cert-time').innerText = now.getFullYear() + "." + String(now.getMonth()+1).padStart(2,'0') + "." + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0');
 
-        // 24개 압축 리스트 렌더링
         const certGrid = document.getElementById('cert-grid-container');
         certGrid.innerHTML = '';
         WAYPOINTS.forEach(wp => {
@@ -268,12 +283,36 @@
         });
     }
 
-    // --- UI 렌더링 ---
+    // --- [핵심] 이미지를 스마트폰에 저장하는 기능 (html2canvas) ---
+    document.getElementById('btn-download-cert').addEventListener('click', () => {
+        const card = document.getElementById('certificate-card');
+        const btn = document.getElementById('btn-download-cert');
+        
+        btn.innerText = "⏳ 이미지 생성 중...";
+        
+        // 카드를 캡처하여 고화질 캔버스로 변환
+        html2canvas(card, { backgroundColor: '#030803', scale: 3 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `APEX_CERTIFICATE_${savedName}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            btn.innerText = "📷 디지털 인증서 갤러리 저장";
+        }).catch(err => {
+            alert("이미지 저장 중 오류가 발생했습니다. 직접 화면을 캡처해주세요.");
+            btn.innerText = "📷 디지털 인증서 갤러리 저장";
+        });
+    });
+
+    // --- [테스트 치트키] 헤더 타이틀을 3번 연속 터치하면 바로 증명서 팝업 ---
+    let clickCount = 0;
+    document.getElementById('main-title-header').addEventListener('click', () => {
+        clickCount++;
+        if(clickCount >= 3) { showCertificate(); clickCount = 0; }
+        setTimeout(() => { clickCount = 0; }, 1000); // 1초 내에 3번 눌러야 함
+    });
+
     function renderCPList() {
-        if (currentCpIndex >= WAYPOINTS.length) {
-            showCertificate();
-            return;
-        }
+        if (currentCpIndex >= WAYPOINTS.length) { showCertificate(); return; }
 
         const cpListContainer = document.getElementById('cp-list-container');
         cpListContainer.innerHTML = '';
@@ -295,7 +334,6 @@
         document.getElementById('mission-status').style.color = "#fbc02d";
     }
 
-    // --- 센서 가동 ---
     document.getElementById('activate-btn').addEventListener('click', () => {
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
         const btnActivate = document.getElementById('activate-btn');
