@@ -4,181 +4,211 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>APEX TACTICAL NAVIGATOR</title>
-<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 <style>
-    /* 전체적인 다크 그린 & 네온 테마 설정 */
+    /* 전체 테마: 깊고 어두운 전술 테마 */
     body {
         margin: 0; padding: 0;
-        background-color: #0a140a; /* 깊은 다크 그린 배경 */
-        background-image: 
-            linear-gradient(rgba(10, 20, 10, 0.9), rgba(10, 20, 10, 0.9)),
-            url('https://www.transparenttextures.com/patterns/carbon-fibre-v2.png'); /* 카본 패턴 질감 추가 */
-        color: #39FF14; /* 네온 그린 텍스트 */
-        font-family: 'Rajdhani', sans-serif;
+        background-color: #050a05; /* 더 깊은 블랙 그린 */
+        background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%); /* 중앙 집중형 조명 효과 */
+        color: #4ade80; /* 눈이 편안하면서도 선명한 택티컬 그린 */
+        font-family: 'Chakra Petch', sans-serif;
         display: flex; flex-direction: column; align-items: center;
         min-height: 100vh;
-        overflow-x: hidden; /* 가로 스크롤 방지 */
+        overflow-x: hidden;
     }
 
-    /* 상단 타이틀 영역 */
-    .header {
-        text-align: center; margin-top: 20px; margin-bottom: 20px;
-        text-shadow: 0 0 10px rgba(57, 255, 20, 0.7);
-    }
+    /* 상단 타이틀 */
+    .header { text-align: center; margin-top: 25px; margin-bottom: 25px; }
     .title {
-        font-family: 'Black Ops One', cursive; font-size: 32px; margin: 0;
-        letter-spacing: 2px; text-transform: uppercase;
+        font-family: 'Black Ops One', cursive; font-size: 30px; margin: 0;
+        letter-spacing: 1px; text-transform: uppercase;
+        color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
-    .subtitle { font-size: 14px; letter-spacing: 4px; opacity: 0.8; margin-top: 5px; }
+    .subtitle { font-size: 13px; letter-spacing: 3px; color: #4ade80; opacity: 0.9; margin-top: 5px; font-weight: 700; }
 
-    /* 메인 컨테이너 */
+    /* 메인 컨테이너 (장비 본체 느낌) */
     .main-container {
-        width: 90%; max-width: 450px;
-        background: rgba(0, 40, 0, 0.6); /* 반투명 다크 그린 박스 */
-        border: 2px solid #39FF14; border-radius: 15px;
-        padding: 20px; box-shadow: 0 0 30px rgba(57, 255, 20, 0.3), inset 0 0 20px rgba(57, 255, 20, 0.1);
-        backdrop-filter: blur(5px); /* 배경 블러 효과 */
+        width: 90%; max-width: 420px;
+        background: #0a0f0a; /* 어두운 금속 질감 배경 */
+        border: 3px solid #1a2f1a; /* 묵직한 테두리 */
+        border-radius: 12px;
+        padding: 25px 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1);
+        position: relative;
+    }
+    /* 장비 나사 디테일 추가 */
+    .screw { position: absolute; width: 10px; height: 10px; background: #333; border-radius: 50%; border: 2px solid #1a1a1a; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
+    .tl { top: 10px; left: 10px; } .tr { top: 10px; right: 10px; }
+    .bl { bottom: 10px; left: 10px; } .br { bottom: 10px; right: 10px; }
+
+    /* 웅장한 나침반 UI (고정된 베젤 + 회전하는 바늘) */
+    .compass-ui {
+        position: relative; width: 260px; height: 260px; margin: 10px auto 30px;
+        border-radius: 50%;
+        /* 묵직한 금속 베젤 디자인 */
+        border: 12px solid #142014;
+        box-shadow: 
+            0 5px 15px rgba(0,0,0,0.5), /* 외부 그림자 */
+            inset 0 5px 20px rgba(0,0,0,0.8), /* 내부 깊이감 */
+            inset 0 0 0 2px rgba(74, 222, 128, 0.3); /* 얇은 네온 림 */
+        background: radial-gradient(circle, #0a140a 30%, #050a05 90%);
+        display: flex; justify-content: center; align-items: center;
     }
 
-    /* 디지털 나침반 UI (HUD 스타일) */
-    .compass-ui {
-        position: relative; width: 240px; height: 240px; margin: 0 auto 25px;
-        border-radius: 50%; border: 4px dashed rgba(57, 255, 20, 0.5);
-        display: flex; justify-content: center; align-items: center;
-        background: radial-gradient(circle, #0f2b0f 0%, #0a140a 100%);
-        box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
-    }
-    /* 방위각 숫자 표시 */
-    .heading-value {
-        font-family: 'Black Ops One', cursive; font-size: 48px;
-        text-shadow: 0 0 15px rgba(57, 255, 20, 1);
-        z-index: 10;
-    }
-    .heading-unit { font-size: 18px; margin-left: 5px; }
-    /* 회전하는 디지털 방향타 */
-    .compass-dial {
+    /* 고정된 나침반 눈금 및 방향 표시 */
+    .compass-face {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        border-radius: 50%; transition: transform 0.1s ease-out;
     }
     .dial-mark {
-        position: absolute; font-weight: bold; font-size: 16px;
-        color: rgba(57, 255, 20, 0.7);
+        position: absolute; font-weight: 700; font-size: 18px;
+        color: #3a5f3a; /* 기본 눈금은 어둡게 처리하여 바늘 강조 */
     }
-    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #FF3F34; /* 북쪽은 붉은색 포인트 */ text-shadow: 0 0 10px #FF3F34; }
-    .mark-s { bottom: 10px; left: 50%; transform: translateX(-50%); }
-    .mark-e { right: 10px; top: 50%; transform: translateY(-50%); }
-    .mark-w { left: 10px; top: 50%; transform: translateY(-50%); }
-    /* 중앙 십자선 */
-    .crosshair {
-        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 80%; height: 80%; border: 1px solid rgba(57, 255, 20, 0.3); border-radius: 50%;
-    }
-    .crosshair::before, .crosshair::after {
-        content: ''; position: absolute; background: rgba(57, 255, 20, 0.6);
-    }
-    .crosshair::before { top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
-    .crosshair::after { top: 50%; left: 0; width: 100%; height: 2px; transform: translateY(-50%); }
+    /* 주요 방향 포인트 강조 */
+    .mark-n { top: 15px; left: 50%; transform: translateX(-50%); color: #d32f2f; font-size: 22px; text-shadow: 0 0 10px rgba(211, 47, 47, 0.4); } /* 레드 N */
+    .mark-s { bottom: 15px; left: 50%; transform: translateX(-50%); color: #ffffff; }
+    .mark-e { right: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
+    .mark-w { left: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
+    
+    /* 세부 눈금선 */
+    .tick { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
+    .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 10px; background: #2a402a; }
+    .tick::before { top: 5px; } .tick::after { bottom: 5px; }
+    .t-30 { transform: translateX(-50%) rotate(30deg); } .t-60 { transform: translateX(-50%) rotate(60deg); }
+    .t-120 { transform: translateX(-50%) rotate(120deg); } .t-150 { transform: translateX(-50%) rotate(150deg); }
+    .t-210 { transform: translateX(-50%) rotate(210deg); } .t-240 { transform: translateX(-50%) rotate(240deg); }
+    .t-300 { transform: translateX(-50%) rotate(300deg); } .t-330 { transform: translateX(-50%) rotate(330deg); }
 
-    /* 통합 데이터 대시보드 (그리드 레이아웃) */
+    /* 실제 회전하는 아날로그 바늘 (레드 & 네이비) */
+    .needle-container {
+        position: absolute; top: 50%; left: 50%;
+        width: 20px; height: 220px;
+        transform-origin: center center;
+        transform: translate(-50%, -50%) rotate(0deg); /* 초기 각도 */
+        transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44); /* 실제 바늘같은 탄성 효과 */
+        z-index: 10; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
+    }
+    .needle-body {
+        width: 100%; height: 100%;
+        /* 날렵한 다이아몬드 형태 컷팅 */
+        clip-path: polygon(50% 0, 85% 50%, 50% 100%, 15% 50%);
+        /* 상단 레드(N), 하단 네이비(S) 그라데이션 */
+        background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 50%, #0d47a1 50%, #1565c0 100%);
+    }
+    /* 바늘 중앙 핀 */
+    .center-pin {
+        position: absolute; top: 50%; left: 50%; width: 18px; height: 18px;
+        background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f);
+        border: 2px solid #263238; border-radius: 50%;
+        transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+    }
+
+    /* 디지털 방위각 표시 (상단 고정) */
+    .heading-display {
+        position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
+        background: #0a0f0a; padding: 5px 15px; border: 2px solid #1a2f1a; border-radius: 5px;
+        font-family: 'Black Ops One', cursive; font-size: 24px; color: #ffffff;
+        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+        display: flex; align-items: baseline;
+    }
+    .heading-unit { font-size: 14px; margin-left: 5px; color: #4ade80; }
+
+    /* 통합 데이터 대시보드 (선명도 개선) */
     .dashboard-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
     }
     .data-panel {
-        background: rgba(0, 20, 0, 0.8);
-        border: 1px solid rgba(57, 255, 20, 0.4); border-radius: 8px;
-        padding: 12px;
+        background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
     }
     .panel-title {
-        font-size: 14px; font-weight: bold; margin-bottom: 10px;
-        border-bottom: 1px solid rgba(57, 255, 20, 0.3); padding-bottom: 5px;
-        text-transform: uppercase; letter-spacing: 1px;
+        font-size: 12px; font-weight: 700; margin-bottom: 8px;
+        border-bottom: 1px solid #1a2f1a; padding-bottom: 4px;
+        color: #80a080; text-transform: uppercase; letter-spacing: 1px;
     }
     .data-row {
         display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 8px; font-size: 13px;
+        margin-bottom: 6px; font-size: 13px;
     }
-    .data-label { opacity: 0.8; }
+    .data-label { color: #80a080; font-weight: 500; }
     .data-value {
-        font-weight: bold; font-size: 15px; color: #ffffff; /* 값은 흰색으로 가독성 확보 */
-        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 15px; color: #ffffff;
     }
 
-    /* 가동 버튼 (전술 스위치 스타일) */
+    /* 가동 버튼 (물리 버튼 느낌) */
     .tactical-btn {
-        width: 100%; padding: 18px;
-        background: linear-gradient(to bottom, #0f4d0f, #051f05); /* 입체적인 다크 그린 버튼 */
-        border: 2px solid #39FF14; border-radius: 8px;
-        color: #39FF14; font-family: 'Black Ops One', cursive; font-size: 20px; letter-spacing: 2px;
-        cursor: pointer; transition: all 0.2s;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-        text-transform: uppercase; text-shadow: 0 0 10px rgba(57, 255, 20, 0.8);
+        width: 100%; padding: 16px;
+        background: linear-gradient(180deg, #2e4e2e, #1a2f1a);
+        border: 2px solid #142014; border-bottom: 4px solid #0a0f0a; border-radius: 6px;
+        color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 2px;
+        cursor: pointer; transition: all 0.1s;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
-    .tactical-btn:active { transform: translateY(2px); box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); }
+    .tactical-btn:active { transform: translateY(3px); border-bottom: 1px solid #0a0f0a; }
     .tactical-btn.active {
-        background: #39FF14; color: #0a140a; /* 활성화되면 네온 그린으로 반전 */
-        box-shadow: 0 0 20px rgba(57, 255, 20, 0.8);
-        animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-        0% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.8); }
-        50% { box-shadow: 0 0 40px rgba(57, 255, 20, 1); }
-        100% { box-shadow: 0 0 20px rgba(57, 255, 20, 0.8); }
+        background: linear-gradient(180deg, #d32f2f, #b71c1c); /* 활성화 시 붉은색 경고등 느낌 */
+        color: #ffffff; border-color: #8e0000;
+        animation: none; /* 눈 아픈 깜빡임 제거 */
     }
 
-    /* 하단 저작권 */
-    .footer { margin-top: 20px; font-size: 10px; opacity: 0.5; letter-spacing: 2px; }
+    .footer { margin-top: 20px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; }
 </style>
 </head>
 <body>
 
 <div class="header">
     <h1 class="title">APEX NAVIGATOR</h1>
-    <p class="subtitle">TACTICAL EDITION // KOREA ACTION TRAIL</p>
+    <p class="subtitle">TACTICAL MASTERPIECE // KOREA ACTION TRAIL</p>
 </div>
 
 <div class="main-container">
+    <div class="screw tl"></div><div class="screw tr"></div>
+    <div class="screw bl"></div><div class="screw br"></div>
+
+    <div class="heading-display">
+        <span id="heading-value">---</span><span class="heading-unit">°DEG</span>
+    </div>
+
     <div class="compass-ui">
-        <div class="compass-dial" id="compass-dial">
+        <div class="compass-face">
             <span class="dial-mark mark-n">N</span>
             <span class="dial-mark mark-e">E</span>
             <span class="dial-mark mark-s">S</span>
             <span class="dial-mark mark-w">W</span>
+            <div class="tick t-30"></div><div class="tick t-60"></div>
+            <div class="tick t-120"></div><div class="tick t-150"></div>
+            <div class="tick t-210"></div><div class="tick t-240"></div>
+            <div class="tick t-300"></div><div class="tick t-330"></div>
         </div>
-        <div class="crosshair"></div>
-        <div class="heading-value">
-            <span id="heading-value">---</span><span class="heading-unit">°</span>
+        <div class="needle-container" id="compass-needle">
+            <div class="needle-body"></div>
         </div>
+        <div class="center-pin"></div>
     </div>
 
     <div class="dashboard-grid">
         <div class="data-panel">
             <div class="panel-title">DISTANCE OPS</div>
             <div class="data-row">
-                <span class="data-label">🚩 출발지 이동</span>
-                <span class="data-value" id="dist-from-start">0 m</span>
+                <span class="data-label">🚩 출발지 이동</span><span class="data-value" id="dist-from-start">0 m</span>
             </div>
             <div class="data-row">
-                <span class="data-label">🏁 목표 남은 거리</span>
-                <span class="data-value" id="dist-to-target">대기 중...</span>
+                <span class="data-label">🏁 목표까지</span><span class="data-value" id="dist-to-target">대기 중...</span>
             </div>
-            <div class="data-row" style="margin-bottom: 0; border-top: 1px dashed rgba(57,255,20,0.3); padding-top: 5px;">
-                <span class="data-label">🔄 총 누적 이동</span>
-                <span class="data-value" id="dist-total">0 m</span>
+            <div class="data-row" style="border-top: 1px solid #1a2f1a; padding-top: 5px;">
+                <span class="data-label">🔄 총 누적</span><span class="data-value" id="dist-total">0 m</span>
             </div>
         </div>
         <div class="data-panel">
             <div class="panel-title">ALTITUDE OPS</div>
             <div class="data-row">
-                <span class="data-label">⛰️ 현재 고도</span>
-                <span class="data-value" id="alt-current">측정 중...</span>
+                <span class="data-label">⛰️ 현재 고도</span><span class="data-value" id="alt-current">측정 중...</span>
             </div>
             <div class="data-row">
-                <span class="data-label">🔼 최고 고도</span>
-                <span class="data-value" id="alt-max">0 m</span>
+                <span class="data-label">🔼 최고 고도</span><span class="data-value" id="alt-max">0 m</span>
             </div>
-            <div class="data-row" style="margin-bottom: 0;">
-                <span class="data-label">🔽 최저 고도</span>
-                <span class="data-value" id="alt-min">0 m</span>
+            <div class="data-row">
+                <span class="data-label">🔽 최저 고도</span><span class="data-value" id="alt-min">0 m</span>
             </div>
         </div>
     </div>
@@ -189,16 +219,15 @@
 <div class="footer">© 2026 APEX SUMMIT. ALL RIGHTS RESERVED.</div>
 
 <script>
-    // --- [중요] APEX SUMMIT 목표 지점 좌표 설정 ---
-    // (예시: 서울 남산타워) 실제 코스 목표 좌표로 반드시 변경해주세요!
-    const TARGET_LAT = 37.5512;
+    // --- APEX SUMMIT 목표 좌표 설정 ---
+    const TARGET_LAT = 37.5512; // 예시: 남산타워
     const TARGET_LON = 126.9882;
 
-    // DOM 요소 참조
     const btnActivate = document.getElementById('activate-btn');
-    const dial = document.getElementById('compass-dial');
+    const needle = document.getElementById('compass-needle'); // 바늘 참조
     const headingVal = document.getElementById('heading-value');
     
+    // 데이터 요소 참조 (기존과 동일)
     const elDistStart = document.getElementById('dist-from-start');
     const elDistTarget = document.getElementById('dist-to-target');
     const elDistTotal = document.getElementById('dist-total');
@@ -206,137 +235,78 @@
     const elAltMax = document.getElementById('alt-max');
     const elAltMin = document.getElementById('alt-min');
 
-    // 데이터 변수 초기화
     let isTracking = false;
-    let startPos = null;
-    let lastPos = null;
-    let totalDistance = 0;
-    let maxAlt = -Infinity;
-    let minAlt = Infinity;
-    let watchId = null;
+    let startPos = null; let lastPos = null;
+    let totalDistance = 0; let maxAlt = -Infinity; let minAlt = Infinity;
 
-    // 하버사인(Haversine) 거리 계산 함수 (미터 단위)
+    // 하버사인 거리 계산 및 포맷팅 함수 (기존과 동일)
     function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; // 지구 반경
-        const rad = Math.PI / 180;
-        const dLat = (lat2 - lat1) * rad;
-        const dLon = (lon2 - lon1) * rad;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        const R = 6371e3; const rad = Math.PI / 180;
+        const dLat = (lat2 - lat1) * rad; const dLon = (lon2 - lon1) * rad;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
-
-    // 거리 표시 포맷팅 함수 (1km 이상은 km로, 이하는 m로)
     function formatDistance(meters) {
         if (meters >= 1000) return (meters / 1000).toFixed(2) + ' km';
         return Math.round(meters) + ' m';
     }
-
-    // 고도 표시 포맷팅 함수
     function formatAltitude(alt) {
         if (alt === null || alt === undefined) return 'N/A';
         return Math.round(alt) + ' m';
     }
 
-    // 시스템 가동 버튼 클릭 이벤트
     btnActivate.addEventListener('click', () => {
-        if (isTracking) return; // 이미 작동 중이면 무시
-
+        if (isTracking) return;
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)';
         btnActivate.classList.add('active');
         isTracking = true;
 
-        // 1. 나침반 센서 권한 요청 및 시작 (iOS 대응)
+        // 나침반 권한 및 시작
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
-                .then(state => {
-                    if (state === 'granted') startCompass();
-                    else alert('나침반 센서 권한이 거부되었습니다.');
-                })
+                .then(state => { if (state === 'granted') startCompass(); })
                 .catch(console.error);
-        } else {
-            startCompass(); // 안드로이드 및 기타
-        }
+        } else { startCompass(); }
 
-        // 2. GPS 위치 추적 시작
+        // GPS 시작
         if (navigator.geolocation) {
-            watchId = navigator.geolocation.watchPosition(updatePosition,handleError, {
-                enableHighAccuracy: true, // 최고 정밀도 모드
-                maximumAge: 0,
-                timeout: 10000
+            navigator.geolocation.watchPosition(updatePosition, (err) => console.warn('GPS Error'), {
+                enableHighAccuracy: true, maximumAge: 0, timeout: 10000
             });
-        } else {
-            alert('이 기기는 GPS를 지원하지 않습니다.');
         }
     });
 
-    // 나침반 이벤트 리스너
     function startCompass() {
         window.addEventListener('deviceorientation', (e) => {
-            // webkitCompassHeading(iOS) 또는 alpha(안드로이드) 값 사용
             let heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
             if (heading) {
-                // 디지털 값 표시 (정수로 반올림)
                 headingVal.innerText = Math.round(heading).toString().padStart(3, '0');
-                // 방향타 회전 (반대 방향으로 돌려 북쪽 고정 효과)
-                dial.style.transform = `rotate(${-heading}deg)`;
+                // [중요 변경] 판 대신 바늘(needle)을 회전시킵니다.
+                // 바늘은 실제 방위를 가리켜야 하므로 heading 값 그대로 회전합니다.
+                needle.style.transform = `translate(-50%, -50%) rotate(${heading}deg)`;
             }
         }, true);
     }
 
-    // GPS 위치 업데이트 처리 함수
     function updatePosition(pos) {
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        const alt = pos.coords.altitude; // 고도 (지원 기기만)
-
-        // A. 출발지점 설정 (최초 1회)
-        if (!startPos) {
-            startPos = { lat, lon };
-            lastPos = { lat, lon };
-            // 초기 고도 설정
-            if (alt !== null) {
-                maxAlt = alt;
-                minAlt = alt;
-            }
-        }
-
-        // B. 거리 데이터 계산 및 업데이트
-        // 1. 출발지로부터의 이동 거리
+        const lat = pos.coords.latitude; const lon = pos.coords.longitude; const alt = pos.coords.altitude;
+        if (!startPos) { startPos = { lat, lon }; lastPos = { lat, lon }; if (alt !== null) { maxAlt = alt; minAlt = alt; }}
+        
         const distFromStart = calculateDistance(startPos.lat, startPos.lon, lat, lon);
         elDistStart.innerText = formatDistance(distFromStart);
 
-        // 2. 목표까지 남은 거리
         const distToTarget = calculateDistance(lat, lon, TARGET_LAT, TARGET_LON);
         elDistTarget.innerText = formatDistance(distToTarget);
 
-        // 3. 총 누적 이동 거리 (이전 위치와의 거리 합산)
         const distStep = calculateDistance(lastPos.lat, lastPos.lon, lat, lon);
-        // GPS 튀는 현상 방지를 위해 너무 작은 움직임은 무시 (노이즈 필터링)
-        if (distStep > 0.5) { 
-            totalDistance += distStep;
-            lastPos = { lat, lon }; // 마지막 위치 갱신
-        }
+        if (distStep > 0.5) { totalDistance += distStep; lastPos = { lat, lon }; }
         elDistTotal.innerText = formatDistance(totalDistance);
 
-        // C. 고도 데이터 계산 및 업데이트
         if (alt !== null) {
             elAltCurrent.innerText = formatAltitude(alt);
-            if (alt > maxAlt) maxAlt = alt;
-            if (alt < minAlt) minAlt = alt;
-            elAltMax.innerText = formatAltitude(maxAlt);
-            elAltMin.innerText = formatAltitude(minAlt);
-        } else {
-            // 고도 정보를 받지 못하는 경우
-            elAltCurrent.innerText = 'N/A';
+            if (alt > maxAlt) maxAlt = alt; if (alt < minAlt) minAlt = alt;
+            elAltMax.innerText = formatAltitude(maxAlt); elAltMin.innerText = formatAltitude(minAlt);
         }
-    }
-
-    // GPS 에러 처리
-    function handleError(err) {
-        console.warn('GPS ERROR(' + err.code + '): ' + err.message);
-        // 에러 발생 시에도 기존 데이터는 유지 (사용자 경험 고려)
     }
 </script>
 </body>
