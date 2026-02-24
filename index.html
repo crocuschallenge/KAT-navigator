@@ -10,41 +10,36 @@
         margin: 0; padding: 0;
         background-color: #050a05;
         background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
-        color: #4ade80;
-        font-family: 'Chakra Petch', sans-serif;
+        color: #4ade80; font-family: 'Chakra Petch', sans-serif;
         display: flex; flex-direction: column; align-items: center;
         min-height: 100vh; overflow-x: hidden;
     }
 
     .header { text-align: center; margin-top: 25px; margin-bottom: 25px; }
-    .title {
-        font-family: 'Black Ops One', cursive; font-size: 30px; margin: 0;
-        letter-spacing: 1px; text-transform: uppercase;
-        color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    }
-    /* 수정 1: 부제목 한 줄 고정 및 밸런스 조정 */
-    .subtitle { 
-        font-size: 11px; letter-spacing: 1.5px; color: #4ade80; 
-        opacity: 0.9; margin-top: 5px; font-weight: 700; 
-        white-space: nowrap; 
-    }
+    .title { font-family: 'Black Ops One', cursive; font-size: 30px; margin: 0; letter-spacing: 1px; text-transform: uppercase; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+    .subtitle { font-size: 11px; letter-spacing: 1.5px; color: #4ade80; opacity: 0.9; margin-top: 5px; font-weight: 700; white-space: nowrap; }
 
     .main-container {
-        width: 90%; max-width: 420px;
-        background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
-        padding: 25px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1);
-        position: relative;
+        width: 90%; max-width: 420px; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
+        padding: 25px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); position: relative;
     }
     .screw { position: absolute; width: 10px; height: 10px; background: #333; border-radius: 50%; border: 2px solid #1a1a1a; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); }
     .tl { top: 10px; left: 10px; } .tr { top: 10px; right: 10px; }
     .bl { bottom: 10px; left: 10px; } .br { bottom: 10px; right: 10px; }
 
+    .heading-display {
+        position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
+        background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px;
+        font-family: 'Black Ops One', cursive; font-size: 26px; color: #ffffff;
+        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); display: flex; align-items: baseline; justify-content: center;
+    }
+    .heading-unit { font-size: 14px; margin-left: 8px; color: #4ade80; }
+
     .compass-ui {
         position: relative; width: 260px; height: 260px; margin: 10px auto 30px;
         border-radius: 50%; border: 12px solid #142014;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(74, 222, 128, 0.3);
-        background: radial-gradient(circle, #0a140a 30%, #050a05 90%);
-        display: flex; justify-content: center; align-items: center;
+        background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
 
     .compass-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
@@ -66,30 +61,17 @@
         position: absolute; top: 50%; left: 50%; width: 20px; height: 220px;
         transform-origin: center center;
         transform: translate(-50%, -50%) rotate(0deg); 
-        transition: transform 0.2s ease-out; 
+        /* 부드러운 애니메이션 제거 (바늘이 360도에서 0도로 튈 때 헛도는 버그 방지 및 실시간 밀착) */
         z-index: 10; filter: drop-shadow(0 3px 5px rgba(0,0,0,0.5));
     }
     .needle-body {
-        width: 100%; height: 100%;
-        clip-path: polygon(50% 0, 85% 50%, 50% 100%, 15% 50%);
+        width: 100%; height: 100%; clip-path: polygon(50% 0, 85% 50%, 50% 100%, 15% 50%);
         background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 50%, #0d47a1 50%, #1565c0 100%);
     }
     .center-pin {
-        position: absolute; top: 50%; left: 50%; width: 18px; height: 18px;
-        background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f);
-        border: 2px solid #263238; border-radius: 50%;
-        transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        position: absolute; top: 50%; left: 50%; width: 18px; height: 18px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f);
+        border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8);
     }
-
-    /* 수정 2: 방위각 디스플레이 간격 조정 */
-    .heading-display {
-        position: absolute; top: -45px; left: 50%; transform: translateX(-50%);
-        background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px;
-        font-family: 'Black Ops One', cursive; font-size: 26px; color: #ffffff;
-        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
-        display: flex; align-items: baseline; justify-content: center;
-    }
-    .heading-unit { font-size: 14px; margin-left: 8px; color: #4ade80; }
 
     .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
     .data-panel { background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
@@ -200,37 +182,43 @@
         btnActivate.classList.add('active');
         isTracking = true;
 
+        // 나침반 센서 가동
+        const handleCompass = (e) => {
+            let heading = null;
+            if (e.webkitCompassHeading !== undefined) {
+                // 아이폰 전용
+                heading = e.webkitCompassHeading;
+            } else if (e.absolute === true || e.alpha !== null) {
+                // 안드로이드 전용 절대 방위각 계산
+                heading = 360 - e.alpha;
+            }
+
+            if (heading !== null) {
+                heading = heading % 360;
+                headingVal.innerText = Math.round(heading).toString().padStart(3, '0');
+                
+                // [핵심] 핸드폰이 돌아간 만큼 바늘을 '반대(-)'로 돌려서 정북 고정
+                needle.style.transform = `translate(-50%, -50%) rotate(${-heading}deg)`;
+            }
+        };
+
+        // iOS 권한 요청
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
-                .then(state => { if (state === 'granted') startCompass(); })
+                .then(state => { if (state === 'granted') window.addEventListener('deviceorientation', handleCompass, true); })
                 .catch(console.error);
-        } else { startCompass(); }
+        } else {
+            // 안드로이드 크롬 전용 '절대 방위각 센서(absolute)' 강제 호출 (단순 자이로 방지)
+            window.addEventListener('deviceorientationabsolute', handleCompass, true);
+        }
 
+        // GPS 가동
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(updatePosition, (err) => console.warn('GPS Error'), {
                 enableHighAccuracy: true, maximumAge: 0, timeout: 10000
             });
         }
     });
-
-    function startCompass() {
-        window.addEventListener('deviceorientation', (e) => {
-            let heading;
-            // iOS와 Android의 방향 센서 차이 보정
-            if (e.webkitCompassHeading !== undefined) {
-                heading = e.webkitCompassHeading;
-            } else {
-                heading = (360 - e.alpha) % 360; 
-            }
-            
-            if (heading !== null && heading !== undefined) {
-                headingVal.innerText = Math.round(heading).toString().padStart(3, '0');
-                
-                // 수정 3: 바늘 정북(N) 고정을 위한 완벽한 역회전(-heading) 적용
-                needle.style.transform = `translate(-50%, -50%) rotate(${-heading}deg)`;
-            }
-        }, true);
-    }
 
     function updatePosition(pos) {
         const lat = pos.coords.latitude; const lon = pos.coords.longitude; const alt = pos.coords.altitude;
