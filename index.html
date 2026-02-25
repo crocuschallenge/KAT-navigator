@@ -61,6 +61,11 @@
     }
     .wind-arrow-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; transition: transform 1s cubic-bezier(0.4, 2.08, 0.55, 0.44); z-index: 5; }
     .wind-arrow { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); color: #00e5ff; font-size: 14px; text-shadow: 0 0 8px #00e5ff; font-family: 'Black Ops One', cursive; }
+    
+    /* [핵심 기능] TACTICAL RADAR (블루 스팟) UI */
+    .radar-spot-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; z-index: 15; display: none; }
+    .radar-spot { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff, inset 0 0 4px #fff; border: 2px solid #fff; }
+
     .compass-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .dial-mark { position: absolute; font-weight: 700; font-size: 18px; color: #3a5f3a; }
     .mark-n { top: 15px; left: 50%; transform: translateX(-50%); color: #d32f2f; font-size: 24px; text-shadow: 0 0 10px rgba(211, 47, 47, 0.4); }
@@ -106,15 +111,19 @@
     .data-label { font-size: 11px; color: #80a080; font-weight: 700; }
     .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; color: #ffffff; }
 
-    /* 4. 가동 버튼 (위치 조정 완료) */
+    /* 4. 가동 및 레이더 버튼 */
     .tactical-btn {
         width: 100%; padding: 18px; background: linear-gradient(180deg, #2e4e2e, #1a2f1a); border: 2px solid #142014; border-bottom: 4px solid #0a0f0a; border-radius: 6px;
-        color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 20px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-bottom: 15px; transition: all 0.1s;
+        color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 20px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-bottom: 10px; transition: all 0.1s;
     }
     .tactical-btn:active { transform: translateY(3px); border-bottom: 1px solid #0a0f0a; }
     .tactical-btn.active { background: linear-gradient(180deg, #d32f2f, #b71c1c); color: #ffffff; border-color: #8e0000; }
 
-    /* 5. 미션 스크롤 패널 (버튼 아래로 이동) */
+    /* 레이더 모드 버튼 스타일 */
+    #radar-btn { background: linear-gradient(180deg, #004d40, #001a11); border-color: #00bfa5; color: #00e5ff; display: none; font-size: 16px; margin-bottom: 15px; }
+    #radar-btn.active { background: linear-gradient(180deg, #00bfa5, #004d40); color: #000; text-shadow: none; box-shadow: 0 0 15px rgba(0,229,255,0.5); }
+
+    /* 5. 미션 스크롤 패널 */
     .mission-panel { width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .cp-list { list-style: none; padding: 0; margin: 0; max-height: 140px; overflow-y: auto; padding-right: 5px;}
     .cp-list::-webkit-scrollbar { width: 4px; } .cp-list::-webkit-scrollbar-track { background: #050a05; } .cp-list::-webkit-scrollbar-thumb { background: #1a2f1a; border-radius: 2px; }
@@ -170,6 +179,9 @@
             <div class="heading-display"><span id="heading-value">---</span><span class="heading-unit">°DEG</span></div>
             <div class="compass-ui">
                 <div class="wind-arrow-container" id="wind-container"><div class="wind-arrow">▼</div></div>
+                
+                <div class="radar-spot-container" id="radar-spot-container"><div class="radar-spot"></div></div>
+
                 <div class="compass-face">
                     <span class="dial-mark mark-n">N</span><span class="dial-mark mark-e">E</span><span class="dial-mark mark-s">S</span><span class="dial-mark mark-w">W</span>
                     <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div><div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
@@ -207,6 +219,7 @@
         </div>
 
         <button class="tactical-btn" id="activate-btn">SYSTEM ENGAGE (가동)</button>
+        <button class="tactical-btn" id="radar-btn">TACTICAL RADAR : OFF</button>
 
         <div class="mission-panel">
             <div class="panel-title"><span>MISSION WAYPOINTS</span> <span id="mission-status">STANDBY</span></div>
@@ -265,6 +278,45 @@
     let savedName = localStorage.getItem('apex_operator_name');
     let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
     let lastWeatherUpdate = 0;
+
+    // [레이더 핵심 변수]
+    let currentHeading = null;
+    let currentTargetBearing = null;
+    let isRadarActive = false;
+
+    // 방위각(Bearing) 수학 공식 (하버사인 응용)
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+        const rad = Math.PI / 180;
+        const dLon = (lon2 - lon1) * rad;
+        const y = Math.sin(dLon) * Math.cos(lat2 * rad);
+        const x = Math.cos(lat1 * rad) * Math.sin(lat2 * rad) - Math.sin(lat1 * rad) * Math.cos(lat2 * rad) * Math.cos(dLon);
+        let brng = Math.atan2(y, x) * (180 / Math.PI);
+        return (brng + 360) % 360;
+    }
+
+    // 레이더(블루 스팟) UI 업데이트
+    function updateRadarUI() {
+        if (currentHeading !== null && currentTargetBearing !== null) {
+            let radarAngle = currentTargetBearing - currentHeading;
+            document.getElementById('radar-spot-container').style.transform = `rotate(${radarAngle}deg)`;
+        }
+    }
+
+    // 레이더 토글 버튼
+    document.getElementById('radar-btn').addEventListener('click', function() {
+        isRadarActive = !isRadarActive;
+        if(isRadarActive) {
+            this.classList.add('active');
+            this.innerText = 'TACTICAL RADAR : ON (추적 중)';
+            document.getElementById('radar-spot-container').style.display = 'block';
+            if(navigator.vibrate) navigator.vibrate([100, 50, 100]); // 레이더 가동 햅틱
+            updateRadarUI();
+        } else {
+            this.classList.remove('active');
+            this.innerText = 'TACTICAL RADAR : OFF';
+            document.getElementById('radar-spot-container').style.display = 'none';
+        }
+    });
 
     // 모터사이클/기계음 햅틱 & 사운드
     function playTacticalStartEngine() {
@@ -374,6 +426,9 @@
         const btnActivate = document.getElementById('activate-btn');
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)'; btnActivate.classList.add('active'); isTracking = true;
 
+        // 시스템 가동 시 레이더 버튼 활성화
+        document.getElementById('radar-btn').style.display = 'block';
+
         const handleCompassAndLevel = (e) => {
             // [초정밀] 안드로이드 화면 방향 왜곡 100% 보정 로직
             let heading = null;
@@ -381,7 +436,6 @@
                 heading = e.webkitCompassHeading; 
             } else if (e.alpha !== null) {
                 heading = 360 - e.alpha;
-                // 기기 화면(세로/가로) 회전축에 따른 오차 보정
                 let screenOrientation = 0;
                 if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) {
                     screenOrientation = window.screen.orientation.angle;
@@ -392,8 +446,12 @@
             }
 
             if (heading !== null) {
+                currentHeading = heading;
                 document.getElementById('heading-value').innerText = Math.round(heading).toString().padStart(3, '0');
                 document.getElementById('compass-needle').style.transform = `translate(-50%, -50%) rotate(${-heading}deg)`;
+                
+                // 레이더 모드가 켜져 있을 때만 UI 갱신
+                if (isRadarActive) updateRadarUI();
             }
 
             // 분리된 수평계 로직
@@ -428,7 +486,12 @@
         if (currentCpIndex >= WAYPOINTS.length) return; 
         const lat = pos.coords.latitude; const lon = pos.coords.longitude; const alt = pos.coords.altitude;
         const targetWP = WAYPOINTS[currentCpIndex];
+        
         const distToTarget = calculateDistance(lat, lon, targetWP.lat, targetWP.lon);
+        
+        // 타겟 방위각(Bearing) 실시간 계산
+        currentTargetBearing = calculateBearing(lat, lon, targetWP.lat, targetWP.lon);
+        if (isRadarActive) updateRadarUI();
         
         document.getElementById('dist-to-target').innerText = formatDistance(distToTarget);
         if (alt !== null) document.getElementById('alt-current').innerText = Math.round(alt) + ' m';
@@ -443,6 +506,10 @@
         if (distToTarget <= RADIUS_METER) {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
             alert(`[인증 완료] ${targetWP.name} 통과!\n다음 목표 지점으로 타겟을 변경합니다.`);
+            
+            // 레이더 모드 초기화 (다음 타겟을 위해 꺼둠)
+            if(isRadarActive) document.getElementById('radar-btn').click(); 
+
             currentCpIndex++; localStorage.setItem('apex_cp_index', currentCpIndex); renderCPList();
         }
     }
