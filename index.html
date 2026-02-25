@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-    /* 전체 기반 설정 (다크 그린 & 네온 그린 테마) */
+    /* 전체 기반 설정 */
     body {
         margin: 0; padding: 0; background-color: #050a05;
         background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
@@ -20,15 +20,33 @@
     #login-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-color: #050a05; background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
-        display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
+        display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9000;
+        transition: background-color 0.2s;
     }
     .login-title { font-family: 'Black Ops One', cursive; font-size: 36px; color: #ffffff; margin-bottom: 5px; text-shadow: 0 0 15px rgba(57,255,20,0.5); }
-    .login-sub { color: #4ade80; font-weight: 700; letter-spacing: 2px; margin-bottom: 40px; }
+    .login-sub { color: #4ade80; font-weight: 700; letter-spacing: 2px; margin-bottom: 30px; }
     .name-input {
-        background: #0a0f0a; border: 2px solid #1a2f1a; border-radius: 8px; color: #ffffff; font-family: 'Chakra Petch', sans-serif; font-size: 20px; font-weight: 700;
-        padding: 15px; width: 80%; max-width: 300px; text-align: center; outline: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); transition: 0.3s;
+        background: #0a0f0a; border: 2px solid #1a2f1a; border-radius: 8px; color: #ffffff; font-family: 'Chakra Petch', sans-serif; font-size: 18px; font-weight: 700;
+        padding: 15px; width: 80%; max-width: 300px; text-align: center; outline: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); transition: 0.3s; margin-bottom: 15px;
     }
     .name-input:focus { border-color: #39FF14; box-shadow: 0 0 10px rgba(57,255,20,0.3); }
+
+    /* [신규] 보안 시스템 오버레이 (Matrix & Glitch) */
+    #system-overlay {
+        display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
+        background: rgba(5, 10, 5, 0.95); flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+    }
+    #overlay-text { font-family: 'Chakra Petch', sans-serif; font-weight: 700; text-align: center; word-break: keep-all; line-height: 1.5; }
+    .glitch-active { animation: glitchAnim 0.3s 3; }
+    @keyframes glitchAnim {
+        0% { transform: translate(0,0); background-color: rgba(255, 0, 0, 0.6); }
+        25% { transform: translate(-10px, 5px); }
+        50% { transform: translate(10px, -5px); }
+        75% { transform: translate(-5px, -10px); }
+        100% { transform: translate(0,0); background-color: #050a05; }
+    }
+    .blink-cursor { animation: blinker 0.8s linear infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
 
     /* 메인 앱 UI */
     #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
@@ -37,12 +55,9 @@
     .operator-bar { background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a; width: 100%; padding: 6px 0; margin-top: 10px; color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center; }
 
     /* 메인 컨테이너 */
-    .main-container {
-        width: 90%; max-width: 420px; background: transparent; 
-        margin-top: 15px; display: flex; flex-direction: column; align-items: center;
-    }
+    .main-container { width: 90%; max-width: 420px; background: transparent; margin-top: 15px; display: flex; flex-direction: column; align-items: center; }
     
-    /* 1. 하이엔드 전술 나침반 */
+    /* 1. 하이엔드 전술 나침반 (V7 레이아웃 100% 보존) */
     .compass-block {
         width: 100%; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
         padding: 30px 15px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); 
@@ -56,24 +71,23 @@
         background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
 
-    /* 전진 방향 고정 마커 (나침반 12시 내부 삽입) */
+    /* 전진 방향 고정 마커 */
     .forward-marker {
         position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
         width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
         border-top: 18px solid #39FF14; filter: drop-shadow(0 0 10px #39FF14); z-index: 25;
     }
     
-    /* [핵심 무기] TACTICAL RADAR 블루 스팟 */
+    /* TACTICAL RADAR 블루 스팟 */
     .radar-spot-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; z-index: 15; display: none; }
     .radar-spot { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 12px #00e5ff, 0 0 25px #00e5ff, inset 0 0 6px #fff; border: 2px solid #fff; }
 
     /* 회전하는 나침반 다이얼 */
     .compass-face { 
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-        transition: transform 0.1s linear; 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.1s linear; 
     }
     .dial-mark { position: absolute; font-weight: 700; font-size: 20px; color: #4a6b4a; }
-    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #ff3f34; font-size: 28px; text-shadow: 0 0 15px rgba(255, 63, 52, 0.6); } /* 붉은색 N극 */
+    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #ff3f34; font-size: 28px; text-shadow: 0 0 15px rgba(255, 63, 52, 0.6); } 
     .mark-s { bottom: 10px; left: 50%; transform: translateX(-50%); color: #ffffff; }
     .mark-e { right: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
     .mark-w { left: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
@@ -87,7 +101,7 @@
     .t-210 { transform: translateX(-50%) rotate(210deg); } .t-240 { transform: translateX(-50%) rotate(240deg); }
     .t-300 { transform: translateX(-50%) rotate(300deg); } .t-330 { transform: translateX(-50%) rotate(330deg); }
     
-    /* [수정 완료] 나침반 정중앙으로 완전히 고정된 계기판 숫자 */
+    /* 정중앙 고정 숫자 패널 */
     .heading-display {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
         background: #050a05; padding: 6px 18px; border: 2px solid #1a2f1a; border-radius: 6px; 
@@ -97,7 +111,7 @@
     }
     .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
 
-    /* 나침반 하단 균형을 잡아주는 GPS 인디케이터 */
+    /* GPS 상태 인디케이터 */
     .gps-status-badge {
         background: #050a05; border: 1px solid #1a2f1a; padding: 6px 16px; border-radius: 4px;
         font-family: 'Black Ops One', cursive; font-size: 13px; color: #555; letter-spacing: 2px;
@@ -134,8 +148,6 @@
     .data-row:last-child { margin-bottom: 0; }
     .data-label { font-size: 11px; color: #80a080; font-weight: 700; }
     .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; color: #ffffff; display: flex; align-items: center; gap: 6px;}
-    
-    /* 기상 경보 강풍 텍스트 */
     .wind-warning { color: #ff3f34 !important; animation: pulse 1s infinite; text-shadow: 0 0 8px rgba(255, 63, 52, 0.6); }
 
     /* 4. 가동 및 레이더 버튼 */
@@ -186,10 +198,15 @@
 </head>
 <body>
 
+<div id="system-overlay">
+    <div id="overlay-text"></div>
+</div>
+
 <div id="login-screen">
     <h1 class="login-title">APEX SUMMIT</h1>
     <p class="login-sub">KOREA ACTION TRAIL</p>
-    <input type="text" id="participant-name" class="name-input" placeholder="CHALLENGER 성명 입력" autocomplete="off">
+    <input type="text" id="participant-name" class="name-input" placeholder="CHALLENGER 성명" autocomplete="off">
+    <input type="password" id="access-key" class="name-input" placeholder="ACCESS KEY (6자리)" autocomplete="off">
     <button class="tactical-btn" id="btn-login" style="width: 80%; max-width: 300px; margin-top: 20px;">시스템 접속 (ENTER)</button>
 </div>
 
@@ -204,17 +221,13 @@
         <div class="compass-block">
             <div class="compass-ui">
                 <div class="forward-marker"></div>
-                
                 <div class="radar-spot-container" id="radar-spot-container"><div class="radar-spot"></div></div>
-
                 <div class="compass-face" id="compass-face">
                     <span class="dial-mark mark-n">N</span><span class="dial-mark mark-e">E</span><span class="dial-mark mark-s">S</span><span class="dial-mark mark-w">W</span>
                     <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div><div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
                 </div>
-
                 <div class="heading-display"><span id="heading-value">---</span><span class="heading-unit">°DEG</span></div>
             </div>
-            
             <div id="gps-status-badge" class="gps-status-badge">GPS OFFLINE</div>
         </div>
 
@@ -301,22 +314,162 @@
     const levelStatusText = document.getElementById('level-status-text');
     const gpsBadge = document.getElementById('gps-status-badge');
 
-    let isTracking = false; let lastPos = null; let totalDistance = 0;
-    let savedName = localStorage.getItem('apex_operator_name');
-    let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
+    let isTracking = false; 
     let lastWeatherUpdate = 0;
-
     let currentHeading = null;
     let currentTargetBearing = null;
     let isRadarActive = false;
 
+    // [신규] 철통 복구를 위한 로컬스토리지 연동 변수
+    let savedName = localStorage.getItem('apex_operator_name');
+    let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
+    let totalDistance = parseFloat(localStorage.getItem('apex_total_dist')) || 0;
+    let lastPos = null;
+    const lastPosStr = localStorage.getItem('apex_last_pos');
+    if (lastPosStr) { lastPos = JSON.parse(lastPosStr); }
+
+    // [신규] 10초 단위 자동 세이브 (Auto-Save Background Engine)
+    setInterval(() => {
+        if (isTracking && savedName) {
+            localStorage.setItem('apex_total_dist', totalDistance);
+            localStorage.setItem('apex_cp_index', currentCpIndex);
+            if (lastPos) localStorage.setItem('apex_last_pos', JSON.stringify(lastPos));
+        }
+    }, 10000); // 10000ms = 10초
+
+    function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m'; }
+
+    // 부팅 시 저장된 총 거리 화면 표시 (Recovery)
+    document.getElementById('dist-total').innerText = formatDistance(totalDistance);
+
+    // [신규] 보안 경보 사운드 (ACCESS DENIED)
+    function playErrorSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const playBeep = (time) => {
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, time);
+                gain.gain.setValueAtTime(0.2, time); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
+                osc.start(time); osc.stop(time + 0.2);
+            };
+            playBeep(ctx.currentTime); playBeep(ctx.currentTime + 0.3); playBeep(ctx.currentTime + 0.6);
+        } catch(e) {}
+    }
+
+    // [신규] 해킹 성공 + 잠금 해제 사운드 (ACCESS GRANTED)
+    function playSuccessSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            // 1. 정보국 서버 접속 비프음
+            const osc1 = ctx.createOscillator(); const gain1 = ctx.createGain();
+            osc1.connect(gain1); gain1.connect(ctx.destination);
+            osc1.type = 'sine'; osc1.frequency.setValueAtTime(1200, ctx.currentTime);
+            gain1.gain.setValueAtTime(0.1, ctx.currentTime); gain1.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
+            osc1.start(ctx.currentTime); osc1.stop(ctx.currentTime + 0.1);
+            
+            // 2. 잠금 해제 (철컥) 사운드
+            setTimeout(() => {
+                const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain();
+                osc2.connect(gain2); gain2.connect(ctx.destination);
+                osc2.type = 'square'; osc2.frequency.setValueAtTime(150, ctx.currentTime);
+                osc2.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.3);
+                gain2.gain.setValueAtTime(0.2, ctx.currentTime); gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc2.start(ctx.currentTime); osc2.stop(ctx.currentTime + 0.3);
+            }, 150);
+        } catch(e) {}
+    }
+
+    function checkLogin() {
+        if (savedName) { 
+            document.getElementById('login-screen').style.display = 'none'; 
+            document.getElementById('main-app').style.display = 'flex'; 
+            document.getElementById('display-op-name').innerText = savedName; 
+            renderCPList(); 
+        }
+    }
+
+    // [신규] TACTICAL ACCESS 로그인 로직 통합
+    document.getElementById('btn-login').addEventListener('click', () => {
+        const name = document.getElementById('participant-name').value.trim();
+        const key = document.getElementById('access-key').value.trim();
+        
+        if (name.length < 2) { alert("CHALLENGER 성명을 정확히 입력해주십시오."); return; }
+        
+        const loginScreen = document.getElementById('login-screen');
+        const overlay = document.getElementById('system-overlay');
+        const overlayText = document.getElementById('overlay-text');
+
+        if (key !== "202606") {
+            // [실패] ACCESS DENIED (글리치 및 경고)
+            playErrorSound();
+            if(navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
+            
+            loginScreen.classList.add('glitch-active');
+            overlay.style.display = 'flex';
+            overlay.style.background = 'rgba(255, 0, 0, 0.3)';
+            overlayText.style.color = '#ff3f34';
+            overlayText.style.fontSize = '24px';
+            overlayText.style.textShadow = '0 0 15px rgba(255, 63, 52, 0.8)';
+            overlayText.innerHTML = "[ACCESS DENIED : 미인가 접속]";
+            
+            setTimeout(() => {
+                loginScreen.classList.remove('glitch-active');
+                overlay.style.display = 'none';
+            }, 1200);
+            return;
+        }
+        
+        // [성공] ACCESS GRANTED (매트릭스 텍스트 효과)
+        playSuccessSound();
+        if(navigator.vibrate) navigator.vibrate([50, 100, 200]);
+        
+        overlay.style.display = 'flex';
+        overlay.style.background = 'rgba(5, 10, 5, 0.95)';
+        overlayText.style.color = '#39FF14';
+        overlayText.style.fontSize = '18px';
+        overlayText.style.textShadow = '0 0 10px #39FF14';
+        
+        const msg = "[ACCESS GRANTED : 신원 확인 완료. 보안 시스템을 해제 합니다.]";
+        let textSoFar = "";
+        let i = 0;
+        
+        const typeInterval = setInterval(() => {
+            textSoFar += msg.charAt(i);
+            overlayText.innerHTML = textSoFar + "<span class='blink-cursor'>_</span>";
+            i++;
+            if (i >= msg.length) {
+                clearInterval(typeInterval);
+                overlayText.innerHTML = textSoFar; // 깜빡이 제거
+                
+                // 로그인 완료 처리
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 1s';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        overlay.style.opacity = '1';
+                        localStorage.setItem('apex_operator_name', name); 
+                        savedName = name; 
+                        checkLogin();
+                    }, 1000);
+                }, 1500);
+            }
+        }, 50); // 타이핑 속도
+    });
+
     function calculateBearing(lat1, lon1, lat2, lon2) {
-        const rad = Math.PI / 180;
-        const dLon = (lon2 - lon1) * rad;
+        const rad = Math.PI / 180; const dLon = (lon2 - lon1) * rad;
         const y = Math.sin(dLon) * Math.cos(lat2 * rad);
         const x = Math.cos(lat1 * rad) * Math.sin(lat2 * rad) - Math.sin(lat1 * rad) * Math.cos(lat2 * rad) * Math.cos(dLon);
-        let brng = Math.atan2(y, x) * (180 / Math.PI);
-        return (brng + 360) % 360;
+        return ((Math.atan2(y, x) * (180 / Math.PI)) + 360) % 360;
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; const rad = Math.PI / 180;
+        const dLat = (lat2 - lat1) * rad; const dLon = (lon2 - lon1) * rad;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
     }
 
     function updateRadarUI() {
@@ -329,97 +482,44 @@
     document.getElementById('radar-btn').addEventListener('click', function() {
         isRadarActive = !isRadarActive;
         if(isRadarActive) {
-            this.classList.add('active');
-            this.innerText = 'TACTICAL RADAR : ON (추적 중)';
+            this.classList.add('active'); this.innerText = 'TACTICAL RADAR : ON (추적 중)';
             document.getElementById('radar-spot-container').style.display = 'block';
             if(navigator.vibrate) navigator.vibrate([100, 50, 100]); 
             updateRadarUI();
         } else {
-            this.classList.remove('active');
-            this.innerText = 'TACTICAL RADAR : OFF';
+            this.classList.remove('active'); this.innerText = 'TACTICAL RADAR : OFF';
             document.getElementById('radar-spot-container').style.display = 'none';
         }
     });
 
-    function playTacticalStartEngine() {
-        if(navigator.vibrate) navigator.vibrate([100, 50, 150, 50, 300, 100, 800]); 
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator(); const gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.type = 'sawtooth'; 
-            osc.frequency.setValueAtTime(100, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.8);
-            gain.gain.setValueAtTime(0, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.2);
-            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
-            osc.start(); osc.stop(ctx.currentTime + 0.8);
-            setTimeout(() => {
-                const bOsc = ctx.createOscillator(); const bGain = ctx.createGain();
-                bOsc.connect(bGain); bGain.connect(ctx.destination);
-                bOsc.type = 'square'; bOsc.frequency.setValueAtTime(1200, ctx.currentTime);
-                bGain.gain.setValueAtTime(0.1, ctx.currentTime);
-                bOsc.start(); bOsc.stop(ctx.currentTime + 0.1);
-            }, 900);
-        } catch(e) {}
-    }
-
     function getWeatherKor(id, description) {
-        if(id >= 200 && id < 300) return "🌩️ 뇌우";
-        if(id >= 300 && id < 600) return "🌧️ 비";
-        if(id >= 600 && id < 700) return "❄️ 눈";
-        if(id >= 700 && id < 800) return "🌫️ 안개/흐림";
-        if(id === 800) return "☀️ 맑음";
-        if(id > 800) return "☁️ 구름많음";
+        if(id >= 200 && id < 300) return "🌩️ 뇌우"; if(id >= 300 && id < 600) return "🌧️ 비";
+        if(id >= 600 && id < 700) return "❄️ 눈"; if(id >= 700 && id < 800) return "🌫️ 안개/흐림";
+        if(id === 800) return "☀️ 맑음"; if(id > 800) return "☁️ 구름많음";
         return description;
     }
 
     function updateWeather(lat, lon) {
         const now = Date.now();
         if (now - lastWeatherUpdate < 10 * 60 * 1000) return; 
-        
         if(OWM_API_KEY === 'YOUR_API_KEY_HERE') return; 
 
         fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OWM_API_KEY}&units=metric&lang=kr`)
         .then(res => res.json())
         .then(data => {
-            lastWeatherUpdate = now;
-            const wSpeed = data.wind.speed;
+            lastWeatherUpdate = now; const wSpeed = data.wind.speed;
             
             document.getElementById('wx-cond').innerText = getWeatherKor(data.weather[0].id, data.weather[0].description);
             document.getElementById('wx-temp').innerText = `${Math.round(data.main.feels_like)} °C`;
             
             const speedTextEl = document.getElementById('wind-speed-text');
-            if (wSpeed > 10) {
-                speedTextEl.innerHTML = `🚨 강풍주의 (${wSpeed.toFixed(1)} m/s)`;
-                speedTextEl.classList.add('wind-warning');
-            } else {
-                speedTextEl.innerHTML = `${wSpeed.toFixed(1)} m/s`;
-                speedTextEl.classList.remove('wind-warning');
-            }
+            if (wSpeed > 10) { speedTextEl.innerHTML = `🚨 강풍주의 (${wSpeed.toFixed(1)} m/s)`; speedTextEl.classList.add('wind-warning'); } 
+            else { speedTextEl.innerHTML = `${wSpeed.toFixed(1)} m/s`; speedTextEl.classList.remove('wind-warning'); }
 
             document.getElementById('wind-arrow-icon').style.transform = `rotate(${data.wind.deg}deg)`;
-            
             const d = new Date(); document.getElementById('wx-update-time').innerText = `UPDATED: ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         }).catch(e => console.error("Weather API Error"));
     }
-
-    function checkLogin() {
-        if (savedName) { document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'flex'; document.getElementById('display-op-name').innerText = savedName; renderCPList(); }
-    }
-    document.getElementById('btn-login').addEventListener('click', () => {
-        const name = document.getElementById('participant-name').value.trim();
-        if (name.length < 2) { alert("정확한 CHALLENGER 성명을 입력해주십시오."); return; }
-        localStorage.setItem('apex_operator_name', name); savedName = name; checkLogin();
-    });
-
-    function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371e3; const rad = Math.PI / 180;
-        const dLat = (lat2 - lat1) * rad; const dLon = (lon2 - lon1) * rad;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*rad) * Math.cos(lat2*rad) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
-    function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m'; }
 
     function showCertificate() {
         trackingUI.style.display = 'none'; certWrapper.style.display = 'flex';
@@ -467,8 +567,7 @@
     document.getElementById('activate-btn').addEventListener('click', () => {
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
         
-        playTacticalStartEngine();
-
+        // (기존 오토바이 배기음 삭제 완료)
         const btnActivate = document.getElementById('activate-btn');
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)'; btnActivate.classList.add('active'); isTracking = true;
         document.getElementById('radar-btn').style.display = 'block';
@@ -479,16 +578,12 @@
         const handleCompassAndLevel = (e) => {
             let heading = null;
             
-            if (e.webkitCompassHeading !== undefined) { 
-                heading = e.webkitCompassHeading; 
-            } else if (e.absolute === true || e.alpha !== null) {
+            if (e.webkitCompassHeading !== undefined) { heading = e.webkitCompassHeading; } 
+            else if (e.absolute === true || e.alpha !== null) {
                 heading = 360 - e.alpha;
                 let screenOrientation = 0;
-                if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) {
-                    screenOrientation = window.screen.orientation.angle;
-                } else if (typeof window.orientation !== "undefined") {
-                    screenOrientation = window.orientation;
-                }
+                if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) { screenOrientation = window.screen.orientation.angle; } 
+                else if (typeof window.orientation !== "undefined") { screenOrientation = window.orientation; }
                 heading = (heading + screenOrientation) % 360;
             }
 
@@ -499,11 +594,8 @@
                 if (isRadarActive) updateRadarUI();
             }
 
-            let b = e.beta || 0; let g = e.gamma || 0;
-            const maxTilt = 30; 
-            let moveX = Math.max(-1, Math.min(1, g / maxTilt)) * 23; 
-            let moveY = Math.max(-1, Math.min(1, b / maxTilt)) * 23;
-            
+            let b = e.beta || 0; let g = e.gamma || 0; const maxTilt = 30; 
+            let moveX = Math.max(-1, Math.min(1, g / maxTilt)) * 23; let moveY = Math.max(-1, Math.min(1, b / maxTilt)) * 23;
             miniBubble.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
 
             if (Math.abs(b) < 3 && Math.abs(g) < 3) {
@@ -522,23 +614,18 @@
                     window.addEventListener('deviceorientation', handleCompassAndLevel, true); 
                 }
             }).catch(console.error);
-        } else { 
-            window.addEventListener('deviceorientationabsolute', handleCompassAndLevel, true); 
-        }
+        } else { window.addEventListener('deviceorientationabsolute', handleCompassAndLevel, true); }
 
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(updatePosition, (err) => {
-                console.warn('GPS Error');
-                gpsBadge.className = 'gps-status-badge';
-                gpsBadge.innerText = 'GPS OFFLINE';
+                console.warn('GPS Error'); gpsBadge.className = 'gps-status-badge'; gpsBadge.innerText = 'GPS OFFLINE';
             }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
         }
     });
 
     function updatePosition(pos) {
         if(gpsBadge.innerText !== 'GPS LOCK') {
-            gpsBadge.className = 'gps-status-badge locked';
-            gpsBadge.innerText = 'GPS LOCK';
+            gpsBadge.className = 'gps-status-badge locked'; gpsBadge.innerText = 'GPS LOCK';
             if(navigator.vibrate) navigator.vibrate(50);
         }
 
@@ -547,7 +634,6 @@
         const targetWP = WAYPOINTS[currentCpIndex];
         
         const distToTarget = calculateDistance(lat, lon, targetWP.lat, targetWP.lon);
-        
         currentTargetBearing = calculateBearing(lat, lon, targetWP.lat, targetWP.lon);
         if (isRadarActive) updateRadarUI();
         
@@ -556,7 +642,10 @@
 
         if (!lastPos) { lastPos = { lat, lon }; }
         const distStep = calculateDistance(lastPos.lat, lastPos.lon, lat, lon);
-        if (distStep > 1) { totalDistance += distStep; lastPos = { lat, lon }; }
+        if (distStep > 1) { 
+            totalDistance += distStep; 
+            lastPos = { lat, lon }; 
+        }
         document.getElementById('dist-total').innerText = formatDistance(totalDistance);
 
         updateWeather(lat, lon);
@@ -564,9 +653,7 @@
         if (distToTarget <= RADIUS_METER) {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
             alert(`[인증 완료] ${targetWP.name} 통과!\n다음 목표 지점으로 타겟을 변경합니다.`);
-            
             if(isRadarActive) document.getElementById('radar-btn').click(); 
-
             currentCpIndex++; localStorage.setItem('apex_cp_index', currentCpIndex); renderCPList();
         }
     }
