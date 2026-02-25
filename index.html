@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>APEX TACTICAL NAVIGATOR</title>
+<title>APEX TACTICAL NAVIGATOR V5</title>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-    /* 전체 기반 설정 (다크 그린 & 네온 그린 테마) */
+    /* 전체 기반 설정 (세련된 민간 원정대 톤앤매너) */
     body {
         margin: 0; padding: 0; background-color: #050a05;
         background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
@@ -31,10 +31,18 @@
     .name-input:focus { border-color: #39FF14; box-shadow: 0 0 10px rgba(57,255,20,0.3); }
 
     /* 메인 앱 UI */
-    #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
-    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer; user-select: none; }
+    #main-app { display: none; width: 100%; flex-direction: column; align-items: center; position: relative; }
+    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer; user-select: none; position: relative; }
     .title { font-family: 'Black Ops One', cursive; font-size: 26px; margin: 0; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
     .operator-bar { background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a; width: 100%; padding: 6px 0; margin-top: 10px; color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center; }
+
+    /* [업그레이드] GPS 수신 상태 인디케이터 */
+    .gps-indicator {
+        position: absolute; top: 18px; right: 15px; font-size: 10px; font-weight: 700; font-family: 'Black Ops One', cursive;
+        padding: 4px 8px; border-radius: 4px; border: 1px solid #555; color: #aaa; background: rgba(0,0,0,0.5); letter-spacing: 1px;
+    }
+    .gps-searching { color: #fbc02d; border-color: #fbc02d; animation: blink 1s infinite; }
+    .gps-locked { color: #39FF14; border-color: #39FF14; text-shadow: 0 0 5px rgba(57,255,20,0.5); box-shadow: 0 0 8px rgba(57,255,20,0.2); }
 
     /* 메인 컨테이너 */
     .main-container {
@@ -45,59 +53,55 @@
     /* 1. 하이엔드 전술 나침반 (Heading-Up 아키텍처) */
     .compass-block {
         width: 100%; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
-        padding: 30px 15px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); 
+        padding: 30px 15px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); 
         display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; box-sizing: border-box;
         position: relative;
     }
-    .heading-display {
-        background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px; font-family: 'Black Ops One', cursive; font-size: 28px; color: #ffffff;
-        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); display: flex; align-items: baseline; justify-content: center; margin-bottom: 25px; z-index: 10;
-    }
-    .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
 
-    /* 전진 방향 고정 마커 (12시 방향 네온 그린) */
+    /* 전진 방향 고정 마커 (12시 네온 그린) */
     .forward-marker {
-        position: absolute; top: 75px; left: 50%; transform: translateX(-50%);
-        width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
-        border-top: 20px solid #39FF14; filter: drop-shadow(0 0 10px #39FF14); z-index: 20;
+        position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+        width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent;
+        border-top: 22px solid #39FF14; filter: drop-shadow(0 0 10px #39FF14); z-index: 20;
     }
 
     .compass-ui {
-        position: relative; width: 260px; height: 260px; margin-bottom: 10px; border-radius: 50%; border: 6px solid #1a2f1a;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), 0 0 0 6px #050a05, 0 0 0 8px rgba(57,255,20,0.2);
+        position: relative; width: 270px; height: 270px; border-radius: 50%; border: 6px solid #1a2f1a;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), 0 0 0 6px #050a05, 0 0 0 8px rgba(57,255,20,0.15);
         background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
     
-    /* 기상 데이터 - 풍향 화살표 (독립 회전) */
-    .wind-arrow-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; transition: transform 1s cubic-bezier(0.4, 2.08, 0.55, 0.44); z-index: 5; }
-    .wind-arrow { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); color: #00e5ff; font-size: 14px; text-shadow: 0 0 8px #00e5ff; font-family: 'Black Ops One', cursive; }
-    
-    /* [핵심 무기] TACTICAL RADAR 블루 스팟 (독립 회전) */
-    .radar-spot-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; z-index: 15; display: none; }
-    .radar-spot { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 12px #00e5ff, 0 0 25px #00e5ff, inset 0 0 6px #fff; border: 2px solid #fff; }
+    /* [핵심 업그레이드] 나침반 정중앙 방위각 패널 (오와 열 맞춤) */
+    .center-heading-display {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: rgba(5, 10, 5, 0.85); border: 2px solid #1a2f1a; border-radius: 8px; padding: 10px 15px;
+        font-family: 'Black Ops One', cursive; font-size: 32px; color: #ffffff; text-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+        display: flex; align-items: baseline; justify-content: center; z-index: 30; box-shadow: inset 0 0 10px rgba(0,0,0,1);
+    }
+    .center-heading-unit { font-size: 14px; margin-left: 5px; color: #4ade80; }
 
-    /* [업그레이드] 회전하는 나침반 다이얼 (Heading-Up 방식) */
+    /* TACTICAL RADAR 블루 스팟 (독립 회전) */
+    .radar-spot-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; z-index: 15; display: none; }
+    .radar-spot { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); width: 18px; height: 18px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff, inset 0 0 8px #fff; border: 2px solid #fff; }
+
+    /* 회전하는 나침반 다이얼 (Heading-Up 방식) */
     .compass-face { 
         position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-        transition: transform 0.1s linear; /* 즉각적인 회전 반응 */
+        transition: transform 0.1s linear; 
     }
-    .dial-mark { position: absolute; font-weight: 700; font-size: 20px; color: #4a6b4a; }
-    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #39FF14; font-size: 26px; text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+    .dial-mark { position: absolute; font-weight: 700; font-size: 22px; color: #4a6b4a; }
+    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #ff3f34; font-size: 28px; text-shadow: 0 0 15px rgba(255, 63, 52, 0.6); } /* 레드 N극 복구 */
     .mark-s { bottom: 10px; left: 50%; transform: translateX(-50%); color: #ffffff; }
     .mark-e { right: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
     .mark-w { left: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
     
-    /* 다이얼 눈금자 */
     .tick { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
-    .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 12px; background: #2a402a; }
+    .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 14px; background: #2a402a; }
     .tick::before { top: 0; } .tick::after { bottom: 0; }
     .t-30 { transform: translateX(-50%) rotate(30deg); } .t-60 { transform: translateX(-50%) rotate(60deg); }
     .t-120 { transform: translateX(-50%) rotate(120deg); } .t-150 { transform: translateX(-50%) rotate(150deg); }
     .t-210 { transform: translateX(-50%) rotate(210deg); } .t-240 { transform: translateX(-50%) rotate(240deg); }
     .t-300 { transform: translateX(-50%) rotate(300deg); } .t-330 { transform: translateX(-50%) rotate(330deg); }
-    
-    /* 중앙 핀 (디자인 요소) */
-    .center-pin { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 
     /* 2. 독립된 정밀 수평계 */
     .level-block {
@@ -122,10 +126,18 @@
     .data-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-bottom: 15px; }
     .data-panel { background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .panel-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #1a2f1a; padding-bottom: 4px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
+    
+    /* [업그레이드] 어프로치 프로그레스 바 */
+    .approach-bar-bg { width: 100%; height: 4px; background: #050a05; border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .approach-bar-fill { width: 0%; height: 100%; background: #4a6b4a; transition: width 1s ease-out, background-color 0.5s; }
+    
     .data-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .data-row:last-child { margin-bottom: 0; }
     .data-label { font-size: 11px; color: #80a080; font-weight: 700; }
-    .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; color: #ffffff; }
+    .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; color: #ffffff; display: flex; align-items: center; gap: 6px;}
+
+    /* [업그레이드] 기상 패널 내 독립 풍향계 */
+    .wind-dir-icon { color: #00e5ff; display: inline-block; font-size: 14px; transition: transform 0.5s; text-shadow: 0 0 5px rgba(0,229,255,0.5); }
 
     /* 4. 가동 및 레이더 버튼 */
     .tactical-btn {
@@ -134,14 +146,14 @@
     }
     .tactical-btn:active { transform: translateY(3px); border-bottom: 1px solid #050a05; }
     .tactical-btn.active { background: linear-gradient(180deg, #1f401f, #142014); color: #39FF14; border-color: #39FF14; box-shadow: 0 0 15px rgba(57,255,20,0.2);}
-
-    /* 레이더 모드 버튼 스타일 */
+    
     #radar-btn { background: linear-gradient(180deg, #004d40, #001a11); border-color: #00bfa5; color: #00e5ff; display: none; font-size: 16px; margin-bottom: 15px; }
     #radar-btn.active { background: linear-gradient(180deg, #00bfa5, #004d40); color: #000; text-shadow: none; box-shadow: 0 0 15px rgba(0,229,255,0.5); }
 
-    /* 5. 미션 스크롤 패널 */
+    /* 5. 미션 스크롤 패널 (정확히 5개 노출 세팅) */
     .mission-panel { width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
-    .cp-list { list-style: none; padding: 0; margin: 0; max-height: 140px; overflow-y: auto; padding-right: 5px;}
+    /* 아이템 1개당 약 31px. 5개 노출을 위해 max-height 155px 설정 */
+    .cp-list { list-style: none; padding: 0; margin: 0; max-height: 155px; overflow-y: auto; padding-right: 5px;}
     .cp-list::-webkit-scrollbar { width: 4px; } .cp-list::-webkit-scrollbar-track { background: #050a05; } .cp-list::-webkit-scrollbar-thumb { background: #1a2f1a; border-radius: 2px; }
     .cp-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #1a2f1a; font-size: 12px; }
     .cp-name { color: #aaaaaa; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -187,24 +199,25 @@
     <div class="header" id="main-title-header">
         <h1 class="title">APEX NAVIGATOR</h1>
         <div class="operator-bar">CHALLENGER : <span id="display-op-name"></span></div>
+        <div id="gps-status" class="gps-indicator gps-searching">GPS OFFLINE</div>
     </div>
 
     <div class="main-container" id="tracking-ui">
         
         <div class="compass-block">
-            <div class="heading-display"><span id="heading-value">---</span><span class="heading-unit">°DEG</span></div>
-            
             <div class="forward-marker"></div>
 
             <div class="compass-ui">
-                <div class="wind-arrow-container" id="wind-container"><div class="wind-arrow">▼</div></div>
+                <div class="center-heading-display">
+                    <span id="heading-value">---</span><span class="center-heading-unit">°</span>
+                </div>
+
                 <div class="radar-spot-container" id="radar-spot-container"><div class="radar-spot"></div></div>
 
                 <div class="compass-face" id="compass-face">
                     <span class="dial-mark mark-n">N</span><span class="dial-mark mark-e">E</span><span class="dial-mark mark-s">S</span><span class="dial-mark mark-w">W</span>
                     <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div><div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
                 </div>
-                <div class="center-pin"></div>
             </div>
         </div>
 
@@ -221,17 +234,20 @@
         </div>
 
         <div class="data-grid">
-            <div class="data-panel" style="display: flex; justify-content: space-between; padding: 12px 15px;">
-                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">TARGET (남은 거리)</span><span class="data-value" id="dist-to-target">대기 중</span></div>
-                <div style="display: flex; flex-direction: column; align-items: center; width: 33%; border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a;"><span class="data-label">TOTAL (총 이동거리)</span><span class="data-value" id="dist-total">0 m</span></div>
-                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">ALTITUDE (현재고도)</span><span class="data-value" id="alt-current">N/A</span></div>
+            <div class="data-panel" style="display: flex; flex-direction: column; padding: 12px 15px;">
+                <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 5px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">TARGET</span><span class="data-value" id="dist-to-target">대기 중</span></div>
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 33%; border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a;"><span class="data-label">TOTAL</span><span class="data-value" id="dist-total">0 m</span></div>
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">ALTITUDE</span><span class="data-value" id="alt-current">N/A</span></div>
+                </div>
+                <div class="approach-bar-bg"><div class="approach-bar-fill" id="approach-progress"></div></div>
             </div>
             
             <div class="data-panel">
-                <div class="panel-title"><span>METAR DATA (기상 및 풍향)</span><span id="wx-update-time" style="font-size: 9px;"></span></div>
-                <div class="data-row"><span class="data-label">WIND SPEED (풍속)</span><span class="data-value" id="wx-wind" style="color:#00e5ff;">-- m/s</span></div>
-                <div class="data-row"><span class="data-label">FEELS LIKE (체감 온도)</span><span class="data-value" id="wx-temp">-- °C</span></div>
-                <div class="data-row"><span class="data-label">CONDITIONS (기상 상태)</span><span class="data-value" id="wx-cond">SCANNING...</span></div>
+                <div class="panel-title"><span>METAR DATA (기상 상태)</span><span id="wx-update-time" style="font-size: 9px;"></span></div>
+                <div class="data-row"><span class="data-label">WIND (풍속/풍향)</span><span class="data-value" id="wx-wind" style="color:#00e5ff;">-- m/s <span class="wind-dir-icon" id="metar-wind-arrow">⬇</span></span></div>
+                <div class="data-row"><span class="data-label">FEELS LIKE (체감)</span><span class="data-value" id="wx-temp">-- °C</span></div>
+                <div class="data-row"><span class="data-label">CONDITIONS</span><span class="data-value" id="wx-cond">SCANNING...</span></div>
             </div>
         </div>
 
@@ -289,6 +305,8 @@
     const miniBubble = document.getElementById('mini-bubble');
     const compassFace = document.getElementById('compass-face');
     const levelStatusText = document.getElementById('level-status-text');
+    const gpsStatusEl = document.getElementById('gps-status');
+    const progressBar = document.getElementById('approach-progress');
 
     let isTracking = false; let lastPos = null; let totalDistance = 0;
     let savedName = localStorage.getItem('apex_operator_name');
@@ -299,7 +317,7 @@
     let currentTargetBearing = null;
     let isRadarActive = false;
 
-    // 하버사인 방위각 도출 로직 (정합성 완벽 유지)
+    // 하버사인 방위각 공식
     function calculateBearing(lat1, lon1, lat2, lon2) {
         const rad = Math.PI / 180;
         const dLon = (lon2 - lon1) * rad;
@@ -309,6 +327,7 @@
         return (brng + 360) % 360;
     }
 
+    // 레이더 갱신 로직
     function updateRadarUI() {
         if (currentHeading !== null && currentTargetBearing !== null) {
             let radarAngle = currentTargetBearing - currentHeading;
@@ -316,6 +335,7 @@
         }
     }
 
+    // 레이더 토글 버튼 이벤트
     document.getElementById('radar-btn').addEventListener('click', function() {
         isRadarActive = !isRadarActive;
         if(isRadarActive) {
@@ -331,6 +351,7 @@
         }
     });
 
+    // 전술 엔진 햅틱 & 오디오
     function playTacticalStartEngine() {
         if(navigator.vibrate) navigator.vibrate([100, 50, 150, 50, 300, 100, 800]); 
         try {
@@ -354,6 +375,7 @@
         } catch(e) {}
     }
 
+    // 기상 API 호출 (독립 풍향계 회전 로직 포함)
     function updateWeather(lat, lon) {
         const now = Date.now();
         if (now - lastWeatherUpdate < 10 * 60 * 1000) return; 
@@ -362,10 +384,9 @@
         .then(res => res.json())
         .then(data => {
             lastWeatherUpdate = now;
-            document.getElementById('wx-wind').innerText = `${data.wind.speed.toFixed(1)} m/s`;
+            document.getElementById('wx-wind').innerHTML = `${data.wind.speed.toFixed(1)} m/s <span class="wind-dir-icon" id="metar-wind-arrow" style="transform: rotate(${data.wind.deg}deg);">⬇</span>`;
             document.getElementById('wx-temp').innerText = `${Math.round(data.main.feels_like)} °C`;
             document.getElementById('wx-cond').innerText = data.weather[0].description.toUpperCase();
-            document.getElementById('wind-container').style.transform = `rotate(${data.wind.deg}deg)`;
             const d = new Date(); document.getElementById('wx-update-time').innerText = `UPDATED: ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         }).catch(e => console.error("Weather API Error"));
     }
@@ -373,6 +394,7 @@
     function checkLogin() {
         if (savedName) { document.getElementById('login-screen').style.display = 'none'; document.getElementById('main-app').style.display = 'flex'; document.getElementById('display-op-name').innerText = savedName; renderCPList(); }
     }
+    
     document.getElementById('btn-login').addEventListener('click', () => {
         const name = document.getElementById('participant-name').value.trim();
         if (name.length < 2) { alert("정확한 CHALLENGER 성명을 입력해주십시오."); return; }
@@ -387,6 +409,7 @@
     }
     function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m'; }
 
+    // 완주 인증서 생성
     function showCertificate() {
         trackingUI.style.display = 'none'; certWrapper.style.display = 'flex';
         document.getElementById('cert-op-name').innerText = savedName;
@@ -394,6 +417,7 @@
         const now = new Date(); document.getElementById('cert-time').innerText = now.getFullYear() + "." + String(now.getMonth()+1).padStart(2,'0') + "." + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0');
         const certGrid = document.getElementById('cert-grid-container'); certGrid.innerHTML = '';
         WAYPOINTS.forEach(wp => { certGrid.innerHTML += `<div class="cert-item"><span class="cert-check">✔</span> <span>${wp.name}</span></div>`; });
+        gpsStatusEl.style.display = 'none';
     }
 
     document.getElementById('btn-download-cert').addEventListener('click', () => {
@@ -415,6 +439,7 @@
         resetClickCount++; if(resetClickCount >= 5) { if(confirm("시스템을 초기화합니다.")) { localStorage.clear(); location.reload(); } resetClickCount = 0; } setTimeout(() => { resetClickCount = 0; }, 1500);
     });
 
+    // CP 리스트 렌더링 (최대 5개 노출)
     function renderCPList() {
         if (currentCpIndex >= WAYPOINTS.length) { showCertificate(); return; }
         const cpListContainer = document.getElementById('cp-list-container'); cpListContainer.innerHTML = '';
@@ -430,6 +455,7 @@
         document.getElementById('mission-status').innerText = `TARGET: ${currentCpIndex + 1} / 24`; document.getElementById('mission-status').style.color = "#fbc02d";
     }
 
+    // 시스템 가동
     document.getElementById('activate-btn').addEventListener('click', () => {
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
         
@@ -439,6 +465,9 @@
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)'; btnActivate.classList.add('active'); isTracking = true;
 
         document.getElementById('radar-btn').style.display = 'block';
+        
+        gpsStatusEl.innerText = 'SEARCHING...';
+        gpsStatusEl.className = 'gps-indicator gps-searching';
 
         const handleCompassAndLevel = (e) => {
             let heading = null;
@@ -459,12 +488,13 @@
                 currentHeading = heading;
                 document.getElementById('heading-value').innerText = Math.round(heading).toString().padStart(3, '0');
                 
-                // [정밀 검증 완료] 다이얼 자체가 역회전하여 12시 방향이 현재 전진 방향이 됨
+                // 다이얼 회전 로직
                 compassFace.style.transform = `rotate(${-heading}deg)`;
                 
                 if (isRadarActive) updateRadarUI();
             }
 
+            // 정밀 수평계 로직
             let b = e.beta || 0; let g = e.gamma || 0;
             const maxTilt = 30; 
             let moveX = Math.max(-1, Math.min(1, g / maxTilt)) * 23; 
@@ -486,23 +516,52 @@
         } else { window.addEventListener('deviceorientationabsolute', handleCompassAndLevel, true); }
 
         if (navigator.geolocation) {
-            navigator.geolocation.watchPosition(updatePosition, (err) => console.warn('GPS Error'), { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
+            navigator.geolocation.watchPosition(updatePosition, (err) => {
+                console.warn('GPS Error');
+                gpsStatusEl.innerText = 'GPS LOST';
+                gpsStatusEl.className = 'gps-indicator gps-searching';
+                gpsStatusEl.style.color = '#ff3f34'; gpsStatusEl.style.borderColor = '#ff3f34';
+            }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
         }
     });
 
+    // 실시간 위치 추적 및 게이지 연동
     function updatePosition(pos) {
         if (currentCpIndex >= WAYPOINTS.length) return; 
+        
+        // GPS 수신 성공 시 상태 변경
+        if(gpsStatusEl.innerText !== 'GPS LOCK') {
+            gpsStatusEl.innerText = 'GPS LOCK';
+            gpsStatusEl.className = 'gps-indicator gps-locked';
+        }
+
         const lat = pos.coords.latitude; const lon = pos.coords.longitude; const alt = pos.coords.altitude;
         const targetWP = WAYPOINTS[currentCpIndex];
         
         const distToTarget = calculateDistance(lat, lon, targetWP.lat, targetWP.lon);
         
+        // 타겟 방위각 갱신
         currentTargetBearing = calculateBearing(lat, lon, targetWP.lat, targetWP.lon);
         if (isRadarActive) updateRadarUI();
         
         document.getElementById('dist-to-target').innerText = formatDistance(distToTarget);
         if (alt !== null) document.getElementById('alt-current').innerText = Math.round(alt) + ' m';
 
+        // 어프로치 프로그레스 바 로직 (기준점 1km -> 0m)
+        let progressPercent = Math.max(0, Math.min(100, 100 - (distToTarget / 1000) * 100));
+        progressBar.style.width = progressPercent + '%';
+        if(distToTarget < 200) {
+            progressBar.style.backgroundColor = '#39FF14';
+            progressBar.style.boxShadow = '0 0 10px #39FF14';
+        } else if (distToTarget < 500) {
+            progressBar.style.backgroundColor = '#fbc02d';
+            progressBar.style.boxShadow = 'none';
+        } else {
+            progressBar.style.backgroundColor = '#4a6b4a';
+            progressBar.style.boxShadow = 'none';
+        }
+
+        // 총 이동거리 누적
         if (!lastPos) { lastPos = { lat, lon }; }
         const distStep = calculateDistance(lastPos.lat, lastPos.lon, lat, lon);
         if (distStep > 1) { totalDistance += distStep; lastPos = { lat, lon }; }
@@ -510,11 +569,13 @@
 
         updateWeather(lat, lon);
 
+        // CP 도착 인증 로직
         if (distToTarget <= RADIUS_METER) {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
             alert(`[인증 완료] ${targetWP.name} 통과!\n다음 목표 지점으로 타겟을 변경합니다.`);
             
             if(isRadarActive) document.getElementById('radar-btn').click(); 
+            progressBar.style.width = '0%'; // 바 초기화
 
             currentCpIndex++; localStorage.setItem('apex_cp_index', currentCpIndex); renderCPList();
         }
