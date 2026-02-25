@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
+    /* 전체 기반 설정 */
     body {
         margin: 0; padding: 0; background-color: #050a05;
         background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
@@ -15,7 +16,7 @@
         min-height: 100vh; overflow-x: hidden;
     }
 
-    /* 요원 등록 화면 */
+    /* 요원(CHALLENGER) 등록 화면 */
     #login-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-color: #050a05; background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
@@ -25,13 +26,13 @@
     .login-sub { color: #4ade80; font-weight: 700; letter-spacing: 2px; margin-bottom: 40px; }
     .name-input {
         background: #0a0f0a; border: 2px solid #1a2f1a; border-radius: 8px; color: #ffffff; font-family: 'Chakra Petch', sans-serif; font-size: 20px; font-weight: 700;
-        padding: 15px; width: 80%; max-width: 300px; text-align: center; outline: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+        padding: 15px; width: 80%; max-width: 300px; text-align: center; outline: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); transition: 0.3s;
     }
     .name-input:focus { border-color: #39FF14; box-shadow: 0 0 10px rgba(57,255,20,0.3); }
 
-    /* 메인 앱 공통 */
+    /* 메인 앱 UI */
     #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
-    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer; user-select: none;}
+    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer; user-select: none; }
     .title { font-family: 'Black Ops One', cursive; font-size: 26px; margin: 0; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
     .operator-bar { background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a; width: 100%; padding: 6px 0; margin-top: 10px; color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center; }
 
@@ -42,16 +43,27 @@
     }
     .heading-display {
         background: #0a0f0a; padding: 5px 20px; border: 2px solid #1a2f1a; border-radius: 5px; font-family: 'Black Ops One', cursive; font-size: 28px; color: #ffffff;
-        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); display: flex; align-items: baseline; justify-content: center; margin-bottom: 20px;
+        text-shadow: 0 0 10px rgba(74, 222, 128, 0.3); display: flex; align-items: baseline; justify-content: center; margin-bottom: 20px; z-index: 10;
     }
     .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
 
-    /* 대형 나침반 UI */
+    /* 대형 나침반 및 신규 위젯들 */
     .compass-ui {
         position: relative; width: 280px; height: 280px; margin-bottom: 25px; border-radius: 50%; border: 12px solid #142014;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(74, 222, 128, 0.3);
         background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
+    
+    /* [신규] 풍향 화살표 (바람 방향) */
+    .wind-arrow-container {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        transform-origin: center center; transition: transform 1s cubic-bezier(0.4, 2.08, 0.55, 0.44); z-index: 5;
+    }
+    .wind-arrow {
+        position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+        color: #00e5ff; font-size: 14px; text-shadow: 0 0 8px #00e5ff; font-family: 'Black Ops One', cursive;
+    }
+
     .compass-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .dial-mark { position: absolute; font-weight: 700; font-size: 18px; color: #3a5f3a; }
     .mark-n { top: 15px; left: 50%; transform: translateX(-50%); color: #d32f2f; font-size: 24px; text-shadow: 0 0 10px rgba(211, 47, 47, 0.4); }
@@ -68,28 +80,36 @@
 
     .needle-container { position: absolute; top: 50%; left: 50%; width: 18px; height: 240px; transform-origin: center center; transform: translate(-50%, -50%) rotate(0deg); z-index: 10; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.6)); }
     .needle-body { width: 100%; height: 100%; clip-path: polygon(50% 0, 85% 50%, 50% 100%, 15% 50%); background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 50%, #0d47a1 50%, #1565c0 100%); }
-    .center-pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f); border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8); transition: background 0.2s;}
-    
-    /* [신규] 지능형 전술 수평계 기포 */
-    .bubble {
-        position: absolute; width: 14px; height: 14px; background: #39FF14; border-radius: 50%;
-        box-shadow: 0 0 10px #39FF14; transition: transform 0.1s ease-out, opacity 0.3s ease, background 0.2s;
-        z-index: 12; pointer-events: none; opacity: 0; /* 평상시 숨김 */
-        top: 50%; left: 50%; transform: translate(-50%, -50%);
+    .center-pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #ff3f34, #7d0000); border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8); transition: background 0.1s, box-shadow 0.1s;}
+
+    /* [신규] 미니 원형 수평계 (Bullseye Level) */
+    .mini-level-widget {
+        position: absolute; bottom: -8px; right: -8px; width: 44px; height: 44px;
+        background: radial-gradient(circle, #1a2f1a, #050a05); border: 3px solid #142014; border-radius: 50%;
+        box-shadow: inset 0 5px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.6); z-index: 20; overflow: hidden;
+    }
+    .mini-level-crosshair-x { position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(57,255,20,0.4); }
+    .mini-level-crosshair-y { position: absolute; top: 0; left: 50%; width: 1px; height: 100%; background: rgba(57,255,20,0.4); }
+    .mini-bubble {
+        position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; background: #ff3f34; border-radius: 50%;
+        transform: translate(-50%, -50%); box-shadow: inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 5px #ff3f34; transition: transform 0.1s ease-out, background 0.2s;
     }
 
-    /* 실시간 데이터 요약 바 */
-    .compact-data { display: flex; justify-content: space-between; width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 15px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
-    .data-item { display: flex; flex-direction: column; align-items: center; width: 33%;}
-    .data-label { font-size: 11px; color: #80a080; margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; text-align: center;}
-    .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; color: #ffffff; text-align: center;}
+    /* GPS & 날씨 데이터 패널 */
+    .data-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-bottom: 15px; }
+    .data-panel { background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
+    .panel-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #1a2f1a; padding-bottom: 4px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
+    
+    .data-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .data-row:last-child { margin-bottom: 0; }
+    .data-label { font-size: 11px; color: #80a080; font-weight: 700; }
+    .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; color: #ffffff; }
 
     /* 미션 스크롤 패널 */
     .mission-panel { width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
-    .panel-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid #1a2f1a; padding-bottom: 5px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
-    .cp-list { list-style: none; padding: 0; margin: 0; max-height: 180px; overflow-y: auto; padding-right: 5px;}
+    .cp-list { list-style: none; padding: 0; margin: 0; max-height: 140px; overflow-y: auto; padding-right: 5px;}
     .cp-list::-webkit-scrollbar { width: 4px; } .cp-list::-webkit-scrollbar-track { background: #050a05; } .cp-list::-webkit-scrollbar-thumb { background: #1a2f1a; border-radius: 2px; }
-    .cp-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #1a2f1a; font-size: 12px; }
+    .cp-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #1a2f1a; font-size: 12px; }
     .cp-name { color: #aaaaaa; font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #555; flex-shrink: 0;}
     .status-dot.active { background-color: #fbc02d; box-shadow: 0 0 10px #fbc02d; animation: blink 1s infinite; }
@@ -100,11 +120,12 @@
     /* 가동 버튼 */
     .tactical-btn {
         width: 100%; padding: 16px; background: linear-gradient(180deg, #2e4e2e, #1a2f1a); border: 2px solid #142014; border-bottom: 4px solid #0a0f0a; border-radius: 6px;
-        color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-top: 10px;
+        color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-top: 5px; transition: all 0.1s;
     }
+    .tactical-btn:active { transform: translateY(3px); border-bottom: 1px solid #0a0f0a; }
     .tactical-btn.active { background: linear-gradient(180deg, #d32f2f, #b71c1c); color: #ffffff; border-color: #8e0000; }
     
-    /* 완주 디지털 인증서 포스터 */
+    /* 완주 디지털 인증서 */
     #certificate-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; margin-top: 10px;}
     #certificate-card {
         width: 100%; max-width: 450px; background-color: #030803; 
@@ -126,10 +147,9 @@
     .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; font-size: 11px; color: #ddd; text-align: left;}
     .cert-item { display: flex; align-items: center; gap: 6px; background: rgba(10,20,10,0.8); padding: 6px; border: 1px solid #1a2f1a;}
     .cert-check { color: #39FF14; font-size: 12px; }
-
     .download-btn { width: 100%; max-width: 450px; padding: 18px; background: #39FF14; color: #000; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 1px; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 20px rgba(57,255,20,0.4); text-transform: uppercase; }
-    .footer { margin-top: 25px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; padding-bottom: 30px;}
-    .reset-link { color: #3a5f3a; text-decoration: underline; cursor: pointer; margin-top: 10px; display: inline-block; }
+
+    .footer { margin-top: 25px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; padding-bottom: 30px; cursor: pointer; user-select: none;}
 </style>
 </head>
 <body>
@@ -137,32 +157,48 @@
 <div id="login-screen">
     <h1 class="login-title">APEX SUMMIT</h1>
     <p class="login-sub">KOREA ACTION TRAIL</p>
-    <input type="text" id="participant-name" class="name-input" placeholder="요원 성명 입력" autocomplete="off">
+    <input type="text" id="participant-name" class="name-input" placeholder="CHALLENGER 성명 입력" autocomplete="off">
     <button class="tactical-btn" id="btn-login" style="width: 80%; max-width: 300px; margin-top: 20px;">시스템 접속 (ENTER)</button>
 </div>
 
 <div id="main-app">
     <div class="header" id="main-title-header">
         <h1 class="title">APEX NAVIGATOR</h1>
-        <div class="operator-bar">OPERATOR : <span id="display-op-name"></span></div>
+        <div class="operator-bar">CHALLENGER : <span id="display-op-name"></span></div>
     </div>
 
     <div class="main-container" id="tracking-ui">
         <div class="heading-display"><span id="heading-value">---</span><span class="heading-unit">°DEG</span></div>
         <div class="compass-ui">
+            <div class="wind-arrow-container" id="wind-container"><div class="wind-arrow">▼</div></div>
+            
             <div class="compass-face">
                 <span class="dial-mark mark-n">N</span><span class="dial-mark mark-e">E</span><span class="dial-mark mark-s">S</span><span class="dial-mark mark-w">W</span>
                 <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div><div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
             </div>
             <div class="needle-container" id="compass-needle"><div class="needle-body"></div></div>
             <div class="center-pin" id="center-pin"></div>
-            <div class="bubble" id="level-bubble"></div>
+            
+            <div class="mini-level-widget">
+                <div class="mini-level-crosshair-x"></div>
+                <div class="mini-level-crosshair-y"></div>
+                <div class="mini-bubble" id="mini-bubble"></div>
+            </div>
         </div>
 
-        <div class="compact-data">
-            <div class="data-item"><span class="data-label">TARGET DIST</span><span class="data-value" id="dist-to-target">대기 중</span></div>
-            <div class="data-item" style="border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a;"><span class="data-label">TOTAL DIST</span><span class="data-value" id="dist-total">0 m</span></div>
-            <div class="data-item"><span class="data-label">ALTITUDE</span><span class="data-value" id="alt-current">N/A</span></div>
+        <div class="data-grid">
+            <div class="data-panel" style="display: flex; justify-content: space-between; padding: 12px 15px;">
+                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">TARGET DIST</span><span class="data-value" id="dist-to-target">대기 중</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 33%; border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a;"><span class="data-label">TOTAL DIST</span><span class="data-value" id="dist-total">0 m</span></div>
+                <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">ALTITUDE</span><span class="data-value" id="alt-current">N/A</span></div>
+            </div>
+            
+            <div class="data-panel">
+                <div class="panel-title"><span>METAR DATA (TACTICAL WEATHER)</span><span id="wx-update-time" style="font-size: 9px;"></span></div>
+                <div class="data-row"><span class="data-label">WIND SPEED</span><span class="data-value" id="wx-wind" style="color:#00e5ff;">-- m/s</span></div>
+                <div class="data-row"><span class="data-label">FEELS LIKE</span><span class="data-value" id="wx-temp">-- °C</span></div>
+                <div class="data-row"><span class="data-label">CONDITIONS</span><span class="data-value" id="wx-cond">SCANNING...</span></div>
+            </div>
         </div>
 
         <div class="mission-panel">
@@ -179,7 +215,7 @@
             <div class="cert-badge">✔</div>
             <h2 class="cert-title">MISSION ACCOMPLISHED</h2>
             <div class="cert-info">
-                <div class="cert-info-row"><span>OPERATOR</span> <span id="cert-op-name" style="color:#fff; font-weight:bold; font-size: 18px;"></span></div>
+                <div class="cert-info-row"><span>CHALLENGER</span> <span id="cert-op-name" style="color:#fff; font-weight:bold; font-size: 18px;"></span></div>
                 <div class="cert-info-row"><span>TOTAL DISTANCE</span> <span id="cert-total-dist" style="color:#39FF14; font-weight:bold; font-family: 'Chakra Petch', sans-serif;"></span></div>
                 <div class="cert-info-row"><span>CLEAR TIME</span> <span id="cert-time" style="color:#fff; font-family: 'Chakra Petch', sans-serif;"></span></div>
             </div>
@@ -189,13 +225,14 @@
         <button class="download-btn" id="btn-download-cert">📷 디지털 인증서 갤러리 저장</button>
     </div>
 
-    <div class="footer">
-        © 2026 APEX SUMMIT. ALL RIGHTS RESERVED.<br>
-        <span class="reset-link" onclick="resetMission()">기록 및 이름 초기화 (테스트용)</span>
-    </div>
+    <div class="footer" id="hidden-reset-footer">© 2026 APEX SUMMIT. ALL RIGHTS RESERVED.</div>
 </div>
 
 <script>
+    // === [설정] OpenWeatherMap API 키 입력 (무료 발급) ===
+    // 'YOUR_API_KEY_HERE' 부분을 발급받은 실제 API 키로 변경하세요!
+    const OWM_API_KEY = 'YOUR_API_KEY_HERE'; 
+
     const WAYPOINTS = [
         { id: 1, name: "용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 }, { id: 2, name: "박달나무쉼터", lat: 38.2050, lon: 128.3900 },
         { id: 3, name: "미시령옛길", lat: 38.2100, lon: 128.4200 }, { id: 4, name: "금강산성인대", lat: 38.2200, lon: 128.4500 },
@@ -214,12 +251,68 @@
     const RADIUS_METER = 50; 
     const trackingUI = document.getElementById('tracking-ui');
     const certWrapper = document.getElementById('certificate-wrapper');
-    const bubble = document.getElementById('level-bubble');
+    const miniBubble = document.getElementById('mini-bubble');
     const centerPin = document.getElementById('center-pin');
 
     let isTracking = false; let lastPos = null; let totalDistance = 0;
     let savedName = localStorage.getItem('apex_operator_name');
     let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
+    let lastWeatherUpdate = 0;
+
+    // --- 기동 사운드 및 햅틱 효과 (모터사이클/기계음) ---
+    function playTacticalStartEngine() {
+        if(navigator.vibrate) navigator.vibrate([100, 50, 150, 50, 300, 100, 800]); // 부릉-부르릉-부아앙 패턴
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator(); const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.type = 'sawtooth'; // 기계음 질감
+            // 주파수 상승 이펙트 (시동 거는 소리)
+            osc.frequency.setValueAtTime(100, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.8);
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.2);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+            osc.start(); osc.stop(ctx.currentTime + 0.8);
+            
+            // 띠딕! 하는 확인 비프음
+            setTimeout(() => {
+                const bOsc = ctx.createOscillator(); const bGain = ctx.createGain();
+                bOsc.connect(bGain); bGain.connect(ctx.destination);
+                bOsc.type = 'square'; bOsc.frequency.setValueAtTime(1200, ctx.currentTime);
+                bGain.gain.setValueAtTime(0.1, ctx.currentTime);
+                bOsc.start(); bOsc.stop(ctx.currentTime + 0.1);
+            }, 900);
+        } catch(e) { console.log("Audio Context blocked"); }
+    }
+
+    // --- 날씨 시스템 (METAR) ---
+    function updateWeather(lat, lon) {
+        const now = Date.now();
+        if (now - lastWeatherUpdate < 10 * 60 * 1000) return; // 10분 제한
+        
+        if(OWM_API_KEY === 'YOUR_API_KEY_HERE') {
+            document.getElementById('wx-cond').innerText = "API KEY REQUIRED"; return;
+        }
+
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OWM_API_KEY}&units=metric&lang=kr`)
+        .then(res => res.json())
+        .then(data => {
+            lastWeatherUpdate = now;
+            const windSpeed = data.wind.speed; const windDeg = data.wind.deg;
+            const feelsLike = data.main.feels_like; const desc = data.weather[0].description;
+            
+            document.getElementById('wx-wind').innerText = `${windSpeed.toFixed(1)} m/s`;
+            document.getElementById('wx-temp').innerText = `${Math.round(feelsLike)} °C`;
+            document.getElementById('wx-cond').innerText = desc.toUpperCase();
+            
+            // 풍향 화살표 회전 (API는 바람이 불어오는 방향(deg)을 제공)
+            document.getElementById('wind-container').style.transform = `rotate(${windDeg}deg)`;
+            
+            const d = new Date();
+            document.getElementById('wx-update-time').innerText = `UPDATED: ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }).catch(e => console.error("Weather API Error"));
+    }
 
     function checkLogin() {
         if (savedName) {
@@ -232,7 +325,7 @@
     
     document.getElementById('btn-login').addEventListener('click', () => {
         const name = document.getElementById('participant-name').value.trim();
-        if (name.length < 2) { alert("정확한 참가자 성명을 입력해주십시오."); return; }
+        if (name.length < 2) { alert("정확한 CHALLENGER 성명을 입력해주십시오."); return; }
         localStorage.setItem('apex_operator_name', name); savedName = name; checkLogin();
     });
 
@@ -263,10 +356,20 @@
         }).catch(err => { alert("저장 오류 발생. 화면을 직접 캡처해주세요."); btn.innerText = "📷 디지털 인증서 갤러리 저장"; });
     });
 
-    let clickCount = 0;
+    let topClickCount = 0;
     document.getElementById('main-title-header').addEventListener('click', () => {
-        clickCount++; if(clickCount >= 3) { showCertificate(); clickCount = 0; }
-        setTimeout(() => { clickCount = 0; }, 1000); 
+        topClickCount++; if(topClickCount >= 3) { showCertificate(); topClickCount = 0; }
+        setTimeout(() => { topClickCount = 0; }, 1000); 
+    });
+
+    let resetClickCount = 0;
+    document.getElementById('hidden-reset-footer').addEventListener('click', () => {
+        resetClickCount++;
+        if(resetClickCount >= 5) {
+            if(confirm("시스템을 초기화합니다.")) { localStorage.clear(); location.reload(); }
+            resetClickCount = 0;
+        }
+        setTimeout(() => { resetClickCount = 0; }, 1500);
     });
 
     function renderCPList() {
@@ -286,11 +389,14 @@
 
     document.getElementById('activate-btn').addEventListener('click', () => {
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
+        
+        // 가동 햅틱 & 사운드 발동!
+        playTacticalStartEngine();
+
         const btnActivate = document.getElementById('activate-btn');
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)'; btnActivate.classList.add('active'); isTracking = true;
 
         const handleCompassAndLevel = (e) => {
-            // 1. 방위각 로직
             let heading = e.webkitCompassHeading !== undefined ? e.webkitCompassHeading : (e.absolute === true || e.alpha !== null ? 360 - e.alpha : null);
             if (heading !== null) {
                 heading = heading % 360;
@@ -298,24 +404,21 @@
                 document.getElementById('compass-needle').style.transform = `translate(-50%, -50%) rotate(${-heading}deg)`;
             }
 
-            // 2. 지능형 수평계 로직
-            let b = e.beta; let g = e.gamma;
-            if(b !== null && g !== null) {
-                if (Math.abs(b) > 60 || Math.abs(b) < -60) {
-                    bubble.style.opacity = "0"; // 세우면 숨김
-                    centerPin.style.background = "radial-gradient(circle at 30% 30%, #b0bec5, #37474f)";
-                } else {
-                    bubble.style.opacity = "1"; // 눕히면 등장
-                    let moveX = Math.max(-40, Math.min(40, g * 1.5)); 
-                    let moveY = Math.max(-40, Math.min(40, b * 1.5));
-                    bubble.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+            // 미니 수평계 (Bullseye Level) 및 더블 체크 로직
+            let b = e.beta || 0; let g = e.gamma || 0;
+            const maxTilt = 20; // 20도 기울기를 원형 테두리 끝으로 계산
+            let moveX = Math.max(-1, Math.min(1, g / maxTilt)) * 14; 
+            let moveY = Math.max(-1, Math.min(1, b / maxTilt)) * 14;
+            
+            miniBubble.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
 
-                    if (Math.abs(b) < 7 && Math.abs(g) < 7) {
-                        centerPin.style.background = "#39FF14"; bubble.style.background = "#39FF14"; bubble.style.boxShadow = "0 0 10px #39FF14";
-                    } else {
-                        centerPin.style.background = "#555"; bubble.style.background = "#ff3f34"; bubble.style.boxShadow = "0 0 10px #ff3f34";
-                    }
-                }
+            // 정밀 수평 (4도 이내) -> 네온그린 '딸깍' 점등
+            if (Math.abs(b) < 4 && Math.abs(g) < 4) {
+                miniBubble.style.background = "#39FF14"; miniBubble.style.boxShadow = "inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 8px #39FF14";
+                centerPin.style.background = "#39FF14"; centerPin.style.boxShadow = "0 0 15px #39FF14";
+            } else {
+                miniBubble.style.background = "#ff3f34"; miniBubble.style.boxShadow = "inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 5px #ff3f34";
+                centerPin.style.background = "radial-gradient(circle at 30% 30%, #ff3f34, #7d0000)"; centerPin.style.boxShadow = "0 2px 5px rgba(0,0,0,0.8)";
             }
         };
 
@@ -342,16 +445,13 @@
         if (distStep > 1) { totalDistance += distStep; lastPos = { lat, lon }; }
         document.getElementById('dist-total').innerText = formatDistance(totalDistance);
 
+        // 실시간 날씨 연동 (10분 간격)
+        updateWeather(lat, lon);
+
         if (distToTarget <= RADIUS_METER) {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
             alert(`[인증 완료] ${targetWP.name} 통과!\n다음 목표 지점으로 타겟을 변경합니다.`);
             currentCpIndex++; localStorage.setItem('apex_cp_index', currentCpIndex); renderCPList();
-        }
-    }
-
-    function resetMission() {
-        if(confirm("요원 등록 정보와 통과 기록이 영구 삭제됩니다. 초기화하시겠습니까?")) {
-            localStorage.removeItem('apex_operator_name'); localStorage.removeItem('apex_cp_index'); location.reload();
         }
     }
     
