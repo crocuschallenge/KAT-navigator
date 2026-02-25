@@ -31,11 +31,11 @@
 
     /* 메인 앱 공통 */
     #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
-    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer;}
+    .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer; user-select: none;}
     .title { font-family: 'Black Ops One', cursive; font-size: 26px; margin: 0; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
     .operator-bar { background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a; width: 100%; padding: 6px 0; margin-top: 10px; color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center; }
 
-    /* 나침반 메인 화면 */
+    /* 메인 컨테이너 */
     .main-container {
         width: 90%; max-width: 420px; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
         padding: 20px 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); margin-top: 15px; display: flex; flex-direction: column; align-items: center;
@@ -46,6 +46,7 @@
     }
     .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
 
+    /* 대형 나침반 UI */
     .compass-ui {
         position: relative; width: 280px; height: 280px; margin-bottom: 25px; border-radius: 50%; border: 12px solid #142014;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(74, 222, 128, 0.3);
@@ -67,13 +68,23 @@
 
     .needle-container { position: absolute; top: 50%; left: 50%; width: 18px; height: 240px; transform-origin: center center; transform: translate(-50%, -50%) rotate(0deg); z-index: 10; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.6)); }
     .needle-body { width: 100%; height: 100%; clip-path: polygon(50% 0, 85% 50%, 50% 100%, 15% 50%); background: linear-gradient(to bottom, #d32f2f 0%, #b71c1c 50%, #0d47a1 50%, #1565c0 100%); }
-    .center-pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f); border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8); }
+    .center-pin { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; background: radial-gradient(circle at 30% 30%, #b0bec5, #37474f); border: 2px solid #263238; border-radius: 50%; transform: translate(-50%, -50%); z-index: 11; box-shadow: 0 2px 5px rgba(0,0,0,0.8); transition: background 0.2s;}
+    
+    /* [신규] 지능형 전술 수평계 기포 */
+    .bubble {
+        position: absolute; width: 14px; height: 14px; background: #39FF14; border-radius: 50%;
+        box-shadow: 0 0 10px #39FF14; transition: transform 0.1s ease-out, opacity 0.3s ease, background 0.2s;
+        z-index: 12; pointer-events: none; opacity: 0; /* 평상시 숨김 */
+        top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
 
+    /* 실시간 데이터 요약 바 */
     .compact-data { display: flex; justify-content: space-between; width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 15px; margin-bottom: 20px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .data-item { display: flex; flex-direction: column; align-items: center; width: 33%;}
     .data-label { font-size: 11px; color: #80a080; margin-bottom: 5px; font-weight: 700; letter-spacing: 1px; text-align: center;}
     .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 16px; color: #ffffff; text-align: center;}
 
+    /* 미션 스크롤 패널 */
     .mission-panel { width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .panel-title { font-size: 12px; font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid #1a2f1a; padding-bottom: 5px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
     .cp-list { list-style: none; padding: 0; margin: 0; max-height: 180px; overflow-y: auto; padding-right: 5px;}
@@ -86,55 +97,37 @@
     @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
     .cp-status-text { font-family: 'Black Ops One', cursive; font-size: 11px; letter-spacing: 1px; }
 
+    /* 가동 버튼 */
     .tactical-btn {
         width: 100%; padding: 16px; background: linear-gradient(180deg, #2e4e2e, #1a2f1a); border: 2px solid #142014; border-bottom: 4px solid #0a0f0a; border-radius: 6px;
         color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-top: 10px;
     }
     .tactical-btn.active { background: linear-gradient(180deg, #d32f2f, #b71c1c); color: #ffffff; border-color: #8e0000; }
     
-    /* [신규] 하이엔드 디지털 인증서 포스터 스타일 (캡처 영역) */
+    /* 완주 디지털 인증서 포스터 */
     #certificate-wrapper { display: none; width: 100%; flex-direction: column; align-items: center; margin-top: 10px;}
-    
     #certificate-card {
         width: 100%; max-width: 450px; background-color: #030803; 
-        background-image: 
-            linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px);
-        background-size: 20px 20px;
-        border: 4px solid #1a2f1a; border-radius: 0; /* 군용 스펙 문서 느낌으로 각진 모서리 */
-        padding: 30px 20px 40px; box-sizing: border-box;
-        display: flex; flex-direction: column; align-items: center; text-align: center;
-        position: relative; overflow: hidden;
+        background-image: linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px); background-size: 20px 20px;
+        border: 4px solid #1a2f1a; padding: 30px 20px 40px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden;
     }
-    /* 모서리 코너 프레임 */
     #certificate-card::before, #certificate-card::after { content: ''; position: absolute; width: 30px; height: 30px; border: 3px solid #39FF14; pointer-events: none; }
     #certificate-card::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
     #certificate-card::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
-
     .cert-logo { font-family: 'Black Ops One', cursive; font-size: 32px; color: #ffffff; margin-bottom: 0; letter-spacing: 2px;}
     .cert-logo span { color: #39FF14; }
     .cert-sub { font-size: 11px; color: #80a080; letter-spacing: 4px; margin-bottom: 25px; border-bottom: 1px solid #1a2f1a; padding-bottom: 10px; width: 100%;}
-    
     .cert-badge { width: 80px; height: 80px; background: rgba(57,255,20,0.1); border: 2px solid #39FF14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 35px; color: #39FF14; margin-bottom: 15px; box-shadow: 0 0 30px rgba(57,255,20,0.3);}
     .cert-title { font-family: 'Black Ops One', cursive; font-size: 24px; color: #ffffff; margin-bottom: 20px; text-shadow: 0 0 10px #39FF14;}
-    
     .cert-info { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
     .cert-info-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); padding: 12px 15px; border-left: 3px solid #39FF14; font-size: 15px;}
     .cert-info-row span:first-child { color: #80a080; font-weight: 700; font-size: 12px; letter-spacing: 1px;}
-    
     .cert-grid-title { width: 100%; text-align: left; font-size: 12px; color: #39FF14; font-weight: 700; border-bottom: 1px dashed #1a2f1a; padding-bottom: 5px; margin-bottom: 10px;}
     .cert-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; font-size: 11px; color: #ddd; text-align: left;}
     .cert-item { display: flex; align-items: center; gap: 6px; background: rgba(10,20,10,0.8); padding: 6px; border: 1px solid #1a2f1a;}
     .cert-check { color: #39FF14; font-size: 12px; }
 
-    /* 다운로드 버튼 */
-    .download-btn {
-        width: 100%; max-width: 450px; padding: 18px; background: #39FF14; color: #000;
-        font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 1px;
-        border: none; border-radius: 8px; cursor: pointer; margin-top: 20px;
-        box-shadow: 0 5px 20px rgba(57,255,20,0.4); text-transform: uppercase;
-    }
-
+    .download-btn { width: 100%; max-width: 450px; padding: 18px; background: #39FF14; color: #000; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 1px; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 20px rgba(57,255,20,0.4); text-transform: uppercase; }
     .footer { margin-top: 25px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; padding-bottom: 30px;}
     .reset-link { color: #3a5f3a; text-decoration: underline; cursor: pointer; margin-top: 10px; display: inline-block; }
 </style>
@@ -162,7 +155,8 @@
                 <div class="tick t-30"></div><div class="tick t-60"></div><div class="tick t-120"></div><div class="tick t-150"></div><div class="tick t-210"></div><div class="tick t-240"></div><div class="tick t-300"></div><div class="tick t-330"></div>
             </div>
             <div class="needle-container" id="compass-needle"><div class="needle-body"></div></div>
-            <div class="center-pin"></div>
+            <div class="center-pin" id="center-pin"></div>
+            <div class="bubble" id="level-bubble"></div>
         </div>
 
         <div class="compact-data">
@@ -182,21 +176,16 @@
         <div id="certificate-card">
             <h1 class="cert-logo">APEX <span>SUMMIT</span></h1>
             <div class="cert-sub">KOREA ACTION TRAIL 2026</div>
-            
             <div class="cert-badge">✔</div>
             <h2 class="cert-title">MISSION ACCOMPLISHED</h2>
-            
             <div class="cert-info">
                 <div class="cert-info-row"><span>OPERATOR</span> <span id="cert-op-name" style="color:#fff; font-weight:bold; font-size: 18px;"></span></div>
                 <div class="cert-info-row"><span>TOTAL DISTANCE</span> <span id="cert-total-dist" style="color:#39FF14; font-weight:bold; font-family: 'Chakra Petch', sans-serif;"></span></div>
                 <div class="cert-info-row"><span>CLEAR TIME</span> <span id="cert-time" style="color:#fff; font-family: 'Chakra Petch', sans-serif;"></span></div>
             </div>
-
             <div class="cert-grid-title">24 CHECKPOINTS CLEARED</div>
-            <div class="cert-grid" id="cert-grid-container">
-                </div>
+            <div class="cert-grid" id="cert-grid-container"></div>
         </div>
-        
         <button class="download-btn" id="btn-download-cert">📷 디지털 인증서 갤러리 저장</button>
     </div>
 
@@ -208,35 +197,25 @@
 
 <script>
     const WAYPOINTS = [
-        { id: 1, name: "용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 }, 
-        { id: 2, name: "박달나무쉼터", lat: 38.2050, lon: 128.3900 },
-        { id: 3, name: "미시령옛길", lat: 38.2100, lon: 128.4200 },
-        { id: 4, name: "금강산성인대", lat: 38.2200, lon: 128.4500 },
-        { id: 5, name: "금강산화암사", lat: 38.2300, lon: 128.4800 },
-        { id: 6, name: "신평골길 8", lat: 38.2400, lon: 128.5000 },
-        { id: 7, name: "천진해수욕장", lat: 38.2500, lon: 128.5300 },
-        { id: 8, name: "청간정", lat: 38.2600, lon: 128.5400 },
-        { id: 9, name: "아야진해수욕장", lat: 38.2700, lon: 128.5500 },
-        { id: 10, name: "교암항", lat: 38.2800, lon: 128.5450 },
-        { id: 11, name: "교암리해수욕장", lat: 38.2850, lon: 128.5400 },
-        { id: 12, name: "능파대 (지질공원)", lat: 38.2900, lon: 128.5350 },
-        { id: 13, name: "문암항", lat: 38.3000, lon: 128.5300 },
-        { id: 14, name: "삼포해수욕장", lat: 38.3100, lon: 128.5250 },
-        { id: 15, name: "송지호철새도래지", lat: 38.3300, lon: 128.5150 },
-        { id: 16, name: "왕곡마을", lat: 38.3400, lon: 128.5100 },
-        { id: 17, name: "수뭇개바위", lat: 38.3500, lon: 128.5050 },
-        { id: 18, name: "동호리해변", lat: 38.3800, lon: 128.4900 },
-        { id: 19, name: "거진해수욕장", lat: 38.4400, lon: 128.4600 },
-        { id: 20, name: "화진포", lat: 38.4700, lon: 128.4400 },
-        { id: 21, name: "화진포의성", lat: 38.4750, lon: 128.4450 },
-        { id: 22, name: "화진포소나무숲", lat: 38.4800, lon: 128.4500 },
-        { id: 23, name: "마차진 (수송)", lat: 38.5000, lon: 128.4300 },
-        { id: 24, name: "고성통일전망타워", lat: 38.5833, lon: 128.3833 }
+        { id: 1, name: "용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 }, { id: 2, name: "박달나무쉼터", lat: 38.2050, lon: 128.3900 },
+        { id: 3, name: "미시령옛길", lat: 38.2100, lon: 128.4200 }, { id: 4, name: "금강산성인대", lat: 38.2200, lon: 128.4500 },
+        { id: 5, name: "금강산화암사", lat: 38.2300, lon: 128.4800 }, { id: 6, name: "신평골길 8", lat: 38.2400, lon: 128.5000 },
+        { id: 7, name: "천진해수욕장", lat: 38.2500, lon: 128.5300 }, { id: 8, name: "청간정", lat: 38.2600, lon: 128.5400 },
+        { id: 9, name: "아야진해수욕장", lat: 38.2700, lon: 128.5500 }, { id: 10, name: "교암항", lat: 38.2800, lon: 128.5450 },
+        { id: 11, name: "교암리해수욕장", lat: 38.2850, lon: 128.5400 }, { id: 12, name: "능파대 (지질공원)", lat: 38.2900, lon: 128.5350 },
+        { id: 13, name: "문암항", lat: 38.3000, lon: 128.5300 }, { id: 14, name: "삼포해수욕장", lat: 38.3100, lon: 128.5250 },
+        { id: 15, name: "송지호철새도래지", lat: 38.3300, lon: 128.5150 }, { id: 16, name: "왕곡마을", lat: 38.3400, lon: 128.5100 },
+        { id: 17, name: "수뭇개바위", lat: 38.3500, lon: 128.5050 }, { id: 18, name: "동호리해변", lat: 38.3800, lon: 128.4900 },
+        { id: 19, name: "거진해수욕장", lat: 38.4400, lon: 128.4600 }, { id: 20, name: "화진포", lat: 38.4700, lon: 128.4400 },
+        { id: 21, name: "화진포의성", lat: 38.4750, lon: 128.4450 }, { id: 22, name: "화진포소나무숲", lat: 38.4800, lon: 128.4500 },
+        { id: 23, name: "마차진 (수송)", lat: 38.5000, lon: 128.4300 }, { id: 24, name: "고성통일전망타워", lat: 38.5833, lon: 128.3833 }
     ];
     
     const RADIUS_METER = 50; 
     const trackingUI = document.getElementById('tracking-ui');
     const certWrapper = document.getElementById('certificate-wrapper');
+    const bubble = document.getElementById('level-bubble');
+    const centerPin = document.getElementById('center-pin');
 
     let isTracking = false; let lastPos = null; let totalDistance = 0;
     let savedName = localStorage.getItem('apex_operator_name');
@@ -250,6 +229,7 @@
             renderCPList();
         }
     }
+    
     document.getElementById('btn-login').addEventListener('click', () => {
         const name = document.getElementById('participant-name').value.trim();
         if (name.length < 2) { alert("정확한 참가자 성명을 입력해주십시오."); return; }
@@ -264,74 +244,44 @@
     }
     function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m'; }
 
-    // --- [핵심] 디지털 인증서 화면 출력 ---
     function showCertificate() {
-        trackingUI.style.display = 'none';
-        certWrapper.style.display = 'flex';
-        
+        trackingUI.style.display = 'none'; certWrapper.style.display = 'flex';
         document.getElementById('cert-op-name').innerText = savedName;
-        // 치트키로 바로 들어왔을 경우를 대비한 총거리 표기 예외처리
         document.getElementById('cert-total-dist').innerText = totalDistance > 0 ? formatDistance(totalDistance) : "108.00 km (완주)";
-        
         const now = new Date();
         document.getElementById('cert-time').innerText = now.getFullYear() + "." + String(now.getMonth()+1).padStart(2,'0') + "." + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0');
-
-        const certGrid = document.getElementById('cert-grid-container');
-        certGrid.innerHTML = '';
-        WAYPOINTS.forEach(wp => {
-            certGrid.innerHTML += `<div class="cert-item"><span class="cert-check">✔</span> <span>${wp.name}</span></div>`;
-        });
+        const certGrid = document.getElementById('cert-grid-container'); certGrid.innerHTML = '';
+        WAYPOINTS.forEach(wp => { certGrid.innerHTML += `<div class="cert-item"><span class="cert-check">✔</span> <span>${wp.name}</span></div>`; });
     }
 
-    // --- [핵심] 이미지를 스마트폰에 저장하는 기능 (html2canvas) ---
     document.getElementById('btn-download-cert').addEventListener('click', () => {
-        const card = document.getElementById('certificate-card');
-        const btn = document.getElementById('btn-download-cert');
-        
+        const card = document.getElementById('certificate-card'); const btn = document.getElementById('btn-download-cert');
         btn.innerText = "⏳ 이미지 생성 중...";
-        
-        // 카드를 캡처하여 고화질 캔버스로 변환
         html2canvas(card, { backgroundColor: '#030803', scale: 3 }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `APEX_CERTIFICATE_${savedName}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            const link = document.createElement('a'); link.download = `APEX_CERTIFICATE_${savedName}.png`; link.href = canvas.toDataURL('image/png'); link.click();
             btn.innerText = "📷 디지털 인증서 갤러리 저장";
-        }).catch(err => {
-            alert("이미지 저장 중 오류가 발생했습니다. 직접 화면을 캡처해주세요.");
-            btn.innerText = "📷 디지털 인증서 갤러리 저장";
-        });
+        }).catch(err => { alert("저장 오류 발생. 화면을 직접 캡처해주세요."); btn.innerText = "📷 디지털 인증서 갤러리 저장"; });
     });
 
-    // --- [테스트 치트키] 헤더 타이틀을 3번 연속 터치하면 바로 증명서 팝업 ---
     let clickCount = 0;
     document.getElementById('main-title-header').addEventListener('click', () => {
-        clickCount++;
-        if(clickCount >= 3) { showCertificate(); clickCount = 0; }
-        setTimeout(() => { clickCount = 0; }, 1000); // 1초 내에 3번 눌러야 함
+        clickCount++; if(clickCount >= 3) { showCertificate(); clickCount = 0; }
+        setTimeout(() => { clickCount = 0; }, 1000); 
     });
 
     function renderCPList() {
         if (currentCpIndex >= WAYPOINTS.length) { showCertificate(); return; }
-
-        const cpListContainer = document.getElementById('cp-list-container');
-        cpListContainer.innerHTML = '';
+        const cpListContainer = document.getElementById('cp-list-container'); cpListContainer.innerHTML = '';
         WAYPOINTS.forEach((wp, index) => {
             let statusClass = 'text-pending'; let dotClass = ''; let statusText = 'PENDING';
             if (index < currentCpIndex) { statusClass = 'text-cleared'; dotClass = 'cleared'; statusText = 'PASSED'; } 
             else if (index === currentCpIndex) { statusClass = 'text-active'; dotClass = 'active'; statusText = 'TRACKING..'; }
-
-            const li = document.createElement('li');
-            li.className = 'cp-item'; if(index === currentCpIndex) li.id = "current-target-cp";
+            const li = document.createElement('li'); li.className = 'cp-item'; if(index === currentCpIndex) li.id = "current-target-cp";
             li.innerHTML = `<div class="cp-name"><div class="status-dot ${dotClass}"></div>${wp.name}</div><div class="cp-status-text ${statusClass}">${statusText}</div>`;
             cpListContainer.appendChild(li);
         });
-
-        const targetEl = document.getElementById("current-target-cp");
-        if(targetEl) cpListContainer.scrollTop = targetEl.offsetTop - 50;
-
-        document.getElementById('mission-status').innerText = `TARGET: ${currentCpIndex + 1} / 24`;
-        document.getElementById('mission-status').style.color = "#fbc02d";
+        const targetEl = document.getElementById("current-target-cp"); if(targetEl) cpListContainer.scrollTop = targetEl.offsetTop - 50;
+        document.getElementById('mission-status').innerText = `TARGET: ${currentCpIndex + 1} / 24`; document.getElementById('mission-status').style.color = "#fbc02d";
     }
 
     document.getElementById('activate-btn').addEventListener('click', () => {
@@ -339,18 +289,39 @@
         const btnActivate = document.getElementById('activate-btn');
         btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)'; btnActivate.classList.add('active'); isTracking = true;
 
-        const handleCompass = (e) => {
+        const handleCompassAndLevel = (e) => {
+            // 1. 방위각 로직
             let heading = e.webkitCompassHeading !== undefined ? e.webkitCompassHeading : (e.absolute === true || e.alpha !== null ? 360 - e.alpha : null);
             if (heading !== null) {
                 heading = heading % 360;
                 document.getElementById('heading-value').innerText = Math.round(heading).toString().padStart(3, '0');
                 document.getElementById('compass-needle').style.transform = `translate(-50%, -50%) rotate(${-heading}deg)`;
             }
+
+            // 2. 지능형 수평계 로직
+            let b = e.beta; let g = e.gamma;
+            if(b !== null && g !== null) {
+                if (Math.abs(b) > 60 || Math.abs(b) < -60) {
+                    bubble.style.opacity = "0"; // 세우면 숨김
+                    centerPin.style.background = "radial-gradient(circle at 30% 30%, #b0bec5, #37474f)";
+                } else {
+                    bubble.style.opacity = "1"; // 눕히면 등장
+                    let moveX = Math.max(-40, Math.min(40, g * 1.5)); 
+                    let moveY = Math.max(-40, Math.min(40, b * 1.5));
+                    bubble.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
+
+                    if (Math.abs(b) < 7 && Math.abs(g) < 7) {
+                        centerPin.style.background = "#39FF14"; bubble.style.background = "#39FF14"; bubble.style.boxShadow = "0 0 10px #39FF14";
+                    } else {
+                        centerPin.style.background = "#555"; bubble.style.background = "#ff3f34"; bubble.style.boxShadow = "0 0 10px #ff3f34";
+                    }
+                }
+            }
         };
 
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission().then(state => { if (state === 'granted') window.addEventListener('deviceorientation', handleCompass, true); }).catch(console.error);
-        } else { window.addEventListener('deviceorientationabsolute', handleCompass, true); }
+            DeviceOrientationEvent.requestPermission().then(state => { if (state === 'granted') window.addEventListener('deviceorientation', handleCompassAndLevel, true); }).catch(console.error);
+        } else { window.addEventListener('deviceorientationabsolute', handleCompassAndLevel, true); }
 
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(updatePosition, (err) => console.warn('GPS Error'), { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
@@ -383,6 +354,7 @@
             localStorage.removeItem('apex_operator_name'); localStorage.removeItem('apex_cp_index'); location.reload();
         }
     }
+    
     checkLogin();
 </script>
 </body>
