@@ -261,9 +261,12 @@
         <button class="tactical-btn" id="activate-btn">SYSTEM ENGAGE (가동)</button>
         <button class="tactical-btn" id="radar-btn">TACTICAL RADAR : OFF</button>
 
-        <div class="mission-panel">
+    <div class="mission-panel">
             <div class="panel-title"><span>MISSION WAYPOINTS</span> <span id="mission-status">STANDBY</span></div>
             <ul class="cp-list" id="cp-list-container"></ul>
+        </div>
+        <div style="width:100%;text-align:center;font-size:11px;color:#4a6b4a;letter-spacing:1px;margin-bottom:10px;padding:6px 0;border-top:1px solid #1a2f1a;">
+          본 시스템은 모바일에서 작동 가능합니다.
         </div>
         
     </div>
@@ -481,6 +484,28 @@
 
     document.getElementById('radar-btn').addEventListener('click', function() {
         isRadarActive = !isRadarActive;
+        if (isRadarActive) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const morse = [1,0,1,0,0,1,1,1,0,1]; // -·- 패턴
+    let t = ctx.currentTime + 0.05;
+    let freq = 600;
+    morse.forEach(function(on){
+      if(on){
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(freq, t);
+        g.gain.setValueAtTime(0.2, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+        o.start(t); o.stop(t + 0.1);
+        freq += 40;
+      }
+      t += 0.13;
+    });
+  } catch(e) {}
+}
         if(isRadarActive) {
             this.classList.add('active'); this.innerText = 'TACTICAL RADAR : ON (추적 중)';
             document.getElementById('radar-spot-container').style.display = 'block';
@@ -565,6 +590,22 @@
     }
 
     document.getElementById('activate-btn').addEventListener('click', () => {
+        try {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(40, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 1.2);
+  osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 2.0);
+  gain.gain.setValueAtTime(0.0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + 0.3);
+  gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 2.0);
+  gain.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 2.4);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 2.4);
+} catch(e) {}
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
         
         // (기존 오토바이 배기음 삭제 완료)
