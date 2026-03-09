@@ -325,6 +325,7 @@
     let currentHeading = null;
     let currentTargetBearing = null;
     let isRadarActive = false;
+    let wakeLock = null;
 
     // [신규] 철통 복구를 위한 로컬스토리지 연동 변수
     let savedName = localStorage.getItem('apex_operator_name');
@@ -609,6 +610,20 @@
   osc.start(ctx.currentTime);
   osc.stop(ctx.currentTime + 2.4);
 } catch(e) {}
+        if ('wakeLock' in navigator) {
+    navigator.wakeLock.request('screen')
+    .then(lock => { wakeLock = lock; })
+    .catch(e => {});
+}
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && isTracking) {
+        if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen')
+            .then(lock => { wakeLock = lock; })
+            .catch(e => {});
+        }
+    }
+});
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
         
         // (기존 오토바이 배기음 삭제 완료)
