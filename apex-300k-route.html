@@ -11,6 +11,8 @@
         :root { --c-neon: #39FF14; --c-dark: #030c06; --c-gray: #888888; --c-bg-panel: rgba(3, 12, 6, 0.85); --c-bus: #ffaa00; }
         body { margin: 0; padding: 0; background-color: var(--c-dark); font-family: sans-serif; overflow: hidden; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; }
+        
+        /* ── 좌측 메인 HUD ── */
         .left-hud { position: absolute; top: 20px; left: 20px; z-index: 10; background: var(--c-bg-panel); border: 1px solid #1a3320; width: 300px; padding: 0; color: #fff; box-shadow: 0 5px 30px rgba(0,0,0,0.9); backdrop-filter: blur(4px); }
         .hud-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #1a3320; }
         .brand-title { color: var(--c-neon); font-weight: 900; font-size: 1.1rem; letter-spacing: 1px; }
@@ -38,28 +40,119 @@
         .speed-grid { display: flex; gap: 5px; margin-top: 10px; }
         .btn-speed { flex: 1; background: #05140a; border: 1px solid #1a3320; color: var(--c-gray); padding: 8px 0; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
         .btn-speed.active { border-color: var(--c-neon); color: var(--c-neon); background: rgba(57, 255, 20, 0.1); }
-        .elevation-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 90px; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); display: flex; flex-direction: column; justify-content: flex-end; }
+        
+        /* ── 하단 고도 그래프 ── */
+        .elevation-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 90px; z-index: 10; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%); display: flex; flex-direction: column; justify-content: flex-end; pointer-events: none;}
         .elevation-info { display: flex; justify-content: space-between; padding: 0 20px 10px 20px; font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; color: var(--c-gray); }
         .elevation-graph { position: relative; width: 100%; height: 40px; border-bottom: 1px solid var(--c-neon); }
         .elevation-svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: url("data:image/svg+xml;utf8,<svg preserveAspectRatio='none' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'><polygon points='0,100 0,92 5,92 15,90 22,90 28,90 33,88 38,85 43,82 50,55 55,62 60,60 66,10 70,52 75,50 83,35 90,65 95,82 100,90 100,100' fill='rgba(57, 255, 20, 0.15)' stroke='%231a3320' stroke-width='1'/></svg>") no-repeat; background-size: 100% 100%; }
         .elevation-tracker { position: absolute; left: 0%; bottom: 20%; width: 20px; height: 20px; background: radial-gradient(circle, #39FF14, transparent); transform: translateX(-50%); z-index: 3; transition: left 0.1s linear, bottom 0.1s linear; border-radius: 50%; }
         .elevation-line { position: absolute; bottom: 0; left: 0; width: 0%; border-bottom: 2px solid var(--c-neon); z-index: 1; transition: width 0.1s linear; }
+        
+        /* ── 우측 위젯 패널 ── */
         .right-panel { position: absolute; top: 20px; right: 20px; z-index: 10; display: flex; flex-direction: column; gap: 15px; width: 140px; }
-        .widget-box { background: var(--c-bg-panel); border: 1px solid #1a3320; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .widget-title { font-size: 0.75rem; color: var(--c-gray); margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; }
+        .widget-box { background: var(--c-bg-panel); border: 1px solid #1a3320; padding: 15px; display: flex; flex-direction: column; align-items: center; backdrop-filter: blur(4px); box-shadow: 0 5px 20px rgba(0,0,0,0.8);}
+        .widget-title { font-size: 0.75rem; color: var(--c-gray); margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; text-align: center;}
         .compass { width: 80px; height: 80px; border: 1px solid var(--c-neon); border-radius: 50%; position: relative; background: #000; }
         .compass::before { content: "N"; position: absolute; top: 5px; left: 50%; transform: translateX(-50%); color: #ff0033; font-size: 14px; font-weight: 900; z-index: 2;}
-        .compass-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 32px solid var(--c-neon); position: absolute; top: 12px; left: 50%; transform-origin: bottom center; margin-left: -6px; }
+        .compass-arrow { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 32px solid var(--c-neon); position: absolute; top: 12px; left: 50%; transform-origin: bottom center; margin-left: -6px; transition: transform 0.1s linear;}
         .donut-chart { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(#004d1a 0% 40%, var(--c-neon) 40% 75%, #ff0033 75% 90%, var(--c-bus) 90% 100%); display: flex; justify-content: center; align-items: center; }
-        .donut-inner { width: 76px; height: 76px; background: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--c-neon); font-weight: 900; font-size: 1rem; flex-direction: column; }
+        .donut-inner { width: 76px; height: 76px; background: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--c-neon); font-weight: 900; font-size: 1rem; flex-direction: column; text-align: center;}
         .donut-inner span { font-size: 0.6rem; color: var(--c-gray); margin-top: 2px; }
-        .marker-label { background: rgba(0,30,10,0.85); border: 1px solid var(--c-neon); color: var(--c-neon); padding: 4px 8px; font-size: 11px; font-weight: bold; margin-top: 5px; white-space: nowrap; visibility: hidden; opacity: 0; transition: opacity 0.5s; }
+        
+        .marker-label { background: rgba(0,30,10,0.85); border: 1px solid var(--c-neon); color: var(--c-neon); padding: 4px 8px; font-size: 11px; font-weight: bold; margin-top: 5px; white-space: nowrap; visibility: hidden; opacity: 0; transition: opacity 0.5s; pointer-events: none;}
         .marker-label.revealed { visibility: visible; opacity: 1; }
+        
         .mission-clear-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, rgba(0,30,10,0.4) 0%, rgba(3,12,6,0.9) 100%); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 3s; }
         .mission-clear-overlay.show { opacity: 1; pointer-events: all; }
-        .mc-title { font-size: 4rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--c-neon); letter-spacing: 10px; margin-bottom: 15px; }
-        .mc-subtitle { font-size: 1.5rem; color: var(--c-neon); letter-spacing: 12px; font-weight: bold; }
+        .mc-title { font-size: 4rem; font-weight: 900; color: #fff; text-shadow: 0 0 20px var(--c-neon); letter-spacing: 10px; margin-bottom: 15px; text-align: center;}
+        .mc-subtitle { font-size: 1.5rem; color: var(--c-neon); letter-spacing: 12px; font-weight: bold; text-align: center;}
+        
+        .disclaimer { position:absolute;bottom:40px;left:50%;transform:translateX(-50%);z-index:11;text-align:center;white-space:nowrap;font-size:0.72rem;color:rgba(255,255,255,0.55);letter-spacing:0.08em;background:rgba(3,12,6,0.70);border:1px solid rgba(57,255,20,0.12);padding:7px 18px;backdrop-filter:blur(4px); pointer-events: none;}
+        
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+        /* 📱 STRICT MOBILE OVERRIDES */
+        @media (max-width: 768px) {
+            /* 좌측 메인 HUD: 상단에 가로로 꽉 차게 배치, 높이 최소화 */
+            .left-hud {
+                top: 0;
+                left: 0;
+                width: 100%;
+                max-height: 40vh; /* 화면의 40% 이상 차지하지 않도록 */
+                overflow-y: auto; /* 내용이 넘치면 스크롤 */
+                border-left: none;
+                border-right: none;
+                border-top: none;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            }
+            .hud-header { padding: 10px 15px; }
+            .brand-title { font-size: 1rem; }
+            .progress-section { padding: 10px 15px; }
+            .checkpoint-section { padding: 10px 15px; }
+            .cp-current { font-size: 1rem; }
+            
+            /* Stats List: 2단 그리드로 변경하여 공간 절약 */
+            .stats-list {
+                padding: 10px 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-row { flex-direction: column; align-items: flex-start; }
+            .stat-label { font-size: 0.7rem; margin-bottom: 2px;}
+            .stat-val { font-size: 0.9rem; }
+            
+            .controls-section { padding: 10px 15px 15px 15px; }
+            .btn-main { padding: 10px 0; font-size: 0.85rem; }
+
+            /* 우측 위젯 패널: 하단 좌측/우측으로 작게 분산시키거나 상단 우측에 미니멀하게 */
+            .right-panel {
+                top: auto;
+                bottom: 80px; /* 고도 그래프 위 */
+                right: 10px;
+                flex-direction: row; /* 가로 배열 */
+                gap: 10px;
+                width: auto;
+            }
+            .widget-box { padding: 8px; border-radius: 8px;}
+            .widget-title { display: none; } /* 모바일에서는 타이틀 숨김 (공간 확보) */
+            
+            /* 나침반 및 도넛 차트 크기 대폭 축소 */
+            .compass { width: 50px; height: 50px; }
+            .compass::before { font-size: 10px; top: 2px;}
+            .compass-arrow { border-left: 4px solid transparent; border-right: 4px solid transparent; border-bottom: 20px solid var(--c-neon); top: 10px; margin-left: -4px;}
+            
+            .donut-chart { width: 50px; height: 50px; }
+            .donut-inner { width: 38px; height: 38px; font-size: 0.7rem; }
+            .donut-inner span { font-size: 0.4rem; display: none;} /* 모바일에서 글씨 숨김 */
+
+            /* 하단 고도 그래프: 더 낮게 밀착 */
+            .elevation-panel { height: 60px; }
+            .elevation-info { padding: 0 10px 5px 10px; font-size: 0.6rem; flex-direction: column; gap: 2px;}
+            .elevation-info span:last-child { display: none; } /* 상세 정보 숨김 */
+            .elevation-graph { height: 30px; }
+            .elevation-tracker { width: 14px; height: 14px; bottom: 15%;}
+            
+            /* 면책 조항 문구: 크기 줄이고 줄바꿈 허용 */
+            .disclaimer { 
+                width: 90%; 
+                white-space: normal; 
+                font-size: 0.6rem; 
+                bottom: 70px; 
+                padding: 5px 10px; 
+            }
+
+            /* 미션 클리어 화면 */
+            .mc-title { font-size: 2.5rem; letter-spacing: 5px; }
+            .mc-subtitle { font-size: 1rem; letter-spacing: 4px; }
+        }
+        
+        /* 📱 아주 작은 화면 (iPhone SE 등) */
+        @media (max-width: 375px) {
+            .stats-list { display: none; } /* 공간 부족 시 통계 숨김 */
+            .right-panel { display: none; } /* 지도 시인성 확보를 위해 위젯 숨김 */
+        }
     </style>
 </head>
 <body>
@@ -67,14 +160,25 @@
     <div class="mc-title">MISSION CLEAR</div>
     <div class="mc-subtitle">2026 KOREA ACTION TRAIL 300K</div>
 </div>
+
 <div class="left-hud">
-    <div class="hud-header"><div class="brand-title">KAT 300K</div><div class="live-status"><div class="live-dot" id="live-dot"></div><span id="standby-text">ORBIT</span></div></div>
-    <div class="progress-section"><div class="route-title"><span>정서진 ▶ 정동진 300K</span><span id="ui-percent">0.0%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="ui-progress-fill"></div></div></div>
-    <div class="checkpoint-section"><div class="cp-label">CURRENT CHECKPOINT</div><div class="cp-current" id="ui-cp-current">위성 궤도 대기 중</div><div class="cp-next" id="ui-cp-next">목표: 경인아라뱃길</div></div>
+    <div class="hud-header">
+        <div class="brand-title">KAT 300K</div>
+        <div class="live-status"><div class="live-dot" id="live-dot"></div><span id="standby-text">ORBIT</span></div>
+    </div>
+    <div class="progress-section">
+        <div class="route-title"><span>정서진 ▶ 정동진 300K</span><span id="ui-percent">0.0%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="ui-progress-fill"></div></div>
+    </div>
+    <div class="checkpoint-section">
+        <div class="cp-label">CURRENT CHECKPOINT</div>
+        <div class="cp-current" id="ui-cp-current">위성 궤도 대기 중</div>
+        <div class="cp-next" id="ui-cp-next">목표: 경인아라뱃길</div>
+    </div>
     <div class="stats-list">
         <div class="stat-row"><span class="stat-label">진행 거리</span><span class="stat-val highlight" id="ui-dist-done">0.00 KM</span></div>
         <div class="stat-row"><span class="stat-label">잔여 거리</span><span class="stat-val" id="ui-dist-remain">300.00 KM</span></div>
-        <div class="stat-row"><span class="stat-label">현재 지형</span><span class="stat-val" id="ui-terrain">지구 궤도</span></div>
+        <div class="stat-row"><span class="stat-label">현재 지형</span><span class="stat-val" id="ui-terrain" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; text-align: right;">지구 궤도</span></div>
         <div class="stat-row"><span class="stat-label">총 거리</span><span class="stat-val">300.00 KM</span></div>
     </div>
     <div class="controls-section">
@@ -87,55 +191,236 @@
         </div>
     </div>
 </div>
+
 <div class="right-panel">
     <div class="widget-box"><div class="widget-title">BEARING</div><div class="compass"><div class="compass-arrow" id="compass-arrow"></div></div></div>
     <div class="widget-box"><div class="widget-title">TERRAIN</div><div class="donut-chart"><div class="donut-inner">300K<span>VERIFIED</span></div></div></div>
 </div>
-<div style="position:absolute;bottom:40px;left:50%;transform:translateX(-50%);z-index:11;text-align:center;white-space:nowrap;font-size:0.72rem;color:rgba(255,255,255,0.55);letter-spacing:0.08em;background:rgba(3,12,6,0.70);border:1px solid rgba(57,255,20,0.12);padding:7px 18px;backdrop-filter:blur(4px)">
+
+<div class="disclaimer">
     ※ 본 경로 루트는 참조 예시용이며, 실거리 코스 답사 최종 완료 후 공지됩니다.
 </div>
+
 <div class="elevation-panel">
-    <div class="elevation-info"><span>ELEVATION PROFILE — JEONGSEOJIN TO JEONGDONGJIN</span><span><span style="color:#fff">최고 1,261m (태기산)</span> | <span style="color:var(--c-neon)">D7 최고 난이도</span></span></div>
+    <div class="elevation-info">
+        <span>ELEVATION PROFILE — JEONGSEOJIN TO JEONGDONGJIN</span>
+        <span><span style="color:#fff">최고 1,261m (태기산)</span> | <span style="color:var(--c-neon)">D7 최고 난이도</span></span>
+    </div>
     <div class="elevation-graph"><div class="elevation-svg"></div><div class="elevation-line" id="elev-line"></div><div class="elevation-tracker" id="elev-tracker"></div></div>
 </div>
+
 <div id="map"></div>
+
 <script>
 mapboxgl.accessToken='pk.eyJ1IjoiYXBleHN1bW1pdCIsImEiOiJjbWx5ZGozcGcxOHh1M2hvbjB0YW5nenR1In0.j6rWkUwyPS7hNFKys9Zbtg';
 const ROUTE_SEGMENTS=[{id:'D1-D2',profile:'cycling',waypoints:[[126.607,37.555],[126.660,37.563],[126.720,37.576],[126.790,37.591],[126.832,37.602],[126.891,37.578],[126.948,37.566],[127.013,37.552],[127.072,37.542],[127.150,37.545],[127.207,37.558]]},{id:'D3',profile:'cycling',waypoints:[[127.207,37.558],[127.285,37.540],[127.365,37.533],[127.435,37.508],[127.492,37.487]]},{id:'D4-D5',profile:'walking',waypoints:[[127.492,37.487],[127.545,37.490],[127.601,37.493],[127.680,37.503],[127.780,37.510],[127.900,37.500],[127.985,37.492]]},{id:'D6-D7',profile:'walking',waypoints:[[127.985,37.492],[128.030,37.500],[128.120,37.515],[128.214,37.524],[128.270,37.550],[128.305,37.565],[128.322,37.601]]},{id:'D8-D10',profile:'walking',waypoints:[[128.322,37.601],[128.450,37.635],[128.550,37.650],[128.699,37.670],[128.770,37.720],[128.856,37.751],[128.970,37.695],[129.032,37.692]]}];
 const KEY_CHECKPOINTS=[{coord:[126.607,37.555],title:'정서진 (START)'},{coord:[126.832,37.602],title:'행주산성'},{coord:[127.207,37.558],title:'남양주 덕소'},{coord:[127.492,37.487],title:'양평읍'},{coord:[127.601,37.493],title:'용문면'},{coord:[127.985,37.492],title:'횡성읍'},{coord:[128.214,37.524],title:'둔내'},{coord:[128.305,37.565],title:'태기산 정상 (1,261m)'},{coord:[128.322,37.601],title:'봉평 효석마을'},{coord:[128.699,37.670],title:'횡계 (대관령면)'},{coord:[128.876,37.751],title:'강릉 경포'},{coord:[129.032,37.692],title:'정동진 (FINISH)',isFinish:true}];
 const elevData=[{x:0,h:3},{x:5,h:5},{x:15,h:8},{x:22,h:8},{x:28,h:10},{x:33,h:12},{x:38,h:15},{x:43,h:18},{x:47,h:22},{x:52,h:45},{x:55,h:38},{x:58,h:55},{x:62,h:65},{x:65,h:78},{x:67,h:85},{x:70,h:55},{x:75,h:58},{x:80,h:72},{x:84,h:84},{x:88,h:35},{x:95,h:10},{x:100,h:3}];
 function getElevH(p){for(let i=0;i<elevData.length-1;i++){if(p>=elevData[i].x&&p<=elevData[i+1].x){const t=(p-elevData[i].x)/(elevData[i+1].x-elevData[i].x);return elevData[i].h+t*(elevData[i+1].h-elevData[i].h);}}return 3;}
+
 let speedCtrl=1,animId,isAnim=false,lastT,camX=0,camY=0,physDist=0,physTotal=0;
 const TARGET=300,DURATION=200000,RESOLUTION=10000;
 let path=[];
 const map=new mapboxgl.Map({container:'map',style:'mapbox://styles/mapbox/satellite-streets-v12',projection:'globe',center:[127.85,37.55],zoom:1.5,pitch:0,bearing:0,antialias:true,interactive:false});
 let hiddenLbls=[];
-map.on('style.load',()=>{map.setFog({'color':'rgb(0,0,0)','high-color':'rgb(20,20,20)','horizon-blend':0.02,'space-color':'rgb(0,0,0)','star-intensity':0.9});map.getStyle().layers.forEach(l=>{if(l.type==='symbol'&&(l.id.includes('label')||l.id.includes('place')||l.id.includes('poi'))){map.setLayoutProperty(l.id,'visibility','none');hiddenLbls.push(l.id);}});});
-async function fetchSeg(seg){const coords=seg.waypoints.map(c=>c.join(',')).join(';');const url=`https://api.mapbox.com/directions/v5/mapbox/${seg.profile}/${coords}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;const r=await fetch(url);const d=await r.json();return d.routes[0].geometry.coordinates;}
+
+map.on('style.load',()=>{
+    map.setFog({'color':'rgb(0,0,0)','high-color':'rgb(20,20,20)','horizon-blend':0.02,'space-color':'rgb(0,0,0)','star-intensity':0.9});
+    map.getStyle().layers.forEach(l=>{
+        if(l.type==='symbol'&&(l.id.includes('label')||l.id.includes('place')||l.id.includes('poi'))){
+            map.setLayoutProperty(l.id,'visibility','none');
+            hiddenLbls.push(l.id);
+        }
+    });
+});
+
+async function fetchSeg(seg){
+    const coords=seg.waypoints.map(c=>c.join(',')).join(';');
+    const url=`https://api.mapbox.com/directions/v5/mapbox/${seg.profile}/${coords}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
+    const r=await fetch(url);
+    const d=await r.json();
+    return d.routes[0].geometry.coordinates;
+}
+
 map.on('load',()=>{
-map.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512,maxzoom:14});
-map.setTerrain({source:'mapbox-dem',exaggeration:1.3});
-KEY_CHECKPOINTS.forEach(loc=>{if(loc.isFinish){const el=document.createElement('div');el.style.cssText='width:18px;height:18px;background:#ff0033;border-radius:50%;box-shadow:0 0 15px #ff0033';new mapboxgl.Marker({element:el}).setLngLat(loc.coord).addTo(map);}else{new mapboxgl.Marker({color:'#ffffff',scale:0.5}).setLngLat(loc.coord).addTo(map);}const lbl=document.createElement('div');lbl.className='marker-label';lbl.innerText=loc.title;new mapboxgl.Marker({element:lbl,anchor:'top'}).setLngLat(loc.coord).addTo(map);});
-const btn=document.getElementById('action-btn');
-btn.innerText='루트 수신 중...';
-Promise.all(ROUTE_SEGMENTS.map(s=>fetchSeg(s))).then(results=>{
-let combined=results[0];for(let i=1;i<results.length;i++)combined=combined.concat(results[i].slice(1));
-const gj={type:'Feature',geometry:{type:'LineString',coordinates:combined}};
-physTotal=turf.length(gj,{units:'kilometers'});
-const kmPerMs=physTotal/DURATION;
-for(let i=0;i<=RESOLUTION;i++){const d=(i/RESOLUTION)*physTotal;path.push({dist:d,coord:turf.along(gj,d).geometry.coordinates});}
-camX=path[0].coord[0];camY=path[0].coord[1];
-map.addSource('route-bg',{type:'geojson',data:gj});map.addLayer({id:'route-bg-layer',type:'line',source:'route-bg',paint:{'line-color':'#003311','line-width':4,'line-opacity':0.4}});
-map.addSource('trace',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:[]}}});map.addLayer({id:'trace-layer',type:'line',source:'trace',paint:{'line-color':'#39FF14','line-width':6}});
-map.addSource('head',{type:'geojson',data:{type:'Feature',geometry:{type:'Point',coordinates:path[0].coord}}});map.addLayer({id:'head-glow',type:'circle',source:'head',paint:{'circle-radius':14,'circle-color':'#39FF14','circle-opacity':0.6,'circle-blur':0.3}});map.addLayer({id:'head-core',type:'circle',source:'head',paint:{'circle-radius':4,'circle-color':'#ffffff'}});
-btn.innerText='▶ MISSION START';btn.classList.add('active-state');btn.disabled=false;
-document.querySelectorAll('.btn-speed').forEach(b=>b.addEventListener('click',e=>{document.querySelectorAll('.btn-speed').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');speedCtrl=parseFloat(e.target.getAttribute('data-speed'));}));
-function updateCP(r){const idx=Math.min(Math.floor(r*(KEY_CHECKPOINTS.length-1)),KEY_CHECKPOINTS.length-1);document.getElementById('ui-cp-current').innerText=KEY_CHECKPOINTS[idx].title;document.getElementById('ui-cp-next').innerText=idx+1<KEY_CHECKPOINTS.length?'다음: '+KEY_CHECKPOINTS[idx+1].title:'목적지 도달';if(r<0.15)document.getElementById('ui-terrain').innerText='아라뱃길 · 한강 자전거길';else if(r<0.32)document.getElementById('ui-terrain').innerText='남한강 · 두물머리';else if(r<0.50)document.getElementById('ui-terrain').innerText='흑천 징검다리 · 임도 구간';else if(r<0.63)document.getElementById('ui-terrain').innerText='횡성호수길 · 산악 진입';else if(r<0.71)document.getElementById('ui-terrain').innerText='태기산 1,261m — 최고 난이도';else if(r<0.85)document.getElementById('ui-terrain').innerText='봉평 · 흥정계곡 능선';else if(r<0.96)document.getElementById('ui-terrain').innerText='백두대간 · 대관령 옛길';else document.getElementById('ui-terrain').innerText='바다부채길 · 정동진 해안';}
-function render(ts){if(!lastT)lastT=ts;const dt=ts-lastT;lastT=ts;physDist+=physTotal/DURATION*speedCtrl*dt;if(physDist>=physTotal){physDist=physTotal;finish();return;}const r=physDist/physTotal;const idx=Math.min(Math.floor(r*RESOLUTION),RESOLUTION);const cur=path[idx];if(idx>0)map.getSource('trace').setData({type:'Feature',geometry:{type:'LineString',coordinates:path.slice(0,idx+1).map(p=>p.coord)}});map.getSource('head').setData({type:'Feature',geometry:{type:'Point',coordinates:cur.coord}});const ui=r*TARGET;document.getElementById('ui-dist-done').innerText=ui.toFixed(2)+' KM';document.getElementById('ui-dist-remain').innerText=Math.max(0,TARGET-ui).toFixed(2)+' KM';const pct=(r*100).toFixed(1);document.getElementById('ui-percent').innerText=pct+'%';document.getElementById('ui-progress-fill').style.width=pct+'%';document.getElementById('elev-tracker').style.left=pct+'%';document.getElementById('elev-tracker').style.bottom=getElevH(r*100)+'%';document.getElementById('elev-line').style.width=pct+'%';updateCP(r);const ahead=path[Math.min(idx+20,RESOLUTION)];document.getElementById('compass-arrow').style.transform=`rotate(${turf.bearing(turf.point(cur.coord),turf.point(ahead.coord))}deg)`;camX+=(cur.coord[0]-camX)*0.1;camY+=(cur.coord[1]-camY)*0.1;map.jumpTo({center:[camX,camY],pitch:55,zoom:13.5,bearing:-10,padding:{bottom:100}});animId=requestAnimationFrame(render);}
-function start(){isAnim=true;physDist=0;lastT=undefined;document.getElementById('mission-clear-overlay').classList.remove('show');camX=path[0].coord[0];camY=path[0].coord[1];document.getElementById('live-dot').classList.add('active');document.getElementById('standby-text').innerText='LIVE';btn.innerText='⏸ 일시 정지';btn.classList.remove('active-state');btn.disabled=false;map.getSource('trace').setData({type:'Feature',geometry:{type:'LineString',coordinates:[]}});map.flyTo({center:[camX,camY],bearing:-10,pitch:55,zoom:13.5,padding:{bottom:100},duration:4500,essential:true});setTimeout(()=>{hiddenLbls.forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});document.querySelectorAll('.marker-label').forEach(el=>el.classList.add('revealed'));lastT=undefined;animId=requestAnimationFrame(render);},4700);}
-function finish(){isAnim=false;cancelAnimationFrame(animId);document.getElementById('ui-dist-done').innerText=TARGET.toFixed(2)+' KM';document.getElementById('ui-dist-remain').innerText='0.00 KM';document.getElementById('ui-percent').innerText='100.0%';document.getElementById('ui-progress-fill').style.width='100%';document.getElementById('ui-cp-current').innerText='작전 종료 (FINISH)';document.getElementById('live-dot').classList.remove('active');document.getElementById('standby-text').innerText='END';btn.innerText='↻ REPLAY';btn.classList.add('active-state');map.flyTo({center:[129.032,37.692],zoom:14.5,pitch:80,bearing:90,duration:6000,essential:true});setTimeout(()=>document.getElementById('mission-clear-overlay').classList.add('show'),3000);}
-btn.addEventListener('click',()=>{const done=document.getElementById('ui-dist-done').innerText;const pct=document.getElementById('ui-percent').innerText;if(!isAnim&&(done==='0.00 KM'||pct==='100.0%')){start();}else if(isAnim){cancelAnimationFrame(animId);isAnim=false;btn.innerText='▶ RESUME';btn.classList.add('active-state');document.getElementById('live-dot').classList.remove('active');}else{isAnim=true;lastT=undefined;btn.innerText='⏸ 일시 정지';btn.classList.remove('active-state');document.getElementById('live-dot').classList.add('active');animId=requestAnimationFrame(render);}});
-}).catch(err=>{console.error(err);btn.innerText='⚠ 새로고침';btn.disabled=false;});
+    map.addSource('mapbox-dem',{type:'raster-dem',url:'mapbox://mapbox.mapbox-terrain-dem-v1',tileSize:512,maxzoom:14});
+    map.setTerrain({source:'mapbox-dem',exaggeration:1.3});
+    
+    KEY_CHECKPOINTS.forEach(loc=>{
+        if(loc.isFinish){
+            const el=document.createElement('div');
+            el.style.cssText='width:18px;height:18px;background:#ff0033;border-radius:50%;box-shadow:0 0 15px #ff0033';
+            new mapboxgl.Marker({element:el}).setLngLat(loc.coord).addTo(map);
+        } else {
+            new mapboxgl.Marker({color:'#ffffff',scale:0.5}).setLngLat(loc.coord).addTo(map);
+        }
+        const lbl=document.createElement('div');
+        lbl.className='marker-label';
+        lbl.innerText=loc.title;
+        new mapboxgl.Marker({element:lbl,anchor:'top'}).setLngLat(loc.coord).addTo(map);
+    });
+
+    const btn=document.getElementById('action-btn');
+    btn.innerText='루트 수신 중...';
+    
+    Promise.all(ROUTE_SEGMENTS.map(s=>fetchSeg(s))).then(results=>{
+        let combined=results[0];
+        for(let i=1;i<results.length;i++) combined=combined.concat(results[i].slice(1));
+        
+        const gj={type:'Feature',geometry:{type:'LineString',coordinates:combined}};
+        physTotal=turf.length(gj,{units:'kilometers'});
+        const kmPerMs=physTotal/DURATION;
+        
+        for(let i=0;i<=RESOLUTION;i++){
+            const d=(i/RESOLUTION)*physTotal;
+            path.push({dist:d,coord:turf.along(gj,d).geometry.coordinates});
+        }
+        
+        camX=path[0].coord[0]; camY=path[0].coord[1];
+        
+        map.addSource('route-bg',{type:'geojson',data:gj});
+        map.addLayer({id:'route-bg-layer',type:'line',source:'route-bg',paint:{'line-color':'#003311','line-width':4,'line-opacity':0.4}});
+        map.addSource('trace',{type:'geojson',data:{type:'Feature',geometry:{type:'LineString',coordinates:[]}}});
+        map.addLayer({id:'trace-layer',type:'line',source:'trace',paint:{'line-color':'#39FF14','line-width':6}});
+        map.addSource('head',{type:'geojson',data:{type:'Feature',geometry:{type:'Point',coordinates:path[0].coord}}});
+        map.addLayer({id:'head-glow',type:'circle',source:'head',paint:{'circle-radius':14,'circle-color':'#39FF14','circle-opacity':0.6,'circle-blur':0.3}});
+        map.addLayer({id:'head-core',type:'circle',source:'head',paint:{'circle-radius':4,'circle-color':'#ffffff'}});
+        
+        btn.innerText='▶ MISSION START';
+        btn.classList.add('active-state');
+        btn.disabled=false;
+        
+        document.querySelectorAll('.btn-speed').forEach(b=>b.addEventListener('click',e=>{
+            document.querySelectorAll('.btn-speed').forEach(x=>x.classList.remove('active'));
+            e.target.classList.add('active');
+            speedCtrl=parseFloat(e.target.getAttribute('data-speed'));
+        }));
+
+        function updateCP(r){
+            const idx=Math.min(Math.floor(r*(KEY_CHECKPOINTS.length-1)),KEY_CHECKPOINTS.length-1);
+            document.getElementById('ui-cp-current').innerText=KEY_CHECKPOINTS[idx].title;
+            document.getElementById('ui-cp-next').innerText=idx+1<KEY_CHECKPOINTS.length?'다음: '+KEY_CHECKPOINTS[idx+1].title:'목적지 도달';
+            
+            if(r<0.15)document.getElementById('ui-terrain').innerText='아라뱃길 · 자전거길';
+            else if(r<0.32)document.getElementById('ui-terrain').innerText='남한강 · 두물머리';
+            else if(r<0.50)document.getElementById('ui-terrain').innerText='흑천 징검다리 · 임도';
+            else if(r<0.63)document.getElementById('ui-terrain').innerText='횡성호수길 · 산악';
+            else if(r<0.71)document.getElementById('ui-terrain').innerText='태기산 1,261m';
+            else if(r<0.85)document.getElementById('ui-terrain').innerText='봉평 · 흥정계곡';
+            else if(r<0.96)document.getElementById('ui-terrain').innerText='백두대간 · 대관령';
+            else document.getElementById('ui-terrain').innerText='바다부채길 · 해안';
+        }
+
+        function render(ts){
+            if(!lastT) lastT=ts;
+            const dt=ts-lastT;
+            lastT=ts;
+            physDist+=physTotal/DURATION*speedCtrl*dt;
+            
+            if(physDist>=physTotal){
+                physDist=physTotal;
+                finish();
+                return;
+            }
+            
+            const r=physDist/physTotal;
+            const idx=Math.min(Math.floor(r*RESOLUTION),RESOLUTION);
+            const cur=path[idx];
+            
+            if(idx>0){
+                map.getSource('trace').setData({type:'Feature',geometry:{type:'LineString',coordinates:path.slice(0,idx+1).map(p=>p.coord)}});
+            }
+            map.getSource('head').setData({type:'Feature',geometry:{type:'Point',coordinates:cur.coord}});
+            
+            const ui=r*TARGET;
+            document.getElementById('ui-dist-done').innerText=ui.toFixed(2)+' KM';
+            document.getElementById('ui-dist-remain').innerText=Math.max(0,TARGET-ui).toFixed(2)+' KM';
+            
+            const pct=(r*100).toFixed(1);
+            document.getElementById('ui-percent').innerText=pct+'%';
+            document.getElementById('ui-progress-fill').style.width=pct+'%';
+            document.getElementById('elev-tracker').style.left=pct+'%';
+            document.getElementById('elev-tracker').style.bottom=getElevH(r*100)+'%';
+            document.getElementById('elev-line').style.width=pct+'%';
+            
+            updateCP(r);
+            
+            const ahead=path[Math.min(idx+20,RESOLUTION)];
+            document.getElementById('compass-arrow').style.transform=`rotate(${turf.bearing(turf.point(cur.coord),turf.point(ahead.coord))}deg)`;
+            
+            camX+=(cur.coord[0]-camX)*0.1;
+            camY+=(cur.coord[1]-camY)*0.1;
+            
+            // 모바일 뷰 패딩 조정
+            const padBottom = window.innerWidth <= 768 ? 150 : 100;
+            map.jumpTo({center:[camX,camY],pitch:55,zoom:13.5,bearing:-10,padding:{bottom:padBottom}});
+            animId=requestAnimationFrame(render);
+        }
+
+        function start(){
+            isAnim=true; physDist=0; lastT=undefined;
+            document.getElementById('mission-clear-overlay').classList.remove('show');
+            camX=path[0].coord[0]; camY=path[0].coord[1];
+            document.getElementById('live-dot').classList.add('active');
+            document.getElementById('standby-text').innerText='LIVE';
+            btn.innerText='⏸ 일시 정지';
+            btn.classList.remove('active-state');
+            btn.disabled=false;
+            
+            map.getSource('trace').setData({type:'Feature',geometry:{type:'LineString',coordinates:[]}});
+            
+            const padBottom = window.innerWidth <= 768 ? 150 : 100;
+            map.flyTo({center:[camX,camY],bearing:-10,pitch:55,zoom:13.5,padding:{bottom:padBottom},duration:4500,essential:true});
+            
+            setTimeout(()=>{
+                hiddenLbls.forEach(id=>{if(map.getLayer(id))map.setLayoutProperty(id,'visibility','visible');});
+                document.querySelectorAll('.marker-label').forEach(el=>el.classList.add('revealed'));
+                lastT=undefined;
+                animId=requestAnimationFrame(render);
+            },4700);
+        }
+
+        function finish(){
+            isAnim=false;
+            cancelAnimationFrame(animId);
+            document.getElementById('ui-dist-done').innerText=TARGET.toFixed(2)+' KM';
+            document.getElementById('ui-dist-remain').innerText='0.00 KM';
+            document.getElementById('ui-percent').innerText='100.0%';
+            document.getElementById('ui-progress-fill').style.width='100%';
+            document.getElementById('ui-cp-current').innerText='작전 종료 (FINISH)';
+            document.getElementById('live-dot').classList.remove('active');
+            document.getElementById('standby-text').innerText='END';
+            btn.innerText='↻ REPLAY';
+            btn.classList.add('active-state');
+            
+            map.flyTo({center:[129.032,37.692],zoom:14.5,pitch:80,bearing:90,duration:6000,essential:true});
+            setTimeout(()=>document.getElementById('mission-clear-overlay').classList.add('show'),3000);
+        }
+
+        btn.addEventListener('click',()=>{
+            const done=document.getElementById('ui-dist-done').innerText;
+            const pct=document.getElementById('ui-percent').innerText;
+            if(!isAnim&&(done==='0.00 KM'||pct==='100.0%')){
+                start();
+            }else if(isAnim){
+                cancelAnimationFrame(animId);
+                isAnim=false;
+                btn.innerText='▶ RESUME';
+                btn.classList.add('active-state');
+                document.getElementById('live-dot').classList.remove('active');
+            }else{
+                isAnim=true; lastT=undefined;
+                btn.innerText='⏸ 일시 정지';
+                btn.classList.remove('active-state');
+                document.getElementById('live-dot').classList.add('active');
+                animId=requestAnimationFrame(render);
+            }
+        });
+    }).catch(err=>{
+        console.error(err);
+        btn.innerText='⚠ 새로고침';
+        btn.disabled=false;
+    });
 });
 </script>
 </body>
