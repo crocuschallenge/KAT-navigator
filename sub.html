@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KAT CHALLENGE | TACTICAL NAVIGATOR</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&family=Noto+Sans+KR:wght@400;700&display=swap');
+
+  :root {
+    --kat-bg: #0B1426;
+    --kat-neon: #39FF14;
+    --kat-gold: #D8B578;
+    --kat-text: #F3F1EA;
+    --kat-dim: rgba(255, 255, 255, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* [오류 해결] Wix 드래그 바 발생 차단 */
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden !important;
+    background: var(--kat-bg);
+    font-family: 'Noto Sans KR', sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* === KOREA MAP BACKGROUND === */
+  .map-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .map-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, transparent 0%, var(--kat-bg) 85%);
+    z-index: 2;
+  }
+  .map-bg img {
+    height: 100vh;
+    object-fit: contain;
+    opacity: 0.12;
+    filter: brightness(0.8) contrast(1.2) hue-rotate(180deg);
+  }
+
+  /* === SCAN LINE & GRID === */
+  .hud-fx {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-image: 
+      linear-gradient(rgba(57, 255, 20, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(57, 255, 20, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+  }
+
+  /* === MAIN CONTAINER === */
+  .tac-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 모바일 환경 스케일 조정 */
+    transform: scale(0.9);
+    transform-origin: center center;
+  }
+
+  /* === TOP BAR === */
+  .class-bar {
+    font-family: 'Rajdhani', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--kat-gold);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--kat-dim);
+    width: 100%;
+    text-align: center;
+  }
+
+  /* === BRAND HEADER === */
+  .brand-block {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .brand-block .kat-main {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 38px;
+    letter-spacing: 12px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+  .brand-block .kat-sub {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 8px;
+    color: var(--kat-neon);
+    text-transform: uppercase;
+  }
+
+  /* === COMPASS UNIT === */
+  .compass-wrap {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin-bottom: 25px;
+  }
+  .outer-circle {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(57, 255, 20, 0.1);
+    border-radius: 50%;
+    animation: rotate 60s linear infinite;
+  }
+  .compass-body {
+    position: absolute;
+    inset: 20px;
+    background: radial-gradient(circle, #15233D, #0B1426);
+    border-radius: 50%;
+    border: 1px solid rgba(216, 181, 120, 0.2);
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* Compass SVG */
+  .compass-svg {
+    width: 100%;
+    height: 100%;
+    animation: jitter 4s ease-in-out infinite;
+  }
+  @keyframes jitter {
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1.5deg); }
+  }
+
+  /* === DATA GRID === */
+  .data-readout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .ro-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--kat-dim);
+    padding: 10px 5px;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .ro-box label {
+    display: block;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 9px;
+    color: var(--kat-gold);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .ro-box span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    color: var(--kat-neon);
+  }
+
+  /* === CTA BUTTON === */
+  .cta-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, rgba(57, 255, 20, 0.15), rgba(57, 255, 20, 0.05));
+    border: 1px solid var(--kat-neon);
+    border-radius: 4px;
+    color: var(--kat-neon);
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: 0.3s;
+  }
+  .cta-btn:active { transform: scale(0.98); background: rgba(57, 255, 20, 0.2); }
+  .cta-btn .main-txt {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin-bottom: 4px;
+  }
+  .cta-btn .sub-txt {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    opacity: 0.6;
+  }
+
+  /* === FOOTER === */
+  .tac-footer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-family: 'Rajdhani', monospace;
+    font-size: 9px;
+    color: rgba(216, 181, 120, 0.4);
+    letter-spacing: 1px;
+  }
+
+  /* HUD Timestamp */
+  .hud-time {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Rajdhani', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--kat-gold);
+    opacity: 0.6;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+<div class="map-bg">
+  <img src="https://static.wixstatic.com/media/7cff30_260dfacb0da14f4dac870749a20f63d4~mv2.png" alt="Korea Map">
+</div>
+<div class="hud-fx"></div>
+
+<div class="tac-container">
+  <div class="class-bar">KOREA ACTION TRAIL · TACTICAL UNIT</div>
+
+  <div class="brand-block">
+    <div class="kat-main">KAT</div>
+    <div class="kat-sub">CHALLENGE</div>
+    <div class="tagline" style="font-size: 9px; letter-spacing: 4px; color: rgba(255,255,255,0.3); margin-top: 10px; font-family: 'Rajdhani';">OFFICIAL NAVIGATOR SYSTEM</div>
+  </div>
+
+  <div class="compass-wrap">
+    <div class="outer-circle"></div>
+    <div class="compass-body">
+      <div class="compass-svg">
+        <svg viewBox="0 0 240 240">
+          <g id="compassTicks"></g>
+          <text x="120" y="28" text-anchor="middle" fill="#39FF14" font-family="Orbitron" font-size="14" font-weight="900">N</text>
+          <text x="222" y="125" text-anchor="middle" fill="#D8B578" font-family="Orbitron" font-size="10">E</text>
+          <text x="120" y="228" text-anchor="middle" fill="#D8B578" font-family="Orbitron" font-size="10">S</text>
+          <text x="18" y="125" text-anchor="middle" fill="#D8B578" font-family="Orbitron" font-size="10">W</text>
+          
+          <polygon points="120,35 114,115 120,105 126,115" fill="#39FF14" />
+          <polygon points="120,205 114,125 120,135 126,125" fill="#1e3a5a" opacity="0.5" />
+          <circle cx="120" cy="120" r="4" fill="#39FF14" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-readout">
+    <div class="ro-box"><label>STATUS</label><span>ACTIVE</span></div>
+    <div class="ro-box"><label>SIGNAL</label><span>KAT-01</span></div>
+    <div class="ro-box"><label>MODE</label><span>CHLG</span></div>
+  </div>
+
+  <a href="https://crocuschallenge.github.io/apex-navigator/" target="_blank" class="cta-btn">
+    <span class="main-txt">TACTICAL NAVIGATOR</span>
+    <span class="sub-txt">KAT CHALLENGE 기동</span>
+  </a>
+
+  <div class="tac-footer">
+    <span>KAT-NAV-V2.0</span>
+    <span>LOC: KOR_PENINSULA</span>
+    <span>ID: K-ACTION-CHLG</span>
+  </div>
+</div>
+
+<div class="hud-time" id="hudTime"></div>
+
+<script>
+  // Generate Compass Ticks
+  (function(){
+    const tg = document.getElementById('compassTicks');
+    const cx=120, cy=120, r=105;
+    for(let i=0; i<360; i+=10){
+      const rad = (i-90)*Math.PI/180;
+      const isMajor = i % 30 === 0;
+      const len = isMajor ? 12 : 6;
+      const ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1', cx + (r-len)*Math.cos(rad));
+      ln.setAttribute('y1', cy + (r-len)*Math.sin(rad));
+      ln.setAttribute('x2', cx + r*Math.cos(rad));
+      ln.setAttribute('y2', cy + r*Math.sin(rad));
+      ln.setAttribute('stroke', isMajor ? '#D8B578' : 'rgba(216,181,120,0.2)');
+      ln.setAttribute('stroke-width', isMajor ? 1.5 : 1);
+      tg.appendChild(ln);
+    }
+  })();
+
+  // HUD Real-time Clock
+  (function tick(){
+    const d = new Date();
+    const s = `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} — ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} KST`;
+    document.getElementById('hudTime').textContent = s;
+    setTimeout(tick, 1000);
+  })();
+</script>
+
+</body>
+</html>
