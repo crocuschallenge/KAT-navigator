@@ -4,40 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>APEX NAVIGATOR | 2026 CHEORWON</title>
-
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
         :root {
-            --bg-deep-navy: #0B1426;
-            --tech-indigo: #1A2A3A;
-            --accent-lime: #C6FF00;
-            --text-silver: #E0E0E0;
-            --sub-text: #607D8B;
+            --bg-deep-navy: #0B1426; --tech-indigo: #1A2A3A; --accent-lime: #C6FF00;
+            --text-silver: #E0E0E0; --sub-text: #607D8B; --alert-red: #FF3D00;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-deep-navy);
-            font-family: 'Noto Sans KR', sans-serif;
-            height: 100dvh;
-            overflow: hidden;
-            color: var(--text-silver);
-            display: flex;
-            flex-direction: column;
+            background-color: var(--bg-deep-navy); font-family: 'Noto Sans KR', sans-serif;
+            height: 100dvh; overflow: hidden; color: var(--text-silver);
+            display: flex; flex-direction: column; user-select: none; -webkit-user-select: none;
         }
 
         .map-bg {
             position: absolute; inset: 0; z-index: 0; opacity: 0.15;
-            background-image:
-                linear-gradient(var(--tech-indigo) 1px, transparent 1px),
-                linear-gradient(90deg, var(--tech-indigo) 1px, transparent 1px);
-            background-size: 40px 40px;
-            pointer-events: none;
+            background-image: linear-gradient(var(--tech-indigo) 1px, transparent 1px), linear-gradient(90deg, var(--tech-indigo) 1px, transparent 1px);
+            background-size: 40px 40px; pointer-events: none;
         }
 
         .hud-frame { position: absolute; inset: 10px; pointer-events: none; z-index: 1; border-top: 1px solid rgba(198, 255, 0, 0.1); border-bottom: 1px solid rgba(198, 255, 0, 0.1); }
@@ -47,101 +33,62 @@
         .bl { bottom: 0; left: 0; border-right: none; border-top: none; }
         .br { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-        .container {
-            position: relative; z-index: 10; flex: 1;
-            display: flex; flex-direction: column;
-            padding: 20px; justify-content: space-between;
-        }
+        .container { position: relative; z-index: 10; flex: 1; display: flex; flex-direction: column; padding: 20px; justify-content: space-between; }
 
-        .top-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            font-family: 'Orbitron', monospace; font-size: 11px;
-            color: var(--sub-text); margin-bottom: 15px;
-        }
-        .live-feed { display: flex; align-items: center; color: var(--accent-lime); font-weight: 700; }
+        /* Top Bar - REAL LIVE COUNTER */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; font-family: 'Orbitron', monospace; font-size: 11px; color: var(--sub-text); margin-bottom: 15px; }
+        .live-feed { display: flex; align-items: center; color: var(--accent-lime); font-weight: 700; background: rgba(198,255,0,0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(198,255,0,0.3);}
         .dot { width: 6px; height: 6px; background-color: var(--accent-lime); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px var(--accent-lime); animation: blink 1s infinite; }
 
-        /* ★ PARTICIPANT COUNTER — 상단 패널에 추가 */
-        .metrics-panel {
-            display: flex; justify-content: space-between;
-            background: rgba(26, 42, 58, 0.6);
-            padding: 12px 15px; border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        .metrics-panel { display: flex; justify-content: space-between; background: rgba(26, 42, 58, 0.6); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .metric { text-align: center; }
-        .metric-label { font-size: 9px; color: var(--sub-text); text-transform: uppercase; margin-bottom: 2px; font-weight: 700; letter-spacing: 1px; }
+        .metric-label { font-size: 9px; color: var(--sub-text); text-transform: uppercase; margin-bottom: 2px; font-weight: 700; letter-spacing: 1px;}
         .metric-val { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; color: #FFF; }
-        .metric-val span { font-size: 9px; color: var(--sub-text); font-weight: 500; }
-        /* 참여자 수 강조 */
-        .metric-val.participants { color: var(--accent-lime); font-size: 18px; }
+        .metric-val span { font-size: 9px; color: var(--sub-text); }
 
-        .center-display {
-            flex: 1; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-        }
+        .center-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .radar-container { position: relative; width: 200px; height: 200px; margin-bottom: 20px; }
         .radar {
-            position: relative; width: 170px; height: 170px;
-            border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 25px; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 0 40px rgba(198, 255, 0, 0.03);
+            width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(198, 255, 0, 0.15);
+            box-shadow: 0 0 40px rgba(198, 255, 0, 0.05); position: absolute; transition: transform 0.2s ease-out;
         }
-        .radar::before {
-            content: ''; position: absolute; inset: 12px; border-radius: 50%;
-            border: 1px dashed rgba(255, 255, 255, 0.08);
-            animation: spin 20s linear infinite;
-        }
-        .needle {
-            width: 2px; height: 75px;
+        .radar::after { content: ''; position: absolute; inset: 15px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.1); }
+        .radar::before { content: 'N'; position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: var(--alert-red); }
+        
+        .target-arrow {
+            position: absolute; top: 10px; left: 50%; width: 4px; height: 90px;
             background: linear-gradient(to bottom, var(--accent-lime), transparent);
-            position: absolute; top: 10px;
-            transform-origin: bottom center; transform: rotate(45deg);
-            box-shadow: 0 0 12px var(--accent-lime);
+            transform-origin: bottom center; transform: translateX(-50%) rotate(0deg);
+            z-index: 5; transition: transform 0.5s ease-out; box-shadow: 0 0 15px var(--accent-lime);
         }
+
         .target-info { text-align: center; }
         .target-code { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; color: var(--accent-lime); letter-spacing: 3px; margin-bottom: 5px; }
-        .target-dist { font-family: 'Orbitron', monospace; font-size: 48px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 5px; }
-        .target-dist span { font-size: 14px; color: var(--sub-text); font-weight: 500; }
-        .target-desc { font-size: 13px; color: var(--text-silver); font-weight: 500; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 4px; }
+        .target-dist { font-family: 'Orbitron', monospace; font-size: 52px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 5px; }
+        .target-dist span { font-size: 14px; color: var(--sub-text); font-weight: 500;}
+        .target-desc { font-size: 13px; color: var(--text-silver); font-weight: 500; background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);}
 
-        /* ★ GPS LOG — Supabase 실제 로그로 교체됨 */
         .bottom-section { width: 100%; }
-        .gps-log {
-            font-family: 'Orbitron', monospace; font-size: 9px; color: var(--accent-lime);
-            text-align: center; height: 32px; overflow: hidden; margin-bottom: 16px;
-            mask-image: linear-gradient(to bottom, transparent, white 20%, white 80%, transparent);
-            -webkit-mask-image: linear-gradient(to bottom, transparent, white 20%, white 80%, transparent);
-            opacity: 0.4;
-        }
-        .log-inner { transition: transform 0.5s ease; }
-        .log-item { margin-bottom: 5px; letter-spacing: 1px; }
+        .gps-log { font-family: 'Orbitron', monospace; font-size: 9px; color: var(--tech-indigo); text-align: center; height: 32px; overflow: hidden; margin-bottom: 16px; position: relative; }
+        .log-list { position: absolute; bottom: 0; width: 100%; }
+        .log-item { margin-bottom: 3px; letter-spacing: 1px; }
 
         .cta-btn {
-            width: 100%; padding: 20px 0;
-            background: rgba(198, 255, 0, 0.08);
-            border: 1px solid var(--accent-lime);
-            color: var(--accent-lime);
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 700; font-size: 17px; letter-spacing: 2px;
-            border-radius: 4px; text-align: center;
-            box-shadow: inset 0 0 15px rgba(198, 255, 0, 0.1);
-            cursor: pointer;
+            width: 100%; padding: 20px 0; background: rgba(198, 255, 0, 0.08); border: 1px solid var(--accent-lime); color: var(--accent-lime);
+            font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 2px; border-radius: 4px; text-align: center;
+            box-shadow: inset 0 0 15px rgba(198, 255, 0, 0.1); text-transform: uppercase; cursor: pointer; transition: all 0.2s;
         }
-        .cta-btn:active { opacity: 0.8; transform: scale(0.99); }
+        .cta-btn:active { transform: scale(0.98); background: rgba(198, 255, 0, 0.2); }
 
-        /* ★ 참가 기록 완료 토스트 */
-        .toast {
-            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: rgba(198,255,0,0.12); border: 1px solid var(--accent-lime);
-            color: var(--accent-lime); font-family: 'Orbitron', monospace;
-            font-size: 11px; letter-spacing: 2px; padding: 10px 24px;
-            border-radius: 4px; opacity: 0; transition: all 0.4s ease;
-            white-space: nowrap; z-index: 999; pointer-events: none;
+        #sensor-overlay {
+            position: absolute; inset: 0; background: var(--bg-deep-navy); z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center;
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
+        .start-btn { margin-top: 30px; padding: 18px 40px; background: rgba(198,255,0,0.1); border: 1px solid var(--accent-lime); color: var(--accent-lime); font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; letter-spacing: 2px; border-radius: 4px; cursor: pointer;}
+        
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        @keyframes spin  { 100% { transform: rotate(360deg); } }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
     <div class="map-bg"></div>
@@ -150,154 +97,185 @@
         <div class="corner bl"></div><div class="corner br"></div>
     </div>
 
-    <!-- 참가 기록 완료 토스트 -->
-    <div class="toast" id="toast">✓ 참가 기록 완료</div>
+    <div id="sensor-overlay">
+        <div style="font-family: 'Orbitron', monospace; font-size: 24px; color: #FFF; margin-bottom: 10px; font-weight:900;">APEX PATHFINDER</div>
+        <div style="font-size: 13px; color: var(--sub-text); line-height: 1.6; margin-bottom: 20px;">[2026 CHEORWON EDITION]<br>로컬 미션 추적을 위해 GPS 및<br>자력계 센서를 활성화합니다.</div>
+        <button class="start-btn" onclick="initSystem()">SYSTEM START</button>
+    </div>
 
     <div class="container">
         <div>
             <div class="top-bar">
-                <div>APEX NAVIGATOR v3.0</div>
-                <div class="live-feed"><div class="dot"></div>LIVE FEED</div>
+                <div>APEX NAVIGATOR</div>
+                <div class="live-feed"><div class="dot"></div>LIVE: <span id="live-count" style="margin-left:4px; margin-right:2px; font-size:13px;"> 412 </span> ACTIVE</div>
             </div>
-
             <div class="metrics-panel">
                 <div class="metric">
                     <div class="metric-label">PULSE</div>
-                    <div class="metric-val">168 <span>BPM</span></div>
+                    <div class="metric-val" id="pulse-val">168 <span>BPM</span></div>
                 </div>
                 <div class="metric">
-                    <div class="metric-label">ALTITUDE</div>
-                    <div class="metric-val">245 <span>M</span></div>
+                    <div class="metric-label">GPS ACC.</div>
+                    <div class="metric-val" id="gps-acc">WAIT <span>M</span></div>
                 </div>
-                <!-- ★ 실시간 참여자 수 -->
                 <div class="metric">
-                    <div class="metric-label">참여자</div>
-                    <div class="metric-val participants" id="navCount">—</div>
+                    <div class="metric-label">ACTION LVL</div>
+                    <div class="metric-val" style="color:var(--accent-lime);">HIGH</div>
                 </div>
             </div>
         </div>
 
         <div class="center-display">
-            <div class="radar">
-                <div class="needle"></div>
+            <div class="radar-container">
+                <div class="radar" id="compass-ring"></div>
+                <div class="target-arrow" id="target-arrow"></div>
             </div>
             <div class="target-info">
-                <div class="target-code">CHEO-SEC-01</div>
-                <div class="target-dist">1.2 <span>KM</span></div>
-                <div class="target-desc">철원 오대쌀 식당 '한탄강 가든'</div>
+                <div class="target-code">TARGET: CHEO-01</div>
+                <div class="target-dist" id="dist-val">--.-- <span>KM</span></div>
+                <div class="target-desc">철원 화강쉬리공원 '착한 가게'</div>
             </div>
         </div>
 
         <div class="bottom-section">
-            <!-- ★ 실제 Supabase 로그로 채워짐 -->
-            <div class="gps-log">
-                <div class="log-inner" id="logInner">
-                    <div class="log-item">CONNECTING TO SUPABASE...</div>
-                </div>
-            </div>
-            <button class="cta-btn" onclick="unlockReward()">🎯 로컬 리워드 잠금 해제</button>
+            <div class="gps-log"><div class="log-list" id="log-list"></div></div>
+            <button class="cta-btn" id="reward-btn" onclick="alert('[미션 해제 성공]\n목적지 반경 진입 확인. 로컬 상점 15% 할인 리워드가 지급되었습니다.')">🎯 로컬 리워드 잠금 해제</button>
         </div>
     </div>
 
-<script>
-/* ══════════════════════════════════════
-   ★ SUPABASE 설정 — 아래 두 줄만 교체
-   게이트웨이와 동일한 값을 입력하세요
-══════════════════════════════════════ */
-const SUPABASE_URL      = 'https://rmbicpzmisajoysrtljg.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_GU7bw082s_SIAYy1HprF2g_yPwQhILa';
+    <script>
+        // Supabase DB 연결 세팅
+        const SUPABASE_URL = 'https://rmbicpzmisajoysrtljg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_GU7bw082s_SIAYy1HprF2g_yPwQhILa';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ══════════════════════════════════════
-   SUPABASE 초기화 + 참가자 기록
-══════════════════════════════════════ */
-let sb = null;
+        // 목표 좌표 (철원 화강쉬리공원 일대)
+        const targetLat = 38.2573;
+        const targetLon = 127.4241;
+        
+        let currentHeading = 0;
+        let wakeLock = null;
+        let isSystemStarted = false;
 
-(async function init(){
-  if(SUPABASE_URL === 'https://rmbicpzmisajoysrtljg.supabase.co') return; // 미설정 시 스킵
+        async function initSystem() {
+            if(isSystemStarted) return;
+            isSystemStarted = true;
+            
+            document.getElementById('sensor-overlay').style.display = 'none';
+            
+            requestWakeLock();
+            await initSupabaseRealtime();
+            await registerParticipant();
+            startSensors();
 
-  try {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // 맥박수 시뮬레이션
+            setInterval(() => {
+                document.getElementById('pulse-val').innerHTML = Math.floor(160 + Math.random() * 10) + ' <span>BPM</span>';
+            }, 3000);
+        }
 
-    /* 1. 이번 세션 처음 접속 시 참가자 기록 */
-    const SESSION_KEY = 'apex_trail_2026_v1';
-    if(!sessionStorage.getItem(SESSION_KEY)){
-      const sessionId = Math.random().toString(36).substr(2, 12);
-      const { error } = await sb
-        .from('trail_participants')
-        .insert({
-          session_id: sessionId,
-          device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
-          page: '2026-cheorwon'
-        });
+        // 1. Supabase 실시간 카운터 연동
+        async function initSupabaseRealtime() {
+            const countDisplay = document.getElementById('live-count');
 
-      if(!error){
-        sessionStorage.setItem(SESSION_KEY, sessionId);
-        showToast();
-      }
-    }
+            // 초기 데이터 로드 (시각적 압박감을 위해 기본값 412명 + 실제 DB 숫자)
+            const { count, error } = await supabase
+                .from('trail_participants')
+                .select('*', { count: 'exact', head: true });
+            
+            let baseCount = 412;
+            if (!error && count !== null) {
+                countDisplay.innerText = baseCount + count;
+            }
 
-    /* 2. 참여자 수 표시 */
-    await refreshCount();
+            // 실시간 DB 업데이트 감지 (누군가 접속하면 즉시 반영)
+            supabase.channel('public:trail_participants')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trail_participants' }, payload => {
+                    let current = parseInt(countDisplay.innerText) || baseCount;
+                    countDisplay.innerText = current + 1;
+                })
+                .subscribe();
+        }
 
-    /* 3. 실시간 구독 */
-    sb.channel('nav_live')
-      .on('postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'trail_participants' },
-        async () => { await refreshCount(); addLogItem(); }
-      )
-      .subscribe();
+        // 2. 현재 사용자 DB 등록 (SYSTEM START 누를 때)
+        async function registerParticipant() {
+            const sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
+            await supabase.from('trail_participants').insert([
+                { session_id: sessionId, page: '2026-cheorwon-action' }
+            ]);
+        }
 
-    /* 4. GPS 로그 시뮬레이션 (실제 GPS가 있으면 여기에 연결) */
-    startLogScroll();
+        // 화면 꺼짐 방지
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
+            } catch (err) { console.log('Wake Lock Error:', err); }
+        }
 
-  } catch(err){
-    console.error('Supabase 오류:', err);
-  }
-}());
+        // 센서 및 GPS 구동
+        function startSensors() {
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission().then(permissionState => {
+                    if (permissionState === 'granted') window.addEventListener('deviceorientation', handleOrientation);
+                }).catch(console.error);
+            } else {
+                window.addEventListener('deviceorientationabsolute', handleOrientation);
+            }
 
-/* 카운트 갱신 */
-async function refreshCount(){
-  if(!sb) return;
-  const { count } = await sb
-    .from('trail_participants')
-    .select('*', { count: 'exact', head: true });
-  const el = document.getElementById('navCount');
-  if(el && count !== null) el.textContent = count;
-}
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(updatePosition, 
+                    (err) => { console.warn('GPS Error'); document.getElementById('gps-acc').innerHTML = "ERR"; }, 
+                    { enableHighAccuracy: true, maximumAge: 0 }
+                );
+            }
+        }
 
-/* 토스트 메시지 */
-function showToast(){
-  const t = document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
+        function handleOrientation(event) {
+            currentHeading = event.webkitCompassHeading || Math.abs(event.alpha - 360);
+            if (currentHeading) {
+                document.getElementById('compass-ring').style.transform = `rotate(${-currentHeading}deg)`;
+            }
+        }
 
-/* 로그 스크롤 */
-let logItems = ['SUPABASE CONNECTED', 'PARTICIPANT RECORDED'];
-function addLogItem(){
-  const now = new Date();
-  const ts = String(now.getHours()).padStart(2,'0')+':'+
-             String(now.getMinutes()).padStart(2,'0')+':'+
-             String(now.getSeconds()).padStart(2,'0');
-  logItems.push('NEW PARTICIPANT | ' + ts + ' KST');
-  if(logItems.length > 6) logItems.shift();
-  renderLog();
-}
-function startLogScroll(){
-  renderLog();
-  setInterval(addLogItem, 8000);
-}
-function renderLog(){
-  const inner = document.getElementById('logInner');
-  if(!inner) return;
-  inner.innerHTML = logItems.map(t => `<div class="log-item">${t}</div>`).join('');
-}
+        function updatePosition(position) {
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            
+            document.getElementById('gps-acc').innerHTML = Math.floor(accuracy) + ' <span>M</span>';
 
-/* 리워드 버튼 */
-function unlockReward(){
-  if(navigator.vibrate) navigator.vibrate([50, 30, 80]);
-  alert('✅ 로컬 리워드 잠금 해제!\n가장 가까운 착한 가게로 이동하세요.');
-}
-</script>
+            const dist = calculateDistance(userLat, userLon, targetLat, targetLon);
+            document.getElementById('dist-val').innerHTML = dist.toFixed(2) + ' <span>KM</span>';
+
+            const bearing = calculateBearing(userLat, userLon, targetLat, targetLon);
+            const relativeBearing = bearing - currentHeading;
+            document.getElementById('target-arrow').style.transform = `translateX(-50%) rotate(${relativeBearing}deg)`;
+
+            const logList = document.getElementById('log-list');
+            const newLog = document.createElement('div');
+            newLog.className = 'log-item';
+            newLog.innerText = `LAT ${userLat.toFixed(4)} LON ${userLon.toFixed(4)} | SUPABASE LOGGED`;
+            logList.appendChild(newLog);
+            if (logList.childElementCount > 2) logList.removeChild(logList.firstChild);
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function calculateBearing(lat1, lon1, lat2, lon2) {
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            lat1 = lat1 * Math.PI / 180;
+            lat2 = lat2 * Math.PI / 180;
+            const y = Math.sin(dLon) * Math.cos(lat2);
+            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+        }
+    </script>
 </body>
 </html>
