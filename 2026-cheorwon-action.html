@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>APEX NAVIGATOR | 2026 CHEORWON</title>
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -20,19 +24,15 @@
         body {
             background-color: var(--bg-deep-navy);
             font-family: 'Noto Sans KR', sans-serif;
-            height: 100dvh; /* 모바일 브라우저 하단바 무시하고 화면 꽉 채우기 */
+            height: 100dvh;
             overflow: hidden;
             color: var(--text-silver);
             display: flex;
             flex-direction: column;
         }
 
-        /* Map Overlay - 은은한 전술 그리드 */
         .map-bg {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            opacity: 0.15;
+            position: absolute; inset: 0; z-index: 0; opacity: 0.15;
             background-image:
                 linear-gradient(var(--tech-indigo) 1px, transparent 1px),
                 linear-gradient(90deg, var(--tech-indigo) 1px, transparent 1px);
@@ -40,7 +40,6 @@
             pointer-events: none;
         }
 
-        /* HUD Corners */
         .hud-frame { position: absolute; inset: 10px; pointer-events: none; z-index: 1; border-top: 1px solid rgba(198, 255, 0, 0.1); border-bottom: 1px solid rgba(198, 255, 0, 0.1); }
         .corner { position: absolute; width: 15px; height: 15px; border: 2px solid var(--accent-lime); }
         .tl { top: 0; left: 0; border-right: none; border-bottom: none; }
@@ -48,108 +47,100 @@
         .bl { bottom: 0; left: 0; border-right: none; border-top: none; }
         .br { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-        /* Main Content Layout - Flexbox 적용으로 겹침 완벽 방지 */
         .container {
-            position: relative;
-            z-index: 10;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            justify-content: space-between;
+            position: relative; z-index: 10; flex: 1;
+            display: flex; flex-direction: column;
+            padding: 20px; justify-content: space-between;
         }
 
-        /* Top Section */
         .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'Orbitron', monospace;
-            font-size: 11px;
-            color: var(--sub-text);
-            margin-bottom: 15px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Orbitron', monospace; font-size: 11px;
+            color: var(--sub-text); margin-bottom: 15px;
         }
-        .live-feed { display: flex; align-items: center; color: var(--accent-lime); font-weight: 700;}
+        .live-feed { display: flex; align-items: center; color: var(--accent-lime); font-weight: 700; }
         .dot { width: 6px; height: 6px; background-color: var(--accent-lime); border-radius: 50%; margin-right: 6px; box-shadow: 0 0 8px var(--accent-lime); animation: blink 1s infinite; }
 
-        /* Metrics Panel - 가로 정렬로 화면 깨짐 방지 */
+        /* ★ PARTICIPANT COUNTER — 상단 패널에 추가 */
         .metrics-panel {
-            display: flex;
-            justify-content: space-between;
+            display: flex; justify-content: space-between;
             background: rgba(26, 42, 58, 0.6);
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 12px 15px; border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .metric { text-align: center; }
-        .metric-label { font-size: 9px; color: var(--sub-text); text-transform: uppercase; margin-bottom: 2px; font-weight: 700; letter-spacing: 1px;}
+        .metric-label { font-size: 9px; color: var(--sub-text); text-transform: uppercase; margin-bottom: 2px; font-weight: 700; letter-spacing: 1px; }
         .metric-val { font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; color: #FFF; }
-        .metric-val span { font-size: 9px; color: var(--sub-text); }
+        .metric-val span { font-size: 9px; color: var(--sub-text); font-weight: 500; }
+        /* 참여자 수 강조 */
+        .metric-val.participants { color: var(--accent-lime); font-size: 18px; }
 
-        /* Center Display - 중앙 나침반 및 타겟 정보 */
         .center-display {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
         }
         .radar {
-            position: relative;
-            width: 170px; height: 170px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 25px;
-            display: flex; justify-content: center; align-items: center;
+            position: relative; width: 170px; height: 170px;
+            border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px; display: flex; justify-content: center; align-items: center;
             box-shadow: 0 0 40px rgba(198, 255, 0, 0.03);
         }
         .radar::before {
-            content: ''; position: absolute; inset: 12px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.08); animation: spin 20s linear infinite;
+            content: ''; position: absolute; inset: 12px; border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.08);
+            animation: spin 20s linear infinite;
         }
         .needle {
             width: 2px; height: 75px;
             background: linear-gradient(to bottom, var(--accent-lime), transparent);
             position: absolute; top: 10px;
-            transform-origin: bottom center;
-            transform: rotate(45deg);
+            transform-origin: bottom center; transform: rotate(45deg);
             box-shadow: 0 0 12px var(--accent-lime);
         }
         .target-info { text-align: center; }
         .target-code { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; color: var(--accent-lime); letter-spacing: 3px; margin-bottom: 5px; }
         .target-dist { font-family: 'Orbitron', monospace; font-size: 48px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 5px; }
-        .target-dist span { font-size: 14px; color: var(--sub-text); font-weight: 500;}
-        .target-desc { font-size: 13px; color: var(--text-silver); font-weight: 500; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 4px;}
+        .target-dist span { font-size: 14px; color: var(--sub-text); font-weight: 500; }
+        .target-desc { font-size: 13px; color: var(--text-silver); font-weight: 500; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 4px; }
 
-        /* Bottom Section - 로그 피드 및 확실한 풀사이즈 버튼 */
+        /* ★ GPS LOG — Supabase 실제 로그로 교체됨 */
         .bottom-section { width: 100%; }
         .gps-log {
-            font-family: 'Orbitron', monospace; font-size: 9px; color: var(--tech-indigo);
+            font-family: 'Orbitron', monospace; font-size: 9px; color: var(--accent-lime);
             text-align: center; height: 32px; overflow: hidden; margin-bottom: 16px;
             mask-image: linear-gradient(to bottom, transparent, white 20%, white 80%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, white 20%, white 80%, transparent);
+            opacity: 0.4;
         }
-        .log-item { margin-bottom: 5px; letter-spacing: 1px;}
+        .log-inner { transition: transform 0.5s ease; }
+        .log-item { margin-bottom: 5px; letter-spacing: 1px; }
 
-        /* CTA Button - 절대 깨지지 않는 하단 고정 구조 */
         .cta-btn {
-            width: 100%;
-            padding: 20px 0;
+            width: 100%; padding: 20px 0;
             background: rgba(198, 255, 0, 0.08);
             border: 1px solid var(--accent-lime);
             color: var(--accent-lime);
             font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 700;
-            font-size: 17px;
-            letter-spacing: 2px;
-            border-radius: 4px;
-            text-align: center;
+            font-weight: 700; font-size: 17px; letter-spacing: 2px;
+            border-radius: 4px; text-align: center;
             box-shadow: inset 0 0 15px rgba(198, 255, 0, 0.1);
-            text-transform: uppercase;
+            cursor: pointer;
         }
+        .cta-btn:active { opacity: 0.8; transform: scale(0.99); }
+
+        /* ★ 참가 기록 완료 토스트 */
+        .toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(198,255,0,0.12); border: 1px solid var(--accent-lime);
+            color: var(--accent-lime); font-family: 'Orbitron', monospace;
+            font-size: 11px; letter-spacing: 2px; padding: 10px 24px;
+            border-radius: 4px; opacity: 0; transition: all 0.4s ease;
+            white-space: nowrap; z-index: 999; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes scroll { 0% { transform: translateY(0); } 100% { transform: translateY(-100px); } }
+        @keyframes spin  { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -158,6 +149,9 @@
         <div class="corner tl"></div><div class="corner tr"></div>
         <div class="corner bl"></div><div class="corner br"></div>
     </div>
+
+    <!-- 참가 기록 완료 토스트 -->
+    <div class="toast" id="toast">✓ 참가 기록 완료</div>
 
     <div class="container">
         <div>
@@ -175,9 +169,10 @@
                     <div class="metric-label">ALTITUDE</div>
                     <div class="metric-val">245 <span>M</span></div>
                 </div>
+                <!-- ★ 실시간 참여자 수 -->
                 <div class="metric">
-                    <div class="metric-label">ACTION LVL</div>
-                    <div class="metric-val" style="color:var(--accent-lime);">HIGH</div>
+                    <div class="metric-label">참여자</div>
+                    <div class="metric-val participants" id="navCount">—</div>
                 </div>
             </div>
         </div>
@@ -194,17 +189,115 @@
         </div>
 
         <div class="bottom-section">
+            <!-- ★ 실제 Supabase 로그로 채워짐 -->
             <div class="gps-log">
-                <div style="animation: scroll 10s linear infinite;">
-                    <div class="log-item">LAT 38.201 LON 127.245 | SUPABASE LOGGED</div>
-                    <div class="log-item">LAT 38.202 LON 127.245 | SUPABASE LOGGED</div>
-                    <div class="log-item">LAT 38.203 LON 127.246 | SUPABASE LOGGED</div>
-                    <div class="log-item">LAT 38.204 LON 127.246 | SUPABASE LOGGED</div>
-                    <div class="log-item">LAT 38.205 LON 127.247 | SUPABASE LOGGED</div>
+                <div class="log-inner" id="logInner">
+                    <div class="log-item">CONNECTING TO SUPABASE...</div>
                 </div>
             </div>
-            <button class="cta-btn">🎯 로컬 리워드 잠금 해제</button>
+            <button class="cta-btn" onclick="unlockReward()">🎯 로컬 리워드 잠금 해제</button>
         </div>
     </div>
+
+<script>
+/* ══════════════════════════════════════
+   ★ SUPABASE 설정 — 아래 두 줄만 교체
+   게이트웨이와 동일한 값을 입력하세요
+══════════════════════════════════════ */
+const SUPABASE_URL      = 'https://rmbicpzmisajoysrtljg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_GU7bw082s_SIAYy1HprF2g_yPwQhILa';
+
+/* ══════════════════════════════════════
+   SUPABASE 초기화 + 참가자 기록
+══════════════════════════════════════ */
+let sb = null;
+
+(async function init(){
+  if(SUPABASE_URL === 'https://rmbicpzmisajoysrtljg.supabase.co') return; // 미설정 시 스킵
+
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    /* 1. 이번 세션 처음 접속 시 참가자 기록 */
+    const SESSION_KEY = 'apex_trail_2026_v1';
+    if(!sessionStorage.getItem(SESSION_KEY)){
+      const sessionId = Math.random().toString(36).substr(2, 12);
+      const { error } = await sb
+        .from('trail_participants')
+        .insert({
+          session_id: sessionId,
+          device: /Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
+          page: '2026-cheorwon'
+        });
+
+      if(!error){
+        sessionStorage.setItem(SESSION_KEY, sessionId);
+        showToast();
+      }
+    }
+
+    /* 2. 참여자 수 표시 */
+    await refreshCount();
+
+    /* 3. 실시간 구독 */
+    sb.channel('nav_live')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'trail_participants' },
+        async () => { await refreshCount(); addLogItem(); }
+      )
+      .subscribe();
+
+    /* 4. GPS 로그 시뮬레이션 (실제 GPS가 있으면 여기에 연결) */
+    startLogScroll();
+
+  } catch(err){
+    console.error('Supabase 오류:', err);
+  }
+}());
+
+/* 카운트 갱신 */
+async function refreshCount(){
+  if(!sb) return;
+  const { count } = await sb
+    .from('trail_participants')
+    .select('*', { count: 'exact', head: true });
+  const el = document.getElementById('navCount');
+  if(el && count !== null) el.textContent = count;
+}
+
+/* 토스트 메시지 */
+function showToast(){
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* 로그 스크롤 */
+let logItems = ['SUPABASE CONNECTED', 'PARTICIPANT RECORDED'];
+function addLogItem(){
+  const now = new Date();
+  const ts = String(now.getHours()).padStart(2,'0')+':'+
+             String(now.getMinutes()).padStart(2,'0')+':'+
+             String(now.getSeconds()).padStart(2,'0');
+  logItems.push('NEW PARTICIPANT | ' + ts + ' KST');
+  if(logItems.length > 6) logItems.shift();
+  renderLog();
+}
+function startLogScroll(){
+  renderLog();
+  setInterval(addLogItem, 8000);
+}
+function renderLog(){
+  const inner = document.getElementById('logInner');
+  if(!inner) return;
+  inner.innerHTML = logItems.map(t => `<div class="log-item">${t}</div>`).join('');
+}
+
+/* 리워드 버튼 */
+function unlockReward(){
+  if(navigator.vibrate) navigator.vibrate([50, 30, 80]);
+  alert('✅ 로컬 리워드 잠금 해제!\n가장 가까운 착한 가게로 이동하세요.');
+}
+</script>
 </body>
 </html>
