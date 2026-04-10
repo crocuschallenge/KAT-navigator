@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>APEX NAVIGATOR | 2026 CHEORWON</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -21,10 +22,10 @@
             display: flex; flex-direction: column; user-select: none; -webkit-user-select: none;
         }
 
-        /* --- PC 방어막 (Desktop Block Screen) --- */
+        /* PC 차단 화면 */
         #desktop-block {
             position: fixed; inset: 0; z-index: 9999; background: var(--bg-deep-navy);
-            display: none; /* 기본적으로 숨김, PC 감지 시 flex로 변경 */
+            display: none;
             flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px;
         }
         .desktop-title { font-family: 'Orbitron', monospace; font-size: 28px; color: #FFF; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px;}
@@ -32,8 +33,7 @@
         #qrcode { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 20px rgba(198,255,0,0.2); }
         .desktop-footer { margin-top: 30px; font-size: 13px; color: var(--accent-lime); font-family: 'Noto Sans KR', sans-serif; font-weight: 700;}
 
-
-        /* --- 모바일 메인 네비게이터 UI --- */
+        /* 모바일 메인 UI */
         #mobile-content { display: flex; flex-direction: column; height: 100%; width: 100%; }
 
         .map-bg {
@@ -62,19 +62,39 @@
         .metric-val span { font-size: 9px; color: var(--sub-text); }
 
         .center-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+        /* 나침반 */
         .radar-container { position: relative; width: 200px; height: 200px; margin-bottom: 20px; }
         .radar {
             width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(198, 255, 0, 0.15);
             box-shadow: 0 0 40px rgba(198, 255, 0, 0.05); position: absolute; transition: transform 0.2s ease-out;
+            display: flex; align-items: center; justify-content: center;
         }
         .radar::after { content: ''; position: absolute; inset: 15px; border-radius: 50%; border: 1px dashed rgba(255, 255, 255, 0.1); }
-        .radar::before { content: 'N'; position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: var(--alert-red); }
-        
+        /* N 표시 — 나침반 링에 고정 (링과 함께 회전) */
+        .compass-n {
+            position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+            font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 900; color: var(--alert-red);
+            pointer-events: none;
+        }
+        /* 내부 눈금선 */
+        .radar-inner { position: absolute; inset: 0; border-radius: 50%; }
+
+        /* 방향 화살표 — 항상 화면 기준 */
         .target-arrow {
             position: absolute; top: 10px; left: 50%; width: 4px; height: 90px;
             background: linear-gradient(to bottom, var(--accent-lime), transparent);
             transform-origin: bottom center; transform: translateX(-50%) rotate(0deg);
             z-index: 5; transition: transform 0.5s ease-out; box-shadow: 0 0 15px var(--accent-lime);
+            border-radius: 2px;
+        }
+
+        /* 중심점 */
+        .radar-center {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent-lime); box-shadow: 0 0 10px var(--accent-lime);
+            z-index: 10;
         }
 
         .target-info { text-align: center; }
@@ -84,29 +104,37 @@
         .target-desc { font-size: 13px; color: var(--text-silver); font-weight: 500; background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);}
 
         .bottom-section { width: 100%; }
-        .gps-log { font-family: 'Orbitron', monospace; font-size: 9px; color: var(--tech-indigo); text-align: center; height: 32px; overflow: hidden; margin-bottom: 16px; position: relative; }
+        .gps-log { font-family: 'Orbitron', monospace; font-size: 9px; color: rgba(198,255,0,0.3); text-align: center; height: 32px; overflow: hidden; margin-bottom: 16px; position: relative; }
         .log-list { position: absolute; bottom: 0; width: 100%; }
         .log-item { margin-bottom: 3px; letter-spacing: 1px; }
 
         .cta-btn {
             width: 100%; padding: 20px 0; background: rgba(198, 255, 0, 0.08); border: 1px solid var(--accent-lime); color: var(--accent-lime);
             font-family: 'Noto Sans KR', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 2px; border-radius: 4px; text-align: center;
-            box-shadow: inset 0 0 15px rgba(198, 255, 0, 0.1); text-transform: uppercase; cursor: pointer; transition: all 0.2s;
+            box-shadow: inset 0 0 15px rgba(198, 255, 0, 0.1); cursor: pointer; transition: all 0.2s;
         }
         .cta-btn:active { transform: scale(0.98); background: rgba(198, 255, 0, 0.2); }
 
+        /* 시작 오버레이 */
         #sensor-overlay {
             position: absolute; inset: 0; background: var(--bg-deep-navy); z-index: 100;
             display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center;
         }
-        .start-btn { margin-top: 30px; padding: 18px 40px; background: rgba(198,255,0,0.1); border: 1px solid var(--accent-lime); color: var(--accent-lime); font-family: 'Orbitron', monospace; font-size: 16px; font-weight: 700; letter-spacing: 2px; border-radius: 4px; cursor: pointer;}
-        
+        .start-title { font-family: 'Orbitron', monospace; font-size: 22px; color: #FFF; font-weight: 900; margin-bottom: 10px; }
+        .start-desc { font-size: 13px; color: var(--sub-text); line-height: 1.7; margin-bottom: 24px; }
+        .start-btn {
+            padding: 18px 40px; background: rgba(198,255,0,0.1); border: 1px solid var(--accent-lime);
+            color: var(--accent-lime); font-family: 'Orbitron', monospace; font-size: 16px;
+            font-weight: 700; letter-spacing: 2px; border-radius: 4px; cursor: pointer;
+        }
+        .start-btn:active { transform: scale(0.97); }
+
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
+    <!-- PC 차단 화면 -->
     <div id="desktop-block">
         <div class="desktop-title">APEX PATHFINDER</div>
         <div class="desktop-desc">본 전술 네비게이션은 현장 작전을 위한<br><b>스마트폰(모바일) 전용 시스템</b>입니다.<br>센서(GPS/나침반) 탑재 기기에서만 작동합니다.</div>
@@ -114,7 +142,7 @@
         <div class="desktop-footer">▶ 스마트폰 카메라로 위 QR 코드를 스캔하십시오 ◀</div>
     </div>
 
-
+    <!-- 모바일 네비게이터 -->
     <div id="mobile-content">
         <div class="map-bg"></div>
         <div class="hud-frame">
@@ -122,22 +150,26 @@
             <div class="corner bl"></div><div class="corner br"></div>
         </div>
 
+        <!-- 시작 오버레이 -->
         <div id="sensor-overlay">
-            <div style="font-family: 'Orbitron', monospace; font-size: 24px; color: #FFF; margin-bottom: 10px; font-weight:900;">APEX PATHFINDER</div>
-            <div style="font-size: 13px; color: var(--sub-text); line-height: 1.6; margin-bottom: 20px;">[2026 CHEORWON EDITION]<br>로컬 미션 추적을 위해 GPS 및<br>자력계 센서를 활성화합니다.</div>
-            <button class="start-btn" onclick="initSystem()">SYSTEM START</button>
+            <div class="start-title">APEX PATHFINDER</div>
+            <div class="start-desc">[2026 CHEORWON EDITION]<br>로컬 미션 추적을 위해<br>GPS 및 나침반 센서를 활성화합니다.</div>
+            <button class="start-btn" onclick="initSystem()">▶ SYSTEM START</button>
         </div>
 
         <div class="container">
             <div>
                 <div class="top-bar">
-                    <div>APEX NAVIGATOR</div>
-                    <div class="live-feed"><div class="dot"></div>LIVE: <span id="live-count" style="margin-left:4px; margin-right:2px; font-size:13px;"> 412 </span> ACTIVE</div>
+                    <div>APEX NAVIGATOR v3.0</div>
+                    <div class="live-feed">
+                        <div class="dot"></div>LIVE:&nbsp;
+                        <span id="live-count" style="font-size:13px;">—</span>&nbsp;ACTIVE
+                    </div>
                 </div>
                 <div class="metrics-panel">
                     <div class="metric">
                         <div class="metric-label">PULSE</div>
-                        <div class="metric-val" id="pulse-val">168 <span>BPM</span></div>
+                        <div class="metric-val" id="pulse-val">— <span>BPM</span></div>
                     </div>
                     <div class="metric">
                         <div class="metric-label">GPS ACC.</div>
@@ -145,180 +177,240 @@
                     </div>
                     <div class="metric">
                         <div class="metric-label">ACTION LVL</div>
-                        <div class="metric-val" style="color:var(--accent-lime);">HIGH</div>
+                        <div class="metric-val" style="color:var(--accent-lime);" id="action-lv">READY</div>
                     </div>
                 </div>
             </div>
 
             <div class="center-display">
                 <div class="radar-container">
-                    <div class="radar" id="compass-ring"></div>
+                    <!-- 나침반 링 (기기 방향에 따라 회전) -->
+                    <div class="radar" id="compass-ring">
+                        <div class="compass-n">N</div>
+                    </div>
+                    <!-- 목표 방향 화살표 (항상 목표를 가리킴) -->
                     <div class="target-arrow" id="target-arrow"></div>
+                    <!-- 중심점 -->
+                    <div class="radar-center"></div>
                 </div>
                 <div class="target-info">
-                    <div class="target-code">TARGET: CHEO-01</div>
+                    <div class="target-code" id="target-code">TARGET: CHEO-01</div>
                     <div class="target-dist" id="dist-val">--.-- <span>KM</span></div>
-                    <div class="target-desc">철원 화강쉬리공원 '착한 가게'</div>
+                    <div class="target-desc" id="target-desc">철원 화강쉬리공원 '착한 가게'</div>
                 </div>
             </div>
 
             <div class="bottom-section">
                 <div class="gps-log"><div class="log-list" id="log-list"></div></div>
-                <button class="cta-btn" id="reward-btn" onclick="alert('[미션 해제 성공]\n목적지 반경 진입 확인. 로컬 상점 15% 할인 리워드가 지급되었습니다.')">🎯 로컬 리워드 잠금 해제</button>
+                <button class="cta-btn" id="reward-btn" onclick="unlockReward()">🎯 로컬 리워드 잠금 해제</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // --- PC/모바일 접속 감지 로직 ---
-        function checkDevice() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (!isMobile) {
-                // 모바일이 아니면 (PC/노트북이면) 네비게이터 숨기고 차단 화면 표시
-                document.getElementById('mobile-content').style.display = 'none';
-                document.getElementById('desktop-block').style.display = 'flex';
-                
-                // 현재 URL을 기반으로 QR 코드 동적 생성
-                const currentUrl = window.location.href;
-                new QRCode(document.getElementById("qrcode"), {
-                    text: currentUrl,
-                    width: 200,
-                    height: 200,
-                    colorDark : "#0B1426",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-            }
-        }
-        
-        // 페이지 로드 시 즉시 기기 체크
-        checkDevice();
+<script>
+/* ═══════════════════════════════
+   SUPABASE 설정
+═══════════════════════════════ */
+const SUPABASE_URL = 'https://rmbicpzmisajoysrtljg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_GU7bw082s_SIAYy1HprF2g_yPwQhILa';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- 기존 Supabase 및 네비게이터 로직 ---
-        const SUPABASE_URL = 'https://rmbicpzmisajoysrtljg.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_GU7bw082s_SIAYy1HprF2g_yPwQhILa';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ═══════════════════════════════
+   목표 좌표 — 화강쉬리공원
+═══════════════════════════════ */
+const TARGET_LAT = 38.2573;
+const TARGET_LON = 127.4241;
+const TARGET_NAME = "철원 화강쉬리공원 '착한 가게'";
 
-        const targetLat = 38.2573;
-        const targetLon = 127.4241;
-        
-        let currentHeading = 0;
-        let wakeLock = null;
-        let isSystemStarted = false;
+let currentHeading = 0;
+let wakeLock = null;
+let isStarted = false;
 
-        async function initSystem() {
-            if(isSystemStarted) return;
-            isSystemStarted = true;
-            
-            document.getElementById('sensor-overlay').style.display = 'none';
-            
-            requestWakeLock();
-            await initSupabaseRealtime();
-            await registerParticipant();
-            startSensors();
+/* ═══════════════════════════════
+   PC / 모바일 감지
+═══════════════════════════════ */
+(function checkDevice(){
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if(!isMobile){
+        document.getElementById('mobile-content').style.display = 'none';
+        document.getElementById('desktop-block').style.display = 'flex';
+        new QRCode(document.getElementById('qrcode'), {
+            text: window.location.href,
+            width: 200, height: 200,
+            colorDark: '#0B1426', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+})();
 
-            setInterval(() => {
-                document.getElementById('pulse-val').innerHTML = Math.floor(160 + Math.random() * 10) + ' <span>BPM</span>';
-            }, 3000);
-        }
+/* ═══════════════════════════════
+   시스템 시작
+═══════════════════════════════ */
+async function initSystem(){
+    if(isStarted) return;
+    isStarted = true;
+    document.getElementById('sensor-overlay').style.display = 'none';
+    document.getElementById('action-lv').textContent = 'HIGH';
 
-        async function initSupabaseRealtime() {
-            const countDisplay = document.getElementById('live-count');
+    await requestWakeLock();
+    await connectSupabase();
+    await registerParticipant();
+    startSensors();
 
-            const { count, error } = await supabase
-                .from('trail_participants')
-                .select('*', { count: 'exact', head: true });
-            
-            let baseCount = 412;
-            if (!error && count !== null) {
-                countDisplay.innerText = baseCount + count;
-            }
+    // 심박수 시뮬레이션
+    document.getElementById('pulse-val').innerHTML = '168 <span>BPM</span>';
+    setInterval(()=>{
+        document.getElementById('pulse-val').innerHTML =
+            Math.floor(160 + Math.random()*15) + ' <span>BPM</span>';
+    }, 3000);
+}
 
-            supabase.channel('public:trail_participants')
-                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'trail_participants' }, payload => {
-                    let current = parseInt(countDisplay.innerText) || baseCount;
-                    countDisplay.innerText = current + 1;
-                })
-                .subscribe();
-        }
+/* ═══════════════════════════════
+   SUPABASE 실시간 연결
+═══════════════════════════════ */
+async function connectSupabase(){
+    const countEl = document.getElementById('live-count');
+    const BASE = 412; // 기본 베이스 카운트
 
-        async function registerParticipant() {
-            const sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
-            await supabase.from('trail_participants').insert([
-                { session_id: sessionId, page: '2026-cheorwon-action' }
-            ]);
+    try {
+        const { count, error } = await sb
+            .from('trail_participants')
+            .select('*', { count:'exact', head:true });
+
+        if(!error && count !== null){
+            countEl.textContent = BASE + count;
         }
 
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); }
-            } catch (err) { console.log('Wake Lock Error:', err); }
-        }
+        sb.channel('public:trail_participants')
+            .on('postgres_changes',
+                { event:'INSERT', schema:'public', table:'trail_participants' },
+                ()=>{ countEl.textContent = parseInt(countEl.textContent||BASE) + 1; }
+            )
+            .subscribe();
+    } catch(e){ console.error('Supabase 연결 실패', e); }
+}
 
-        function startSensors() {
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission().then(permissionState => {
-                    if (permissionState === 'granted') window.addEventListener('deviceorientation', handleOrientation);
-                }).catch(console.error);
-            } else {
-                window.addEventListener('deviceorientationabsolute', handleOrientation);
-            }
+/* ═══════════════════════════════
+   참가자 등록
+═══════════════════════════════ */
+async function registerParticipant(){
+    const key = 'apex_sess_2026';
+    if(sessionStorage.getItem(key)) return;
+    const id = 'u_' + Math.random().toString(36).substr(2,9);
+    const { error } = await sb.from('trail_participants').insert([
+        { session_id: id, page: '2026-cheorwon-action',
+          device: /Mobi/i.test(navigator.userAgent)?'mobile':'desktop' }
+    ]);
+    if(!error) sessionStorage.setItem(key, id);
+}
 
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(updatePosition, 
-                    (err) => { console.warn('GPS Error'); document.getElementById('gps-acc').innerHTML = "ERR"; }, 
-                    { enableHighAccuracy: true, maximumAge: 0 }
-                );
-            }
-        }
+/* ═══════════════════════════════
+   Wake Lock
+═══════════════════════════════ */
+async function requestWakeLock(){
+    try {
+        if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen');
+    } catch(e){}
+}
 
-        function handleOrientation(event) {
-            currentHeading = event.webkitCompassHeading || Math.abs(event.alpha - 360);
-            if (currentHeading) {
-                document.getElementById('compass-ring').style.transform = `rotate(${-currentHeading}deg)`;
-            }
-        }
+/* ═══════════════════════════════
+   센서 시작 (GPS + 나침반)
+═══════════════════════════════ */
+function startSensors(){
+    // 나침반
+    if(typeof DeviceOrientationEvent.requestPermission === 'function'){
+        DeviceOrientationEvent.requestPermission()
+            .then(s=>{ if(s==='granted') window.addEventListener('deviceorientation', handleOrientation); })
+            .catch(console.error);
+    } else {
+        window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+        window.addEventListener('deviceorientation', handleOrientation, true);
+    }
 
-        function updatePosition(position) {
-            const userLat = position.coords.latitude;
-            const userLon = position.coords.longitude;
-            const accuracy = position.coords.accuracy;
-            
-            document.getElementById('gps-acc').innerHTML = Math.floor(accuracy) + ' <span>M</span>';
+    // GPS
+    if(navigator.geolocation){
+        navigator.geolocation.watchPosition(
+            updatePosition,
+            ()=>{ document.getElementById('gps-acc').innerHTML = 'ERR'; },
+            { enableHighAccuracy:true, maximumAge:0, timeout:10000 }
+        );
+    }
+}
 
-            const dist = calculateDistance(userLat, userLon, targetLat, targetLon);
-            document.getElementById('dist-val').innerHTML = dist.toFixed(2) + ' <span>KM</span>';
+/* ═══════════════════════════════
+   나침반 처리
+═══════════════════════════════ */
+function handleOrientation(e){
+    let h = e.webkitCompassHeading;
+    if(h == null) h = e.alpha ? (360 - e.alpha) % 360 : 0;
+    currentHeading = h;
+    // 나침반 링 회전 (N이 실제 북쪽 가리키도록)
+    document.getElementById('compass-ring').style.transform = `rotate(${-h}deg)`;
+    // 화살표는 목표 방향 유지 (updatePosition에서 설정)
+}
 
-            const bearing = calculateBearing(userLat, userLon, targetLat, targetLon);
-            const relativeBearing = bearing - currentHeading;
-            document.getElementById('target-arrow').style.transform = `translateX(-50%) rotate(${relativeBearing}deg)`;
+/* ═══════════════════════════════
+   GPS 위치 처리
+═══════════════════════════════ */
+function updatePosition(pos){
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    const acc = pos.coords.accuracy;
 
-            const logList = document.getElementById('log-list');
-            const newLog = document.createElement('div');
-            newLog.className = 'log-item';
-            newLog.innerText = `LAT ${userLat.toFixed(4)} LON ${userLon.toFixed(4)} | SUPABASE LOGGED`;
-            logList.appendChild(newLog);
-            if (logList.childElementCount > 2) logList.removeChild(logList.firstChild);
-        }
+    document.getElementById('gps-acc').innerHTML = Math.floor(acc) + ' <span>M</span>';
 
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; 
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
+    // 거리 계산
+    const dist = calcDist(lat, lon, TARGET_LAT, TARGET_LON);
+    document.getElementById('dist-val').innerHTML = dist.toFixed(2) + ' <span>KM</span>';
 
-        function calculateBearing(lat1, lon1, lat2, lon2) {
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            lat1 = lat1 * Math.PI / 180;
-            lat2 = lat2 * Math.PI / 180;
-            const y = Math.sin(dLon) * Math.cos(lat2);
-            const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
-            return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-        }
-    </script>
+    // 방향 화살표
+    const bearing = calcBearing(lat, lon, TARGET_LAT, TARGET_LON);
+    const rel = (bearing - currentHeading + 360) % 360;
+    document.getElementById('target-arrow').style.transform = `translateX(-50%) rotate(${rel}deg)`;
+
+    // 50m 이내 도착 감지
+    if(dist < 0.05){
+        document.getElementById('target-code').textContent = '✅ 목적지 도착!';
+        document.getElementById('reward-btn').style.background = 'rgba(198,255,0,0.25)';
+        document.getElementById('reward-btn').style.boxShadow = '0 0 20px rgba(198,255,0,0.4)';
+    }
+
+    // GPS 로그
+    const log = document.getElementById('log-list');
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.textContent = `LAT ${lat.toFixed(4)} LON ${lon.toFixed(4)} | ACC ${Math.floor(acc)}M`;
+    log.appendChild(item);
+    if(log.childElementCount > 3) log.removeChild(log.firstChild);
+}
+
+/* ═══════════════════════════════
+   거리 계산 (Haversine)
+═══════════════════════════════ */
+function calcDist(lat1,lon1,lat2,lon2){
+    const R=6371, dL=(lat2-lat1)*Math.PI/180, dLn=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dL/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLn/2)**2;
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+/* ═══════════════════════════════
+   방위각 계산
+═══════════════════════════════ */
+function calcBearing(lat1,lon1,lat2,lon2){
+    const dLn=(lon2-lon1)*Math.PI/180;
+    lat1=lat1*Math.PI/180; lat2=lat2*Math.PI/180;
+    const y=Math.sin(dLn)*Math.cos(lat2);
+    const x=Math.cos(lat1)*Math.sin(lat2)-Math.sin(lat1)*Math.cos(lat2)*Math.cos(dLn);
+    return(Math.atan2(y,x)*180/Math.PI+360)%360;
+}
+
+/* ═══════════════════════════════
+   리워드 잠금 해제
+═══════════════════════════════ */
+function unlockReward(){
+    if(navigator.vibrate) navigator.vibrate([50,30,80]);
+    alert('✅ 로컬 리워드 잠금 해제!\n목적지 반경 진입 확인.\n로컬 상점 15% 할인 리워드가 지급되었습니다.');
+}
+</script>
 </body>
 </html>
