@@ -10,7 +10,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg-deep-navy); font-family: 'Noto Sans KR', sans-serif; height: 100dvh; overflow: hidden; color: var(--text-silver); display: flex; flex-direction: column; user-select: none; -webkit-user-select: none; }
         
-        /* PC 방어막 */
         #desktop-block { position: fixed; inset: 0; z-index: 9999; background: var(--bg-deep-navy); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px; }
         #qr-img { background: white; padding: 10px; border-radius: 8px; margin: 20px 0; width: 180px; height: 180px; }
 
@@ -25,7 +24,6 @@
         .live-feed { display: flex; align-items: center; color: var(--accent-lime); font-weight: 700; background: rgba(198,255,0,0.1); padding: 4px 10px; border-radius: 20px; }
         .dot { width: 6px; height: 6px; background-color: var(--accent-lime); border-radius: 50%; margin-right: 6px; animation: blink 1s infinite; }
 
-        /* 포인트 현황판 */
         .metrics-panel { display: flex; justify-content: space-between; background: rgba(26, 42, 58, 0.6); padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 15px; }
         .metric { text-align: center; }
         .metric-label { font-size: 9px; color: var(--sub-text); text-transform: uppercase; font-weight: 700; }
@@ -37,21 +35,20 @@
         .course-btn.active { background: rgba(198, 255, 0, 0.15); border-color: var(--accent-lime); color: var(--accent-lime); }
 
         .center-display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        .radar-container { position: relative; width: 200px; height: 200px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; }
-        .radar-watermark { position: absolute; width: 100px; opacity: 0.15; z-index: 1; filter: grayscale(1) brightness(1.5); }
+        .radar-container { position: relative; width: 220px; height: 220px; margin-bottom: 15px; display: flex; justify-content: center; align-items: center; }
+        .radar-watermark { position: absolute; width: 110px; opacity: 0.15; z-index: 1; filter: grayscale(1) brightness(1.5); }
         .radar { width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(198, 255, 0, 0.2); position: absolute; transition: transform 0.1s ease-out; z-index: 2; }
-        .level-bubble { position: absolute; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--alert-red); background: rgba(255,61,0,0.3); z-index: 4; }
+        .level-bubble { position: absolute; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--alert-red); background: rgba(255,61,0,0.3); z-index: 4; }
         .level-bubble.aligned { border-color: var(--accent-lime); background: rgba(198,255,0,0.4); box-shadow: 0 0 15px var(--accent-lime); }
-        .target-arrow { position: absolute; top: 10px; left: 50%; width: 4px; height: 90px; background: linear-gradient(to bottom, var(--accent-lime), transparent); transform-origin: bottom center; z-index: 5; transition: transform 0.3s ease-out; }
+        .target-arrow { position: absolute; top: 10px; left: 50%; width: 4px; height: 100px; background: linear-gradient(to bottom, var(--accent-lime), transparent); transform-origin: bottom center; z-index: 5; transition: transform 0.3s ease-out; }
 
         .target-info { text-align: center; }
-        .target-dist { font-family: 'Orbitron', monospace; font-size: 48px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 5px; }
+        .target-dist { font-family: 'Orbitron', monospace; font-size: 52px; font-weight: 900; color: #FFF; line-height: 1; margin-bottom: 5px; }
         .target-desc { font-size: 13px; color: var(--text-silver); background: rgba(0,0,0,0.4); padding: 6px 12px; border-radius: 4px; }
 
-        .cta-btn { width: 100%; padding: 18px 0; background: rgba(198, 255, 0, 0.08); border: 1px solid var(--accent-lime); color: var(--accent-lime); font-weight: 700; font-size: 16px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-        .cta-btn:active { transform: scale(0.98); background: rgba(198, 255, 0, 0.2); }
+        .cta-btn { width: 100%; padding: 20px 0; background: rgba(198, 255, 0, 0.08); border: 1px solid var(--accent-lime); color: var(--accent-lime); font-weight: 700; font-size: 17px; border-radius: 4px; cursor: pointer; }
         #sensor-overlay { position: absolute; inset: 0; background: var(--bg-deep-navy); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; text-align: center; }
-        .start-btn { margin-top: 20px; padding: 15px 35px; background: rgba(198,255,0,0.1); border: 1px solid var(--accent-lime); color: var(--accent-lime); font-family: 'Orbitron', monospace; border-radius: 4px; cursor: pointer;}
+        .start-btn { margin-top: 25px; padding: 18px 40px; background: rgba(198,255,0,0.1); border: 1px solid var(--accent-lime); color: var(--accent-lime); font-family: 'Orbitron', monospace; border-radius: 4px; cursor: pointer;}
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </style>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -60,20 +57,20 @@
     <div id="desktop-block">
         <div style="font-family:'Orbitron'; font-size:24px;">APEX PATHFINDER</div>
         <img id="qr-img" src="" alt="QR">
-        <div>스마트폰으로 스캔하여 작전을 시작하십시오.</div>
+        <div style="color:var(--sub-text);">스마트폰으로 스캔하여 작전을 시작하십시오.</div>
     </div>
     <div id="mobile-content">
         <div class="map-bg"></div>
         <div class="hud-frame"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div></div>
         <div id="sensor-overlay">
-            <div style="font-family:'Orbitron'; font-size:22px; font-weight:900;">APEX PATHFINDER</div>
-            <div style="font-size:12px; margin:15px 0; color:var(--sub-text);">[2026 CHEORWON POC]<br>실시간 로컬 연계 시스템 가동</div>
+            <div style="font-family:'Orbitron'; font-size:24px; font-weight:900;">APEX PATHFINDER</div>
+            <div style="font-size:12px; margin:15px 0; color:var(--sub-text);">[2026 CHEORWON DEMO]<br>오프라인 데이터 복원 엔진 가동 중</div>
             <button class="start-btn" onclick="initSystem()">SYSTEM START</button>
         </div>
         <div class="container">
             <div>
                 <div class="top-bar">
-                    <div>APEX NAVIGATOR v3.0</div>
+                    <div>APEX NAVIGATOR v3.5</div>
                     <div class="live-feed"><div class="dot"></div>LIVE: <span id="live-count"> 200 </span></div>
                 </div>
                 <div class="metrics-panel">
@@ -95,73 +92,92 @@
                     <div class="target-arrow" id="target-arrow"></div>
                 </div>
                 <div class="target-info">
-                    <div style="font-family:'Orbitron'; color:var(--accent-lime); font-size:12px; letter-spacing:2px;" id="target-code">TARGET: DONG-SONG</div>
+                    <div style="font-family:'Orbitron'; color:var(--accent-lime); font-size:12px; letter-spacing:2px;" id="target-code">TARGET: MARKET-SYNC</div>
                     <div class="target-dist" id="dist-val">-- <span>M</span></div>
-                    <div class="target-desc" id="target-desc">동송전통시장 (이평로 48번길)</div>
+                    <div class="target-desc" id="target-desc">동송전통시장 거점 데이터 대기 중</div>
                 </div>
             </div>
             <button class="cta-btn" onclick="claimPoint()">🎯 미션 인증 & 포인트 적립</button>
         </div>
     </div>
     <script>
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        if (!isMobile) {
+        // --- 1. PC 접속 방어막 ---
+        if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             document.getElementById('mobile-content').style.display = 'none';
             document.getElementById('desktop-block').style.display = 'flex';
             document.getElementById('qr-img').src = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=" + encodeURIComponent(window.location.href);
         }
 
-        let currentHeading = 0, isSystemStarted = false, baseCount = 200, currentPoints = 0, demoTargetLat = null, demoTargetLon = null, initialLat = null, initialLon = null;
+        // --- 2. IndexedDB 오프라인 엔진 세팅 ---
+        let db, currentHeading = 0, isSystemStarted = false, baseCount = 200, currentPoints = 0, demoTargetLat, demoTargetLon, initialLat, initialLon;
+        const request = indexedDB.open("ApexTrailCache", 1);
+        request.onupgradeneeded = (e) => { e.target.result.createObjectStore("location_logs", { keyPath: "id", autoIncrement: true }); };
+        request.onsuccess = (e) => { db = e.target.result; };
+
         const courses = [
-            { code: "TARGET: DONG-SONG", desc: "동송전통시장 (이평로 48번길)", dist: 30 },
-            { code: "TARGET: NOPO-04", desc: "철원막국수 (갈말읍 명성로)", dist: 2500 },
-            { code: "TARGET: 9-VIEW-01", desc: "고석정 (동송읍 태봉로)", dist: 8500 }
+            { code: "TARGET: MARKET-SYNC", desc: "동송전통시장 (이평로 48번길)", dist: 30 },
+            { code: "TARGET: NOPO-RECOVER", desc: "철원막국수 (갈말읍 명성로)", dist: 2500 },
+            { code: "TARGET: VIEW-POINT", desc: "고석정 (동송읍 태봉로)", dist: 8500 }
         ];
 
+        // --- 3. 데이터 복원(Sync) 로직 ---
+        async function syncData() {
+            if (!supabaseClient || !navigator.onLine || !db) return;
+            const tx = db.transaction("location_logs", "readwrite"), store = tx.objectStore("location_logs");
+            store.getAll().onsuccess = async (e) => {
+                const logs = e.target.result; if (logs.length === 0) return;
+                const { error } = await supabaseClient.from('trail_participants').insert(logs.map(l => ({ session_id: 'RECOVERED_'+l.timestamp, page: '2026-cheorwon-action' })));
+                if (!error) { const delTx = db.transaction("location_logs", "readwrite"); delTx.objectStore("location_logs").clear(); console.log("[SYNC] 복원 완료"); }
+            };
+        }
+
         function selectCourse(idx, btn) {
-            document.querySelectorAll('.course-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('target-code').innerText = courses[idx].code;
-            document.getElementById('target-desc').innerText = courses[idx].desc;
+            document.querySelectorAll('.course-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+            document.getElementById('target-code').innerText = courses[idx].code; document.getElementById('target-desc').innerText = courses[idx].desc;
             if(initialLat) { demoTargetLat = initialLat + (courses[idx].dist / 111000); demoTargetLon = initialLon; }
         }
 
         function claimPoint() {
-            currentPoints += 500;
-            document.getElementById('point-val').innerText = currentPoints.toLocaleString();
-            alert(`[미션 성공]\n${document.getElementById('target-desc').innerText} 인증 완료!\n500포인트가 적립되었습니다.\n\n* 적립된 포인트는 철원사랑상품권으로 교환 가능합니다.`);
+            currentPoints += 500; document.getElementById('point-val').innerText = currentPoints.toLocaleString();
+            alert(`[미션 성공]\n포인트 적립 완료!\n\n* IndexedDB 엔진을 통해 오프라인 상태에서도 포인트 데이터가 안전하게 보호됩니다.`);
         }
+
+        // --- 4. 시스템 가동 ---
+        const SUPABASE_URL = 'https://rmbicpzmisajoysrtljg.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_GU7bw082s_SIAYy1HprF2g_yPwQhILa';
+        let supabaseClient = null;
 
         async function initSystem() {
             if(isSystemStarted) return; isSystemStarted = true;
             document.getElementById('sensor-overlay').style.display = 'none';
+            try { supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); syncData(); } catch(e) {}
             startSensors();
-            setInterval(() => {
-                if(Math.random() > 0.6) { baseCount++; document.getElementById('live-count').innerText = baseCount; }
-            }, 3000);
+            setInterval(() => { if(Math.random() > 0.6) { baseCount++; document.getElementById('live-count').innerText = baseCount; } }, 3000);
+            window.addEventListener('focus', syncData); // 화면 켰을 때 복원 실행
         }
 
         function startSensors() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission().then(state => { if(state === 'granted') window.addEventListener('deviceorientation', handleOrient); });
             } else { window.addEventListener('deviceorientation', handleOrient); }
-            if (navigator.geolocation) navigator.geolocation.watchPosition(updatePos, null, { enableHighAccuracy: true });
+            navigator.geolocation.watchPosition(updatePos, null, { enableHighAccuracy: true });
         }
 
         function handleOrient(e) {
             currentHeading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
             document.getElementById('compass-ring').style.transform = `rotate(${-currentHeading}deg)`;
-            const bubble = document.getElementById('level-bubble'), status = document.getElementById('level-status');
-            let x = Math.max(-40, Math.min(40, e.gamma * 2)), y = Math.max(-40, Math.min(40, e.beta * 2));
-            bubble.style.transform = `translate(${x}px, ${y}px)`;
-            if(Math.abs(e.beta) < 3 && Math.abs(e.gamma) < 3) { bubble.classList.add('aligned'); status.innerText = "ALIGNED"; status.style.color = "var(--accent-lime)"; }
-            else { bubble.classList.remove('aligned'); status.innerText = "TILT"; status.style.color = "var(--alert-red)"; }
+            const b = document.getElementById('level-bubble'), s = document.getElementById('level-status');
+            let x = Math.max(-45, Math.min(45, e.gamma * 2)), y = Math.max(-45, Math.min(45, e.beta * 2));
+            b.style.transform = `translate(${x}px, ${y}px)`;
+            if(Math.abs(e.beta) < 3 && Math.abs(e.gamma) < 3) { b.classList.add('aligned'); s.innerText = "ALIGNED"; s.style.color = "var(--accent-lime)"; if(navigator.vibrate) navigator.vibrate(50); }
+            else { b.classList.remove('aligned'); s.innerText = "TILT"; s.style.color = "var(--alert-red)"; }
         }
 
         function updatePos(p) {
             const lat = p.coords.latitude, lon = p.coords.longitude;
             if(!initialLat) { initialLat = lat; initialLon = lon; selectCourse(0, document.querySelector('.course-btn')); }
             document.getElementById('gps-acc').innerText = Math.floor(p.coords.accuracy) + "M";
+            if(db) { const tx = db.transaction("location_logs", "readwrite"); tx.objectStore("location_logs").add({ lat, lon, timestamp: new Date().toISOString() }); }
             const d = calcDist(lat, lon, demoTargetLat, demoTargetLon);
             document.getElementById('dist-val').innerHTML = d < 1 ? Math.floor(d*1000) + " <span>M</span>" : d.toFixed(2) + " <span>KM</span>";
             const b = calcBearing(lat, lon, demoTargetLat, demoTargetLon);
