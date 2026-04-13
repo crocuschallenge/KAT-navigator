@@ -137,6 +137,71 @@ html,body{width:100%;background:var(--bg);color:var(--text);font-family:'Pretend
 .tac-btn:active{transform:scale(.99)}
 .tac-btn.active{border-color:rgba(198,255,0,.5);color:var(--accent);box-shadow:0 0 18px rgba(198,255,0,.07)}
 .tac-btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* ── ENGAGE 버튼 전용 오버라이드 ── */
+#engage-btn {
+  background: linear-gradient(135deg, #C6FF00 0%, #8BCB00 100%);
+  border: 2px solid #C6FF00;
+  color: #000 !important;
+  font-size: 20px;
+  letter-spacing: 5px;
+  padding: 22px 20px 30px;
+  text-align: center;
+  padding-left: 20px;
+  box-shadow: 0 0 0 3px rgba(198,255,0,.2), 0 0 35px rgba(198,255,0,.35), 0 6px 24px rgba(0,0,0,.55);
+  animation: engagePulse 1.8s ease-in-out infinite;
+}
+#engage-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.28) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: engageShine 2.4s ease-in-out infinite;
+  box-shadow: none;
+}
+#engage-btn::after {
+  content: '▶ 터치하여 시스템을 가동하십시오';
+  position: absolute;
+  bottom: 6px;
+  left: 0; right: 0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: rgba(0,0,0,.5);
+  text-align: center;
+}
+#engage-btn.active {
+  background: rgba(11,20,38,.88) !important;
+  border: 1px solid rgba(198,255,0,.3) !important;
+  color: rgba(198,255,0,.5) !important;
+  font-size: 13px;
+  letter-spacing: 3px;
+  padding: 12px 20px;
+  box-shadow: none !important;
+  animation: none !important;
+}
+#engage-btn.active::after { display: none; }
+#engage-btn.active::before {
+  background: var(--accent);
+  width: 3px;
+  height: auto;
+  inset: 0;
+  transform: none;
+  animation: none;
+}
+@keyframes engagePulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(198,255,0,.2), 0 0 35px rgba(198,255,0,.35), 0 6px 24px rgba(0,0,0,.55); }
+  50%      { box-shadow: 0 0 0 8px rgba(198,255,0,.07), 0 0 60px rgba(198,255,0,.55), 0 6px 24px rgba(0,0,0,.55); }
+}
+@keyframes engageShine {
+  0%  { transform: translateX(-100%); }
+  60% { transform: translateX(100%); }
+  100%{ transform: translateX(100%); }
+}
 #radar-btn{border-color:rgba(0,229,255,.22);color:rgba(0,229,255,.8);font-size:13px;margin-bottom:10px;display:none}
 #radar-btn::before{background:var(--cyan);box-shadow:0 0 12px rgba(0,229,255,.45)}
 #radar-btn.active{border-color:rgba(0,229,255,.52);color:var(--cyan)}
@@ -172,12 +237,50 @@ html,body{width:100%;background:var(--bg);color:var(--text);font-family:'Pretend
 .mi-lbl{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:1.5px;color:rgba(198,255,0,.4);margin-bottom:3px}
 .mi-val{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;color:#fff}
 .mi-val.acc{color:var(--accent);text-shadow:0 0 10px rgba(198,255,0,.25)}
-.course-tabs{width:100%;display:none;gap:0;margin-bottom:10px}
-.c-tab{flex:1;padding:11px 4px;text-align:center;background:rgba(11,20,38,.72);border:1px solid rgba(198,255,0,.14);color:rgba(198,255,0,.45);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:11px;letter-spacing:1px;cursor:pointer;transition:all .2s;border-right:none}
-.c-tab:last-child{border-right:1px solid rgba(198,255,0,.14)}
-.c-tab.active{background:rgba(198,255,0,.08);border-color:rgba(198,255,0,.45);color:var(--accent)}
-.c-tab .tab-sub{font-family:'Share Tech Mono',monospace;font-size:7px;display:block;color:rgba(198,255,0,.35);margin-top:2px}
-.c-tab.active .tab-sub{color:rgba(198,255,0,.65)}
+.course-tabs{width:100%;display:none;flex-direction:column;gap:8px;margin-bottom:14px}
+.course-tabs-label{
+  font-family:'Share Tech Mono',monospace;
+  font-size:9px;letter-spacing:2px;
+  color:var(--accent);text-align:center;
+  padding:8px 0 4px;
+  border-top:1px solid rgba(198,255,0,.22);
+  animation:blinkLabel 1.2s ease-in-out infinite;
+}
+@keyframes blinkLabel{0%,100%{opacity:1}50%{opacity:.35}}
+.c-tab{
+  width:100%;padding:16px 18px;
+  text-align:left;
+  background:rgba(11,20,38,.85);
+  border:1px solid rgba(198,255,0,.22);
+  border-left:4px solid rgba(198,255,0,.4);
+  color:rgba(255,255,255,.8);
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:800;font-size:18px;letter-spacing:2px;
+  cursor:pointer;
+  transition:all .22s cubic-bezier(.16,1,.3,1);
+  display:flex;align-items:center;justify-content:space-between;
+  border-right:1px solid rgba(198,255,0,.22);
+  position:relative;overflow:hidden;
+}
+.c-tab:hover{border-color:rgba(198,255,0,.55);border-left-color:var(--accent);color:#fff}
+.c-tab:active{transform:scale(.99)}
+.c-tab-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.c-tab .tab-sub{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:rgba(198,255,0,.5);display:block;margin-top:0}
+.c-tab .tab-pts{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;color:rgba(255,179,0,.65)}
+.c-tab.active{
+  background:rgba(198,255,0,.10);
+  border-color:var(--accent);
+  border-left:4px solid var(--accent);
+  color:var(--accent);
+  box-shadow:0 0 20px rgba(198,255,0,.12), inset 0 0 20px rgba(198,255,0,.04);
+}
+.c-tab.active .tab-sub{color:rgba(198,255,0,.75)}
+.c-tab.active::after{
+  content:'✔ 선택됨';
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--accent);
+}
+.c-tab.active .c-tab-right{opacity:0}
 .acc-wrap{width:100%;margin-bottom:4px;border:1px solid rgba(198,255,0,.1)}
 .acc-head{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:rgba(11,20,38,.75);user-select:none;transition:background .2s}
 .acc-head:hover{background:rgba(11,20,38,.92)}
@@ -360,10 +463,29 @@ html,body{width:100%;background:var(--bg);color:var(--text);font-family:'Pretend
     </div>
     <button class="tac-btn" id="engage-btn">⚡ SYSTEM ENGAGE (가동)</button>
     <div class="course-tabs" id="course-tabs">
-      <div class="c-tab" data-course="market">전통시장<span class="tab-sub">2H · 5개소</span></div>
-      <div class="c-tab" data-course="nopo">철원노포<span class="tab-sub">5H · 9개소</span></div>
-      <div class="c-tab" data-course="gyeong">철원9경<span class="tab-sub">8H · 15개소</span></div>
+  <div class="course-tabs-label">▼ 참여할 코스를 선택하십시오</div>
+  <div class="c-tab" data-course="market">
+    <span>🛒 전통시장 코스</span>
+    <div class="c-tab-right">
+      <span class="tab-sub">⏱ 2H · 5개소</span>
+      <span class="tab-pts">최대 5,500P</span>
     </div>
+  </div>
+  <div class="c-tab" data-course="nopo">
+    <span>🍜 철원노포 코스</span>
+    <div class="c-tab-right">
+      <span class="tab-sub">⏱ 5H · 9개소</span>
+      <span class="tab-pts">최대 8,000P</span>
+    </div>
+  </div>
+  <div class="c-tab" data-course="gyeong">
+    <span>🏔 철원9경 코스</span>
+    <div class="c-tab-right">
+      <span class="tab-sub">⏱ 8H · 15개소</span>
+      <span class="tab-pts">최대 13,000P</span>
+    </div>
+  </div>
+</div>
     <button class="tac-btn" id="radar-btn">📡 LOCAL RADAR : OFF</button>
     <button class="tac-btn" id="map-btn">🗺️ TACTICAL MAP — 상황 지도 열기</button>
     <div class="pathfinder-panel" id="pf-panel">
