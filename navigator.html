@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-    /* 전체 기반 설정 */
     body {
         margin: 0; padding: 0; background-color: #050a05;
         background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
@@ -15,8 +14,6 @@
         display: flex; flex-direction: column; align-items: center;
         min-height: 100vh; overflow-x: hidden;
     }
-
-    /* CHALLENGER 등록 화면 */
     #login-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background-color: #050a05; background-image: radial-gradient(circle at center, #0a140a 0%, #000000 100%);
@@ -30,8 +27,6 @@
         padding: 15px; width: 80%; max-width: 300px; text-align: center; outline: none; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); transition: 0.3s; margin-bottom: 15px;
     }
     .name-input:focus { border-color: #39FF14; box-shadow: 0 0 10px rgba(57,255,20,0.3); }
-
-    /* [신규] 보안 시스템 오버레이 (Matrix & Glitch) */
     #system-overlay {
         display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
         background: rgba(5, 10, 5, 0.95); flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
@@ -47,52 +42,34 @@
     }
     .blink-cursor { animation: blinker 0.8s linear infinite; }
     @keyframes blinker { 50% { opacity: 0; } }
-
-    /* 메인 앱 UI */
     #main-app { display: none; width: 100%; flex-direction: column; align-items: center; }
     .header { text-align: center; margin-top: 15px; margin-bottom: 5px; width: 100%; cursor: pointer; user-select: none; }
     .title { font-family: 'Black Ops One', cursive; font-size: 26px; margin: 0; color: #ffffff; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
     .operator-bar { background: #0f140f; border-top: 1px solid #1a2f1a; border-bottom: 1px solid #1a2f1a; width: 100%; padding: 6px 0; margin-top: 10px; color: #fbc02d; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-align: center; }
-
-    /* 메인 컨테이너 */
     .main-container { width: 90%; max-width: 420px; background: transparent; margin-top: 15px; display: flex; flex-direction: column; align-items: center; }
-    
-    /* 1. 하이엔드 전술 나침반 (V7 레이아웃 100% 보존) */
     .compass-block {
         width: 100%; background: #0a0f0a; border: 3px solid #1a2f1a; border-radius: 12px;
-        padding: 30px 15px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1); 
-        display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; box-sizing: border-box;
-        position: relative;
+        padding: 30px 15px 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 5px rgba(255,255,255,0.1);
+        display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; box-sizing: border-box; position: relative;
     }
-
     .compass-ui {
         position: relative; width: 260px; height: 260px; margin-bottom: 25px; border-radius: 50%; border: 6px solid #1a2f1a;
         box-shadow: 0 5px 15px rgba(0,0,0,0.5), inset 0 5px 20px rgba(0,0,0,0.8), 0 0 0 6px #050a05, 0 0 0 8px rgba(57,255,20,0.2);
         background: radial-gradient(circle, #0a140a 30%, #050a05 90%); display: flex; justify-content: center; align-items: center;
     }
-
-    /* 전진 방향 고정 마커 */
     .forward-marker {
         position: absolute; top: -2px; left: 50%; transform: translateX(-50%);
         width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
         border-top: 18px solid #39FF14; filter: drop-shadow(0 0 10px #39FF14); z-index: 25;
     }
-    
-    /* TACTICAL RADAR 블루 스팟 */
     .radar-spot-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center center; z-index: 15; display: none; }
     .radar-spot { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 12px #00e5ff, 0 0 25px #00e5ff, inset 0 0 6px #fff; border: 2px solid #fff; }
-
-    /* 회전하는 나침반 다이얼 */
-    .compass-face { 
-        position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.1s linear; 
-    }
+    .compass-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; transition: transform 0.1s linear; }
     .dial-mark { position: absolute; font-weight: 700; font-size: 20px; color: #4a6b4a; }
-    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #ff3f34; font-size: 28px; text-shadow: 0 0 15px rgba(255, 63, 52, 0.6); } 
+    .mark-n { top: 10px; left: 50%; transform: translateX(-50%); color: #ff3f34; font-size: 28px; text-shadow: 0 0 15px rgba(255, 63, 52, 0.6); }
     .mark-s { bottom: 10px; left: 50%; transform: translateX(-50%); color: #ffffff; }
     .mark-e { right: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
     .mark-w { left: 15px; top: 50%; transform: translateY(-50%); color: #ffffff; }
-    
-    /* 다이얼 눈금자 */
     .tick { position: absolute; top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
     .tick::before, .tick::after { content: ''; position: absolute; width: 2px; height: 12px; background: #2a402a; }
     .tick::before { top: 0; } .tick::after { bottom: 0; }
@@ -100,18 +77,14 @@
     .t-120 { transform: translateX(-50%) rotate(120deg); } .t-150 { transform: translateX(-50%) rotate(150deg); }
     .t-210 { transform: translateX(-50%) rotate(210deg); } .t-240 { transform: translateX(-50%) rotate(240deg); }
     .t-300 { transform: translateX(-50%) rotate(300deg); } .t-330 { transform: translateX(-50%) rotate(330deg); }
-    
-    /* 정중앙 고정 숫자 패널 */
     .heading-display {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        background: #050a05; padding: 6px 18px; border: 2px solid #1a2f1a; border-radius: 6px; 
+        background: #050a05; padding: 6px 18px; border: 2px solid #1a2f1a; border-radius: 6px;
         font-family: 'Black Ops One', cursive; font-size: 32px; color: #ffffff;
-        text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); display: flex; align-items: baseline; justify-content: center; 
+        text-shadow: 0 0 10px rgba(57, 255, 20, 0.4); display: flex; align-items: baseline; justify-content: center;
         z-index: 30; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.6);
     }
     .heading-unit { font-size: 12px; margin-left: 8px; color: #4ade80; }
-
-    /* GPS 상태 인디케이터 */
     .gps-status-badge {
         background: #050a05; border: 1px solid #1a2f1a; padding: 6px 16px; border-radius: 4px;
         font-family: 'Black Ops One', cursive; font-size: 13px; color: #555; letter-spacing: 2px;
@@ -120,8 +93,6 @@
     .gps-status-badge.scanning { color: #fbc02d; text-shadow: 0 0 8px rgba(251, 192, 45, 0.5); border-color: #fbc02d; animation: pulse 1.5s infinite; }
     .gps-status-badge.locked { color: #39FF14; text-shadow: 0 0 8px rgba(57, 255, 20, 0.5); border-color: #39FF14; }
     @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
-
-    /* 2. 독립된 정밀 수평계 */
     .level-block {
         width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 15px;
         box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); display: flex; flex-direction: column; align-items: center; box-sizing: border-box;
@@ -139,8 +110,6 @@
         transform: translate(-50%, -50%); box-shadow: inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 5px #ff3f34; transition: transform 0.1s ease-out, background 0.2s;
     }
     .level-status-text { font-family: 'Black Ops One', cursive; font-size: 14px; color: #ff3f34; letter-spacing: 1px; transition: color 0.2s;}
-
-    /* 3. GPS & 날씨 데이터 패널 */
     .data-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; margin-bottom: 15px; }
     .data-panel { background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .panel-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #1a2f1a; padding-bottom: 4px; color: #80a080; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between;}
@@ -149,19 +118,14 @@
     .data-label { font-size: 11px; color: #80a080; font-weight: 700; }
     .data-value { font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 14px; color: #ffffff; display: flex; align-items: center; gap: 6px;}
     .wind-warning { color: #ff3f34 !important; animation: pulse 1s infinite; text-shadow: 0 0 8px rgba(255, 63, 52, 0.6); }
-
-    /* 4. 가동 및 레이더 버튼 */
     .tactical-btn {
         width: 100%; padding: 18px; background: linear-gradient(180deg, #1a2f1a, #0f140f); border: 2px solid #142014; border-bottom: 4px solid #050a05; border-radius: 6px;
         color: #ffffff; font-family: 'Black Ops One', cursive; font-size: 20px; letter-spacing: 2px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-bottom: 10px; transition: all 0.1s;
     }
     .tactical-btn:active { transform: translateY(3px); border-bottom: 1px solid #050a05; }
     .tactical-btn.active { background: linear-gradient(180deg, #1f401f, #142014); color: #39FF14; border-color: #39FF14; box-shadow: 0 0 15px rgba(57,255,20,0.2);}
-
     #radar-btn { background: linear-gradient(180deg, #004d40, #001a11); border-color: #00bfa5; color: #00e5ff; display: none; font-size: 16px; margin-bottom: 15px; }
     #radar-btn.active { background: linear-gradient(180deg, #00bfa5, #004d40); color: #000; text-shadow: none; box-shadow: 0 0 15px rgba(0,229,255,0.5); }
-
-    /* 5. 미션 스크롤 패널 (정확히 5개 노출) */
     .mission-panel { width: 100%; background: #0f140f; border: 1px solid #1a2f1a; border-radius: 6px; padding: 12px; margin-bottom: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); box-sizing: border-box; }
     .cp-list { list-style: none; padding: 0; margin: 0; max-height: 165px; overflow-y: auto; padding-right: 5px;}
     .cp-list::-webkit-scrollbar { width: 4px; } .cp-list::-webkit-scrollbar-track { background: #050a05; } .cp-list::-webkit-scrollbar-thumb { background: #1a2f1a; border-radius: 2px; }
@@ -172,8 +136,6 @@
     .status-dot.cleared { background-color: #39FF14; box-shadow: 0 0 10px #39FF14; }
     @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.4;} 100% {opacity: 1;} }
     .cp-status-text { font-family: 'Black Ops One', cursive; font-size: 11px; letter-spacing: 1px; }
-    
-    /* 완주 디지털 인증서 */
     #certificate-wrapper { display: none; width: 90%; max-width: 450px; flex-direction: column; align-items: center; margin-top: 15px;}
     #certificate-card { width: 100%; background-color: #030803; background-image: linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px); background-size: 20px 20px; border: 4px solid #1a2f1a; padding: 30px 20px 40px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; overflow: hidden; }
     #certificate-card::before, #certificate-card::after { content: ''; position: absolute; width: 30px; height: 30px; border: 3px solid #39FF14; pointer-events: none; }
@@ -192,7 +154,6 @@
     .cert-item { display: flex; align-items: center; gap: 6px; background: rgba(10,20,10,0.8); padding: 6px; border: 1px solid #1a2f1a;}
     .cert-check { color: #39FF14; font-size: 12px; }
     .download-btn { width: 100%; padding: 18px; background: #39FF14; color: #000; font-family: 'Black Ops One', cursive; font-size: 18px; letter-spacing: 1px; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 20px rgba(57,255,20,0.4); text-transform: uppercase; }
-
     .footer { margin-top: 25px; font-size: 10px; color: #4a6b4a; letter-spacing: 2px; text-align: center; padding-bottom: 30px; cursor: pointer; user-select: none;}
 </style>
 </head>
@@ -207,10 +168,7 @@
     <p class="login-sub">KOREA ACTION TRAIL</p>
     <input type="text" id="participant-name" class="name-input" placeholder="CHALLENGER 성명" autocomplete="off">
     <input type="password" id="access-key" class="name-input" placeholder="ACCESS KEY (6자리)" autocomplete="off">
-    <button class="tactical-btn" id="btn-login" style="width: 80%; max-width: 300px; margin-top: 20px;">시스템 접속<br>
-        (ENTER)<br>
-        KEY - 202606<br>
-        (시스템 경험하기)</button>
+    <button class="tactical-btn" id="btn-login" style="width: 80%; max-width: 300px; margin-top: 20px;">시스템 접속<br>(ENTER)<br>KEY - 202606<br>(시스템 경험하기)</button>
 </div>
 
 <div id="main-app">
@@ -220,7 +178,6 @@
     </div>
 
     <div class="main-container" id="tracking-ui">
-        
         <div class="compass-block">
             <div class="compass-ui">
                 <div class="forward-marker"></div>
@@ -252,7 +209,6 @@
                 <div style="display: flex; flex-direction: column; align-items: center; width: 33%; border-left: 1px solid #1a2f1a; border-right: 1px solid #1a2f1a;"><span class="data-label">TOTAL (총 이동거리)</span><span class="data-value" id="dist-total">0 m</span></div>
                 <div style="display: flex; flex-direction: column; align-items: center; width: 33%;"><span class="data-label">ALTITUDE (현재고도)</span><span class="data-value" id="alt-current">N/A</span></div>
             </div>
-            
             <div class="data-panel">
                 <div class="panel-title"><span>METAR DATA (기상/풍향)</span><span id="wx-update-time" style="font-size: 9px;"></span></div>
                 <div class="data-row"><span class="data-label">CONDITIONS (기상 상태)</span><span class="data-value" id="wx-cond">☀️ 맑음</span></div>
@@ -264,14 +220,13 @@
         <button class="tactical-btn" id="activate-btn">SYSTEM ENGAGE (가동)</button>
         <button class="tactical-btn" id="radar-btn">TACTICAL RADAR : OFF</button>
 
-    <div class="mission-panel">
+        <div class="mission-panel">
             <div class="panel-title"><span>MISSION WAYPOINTS</span> <span id="mission-status">STANDBY</span></div>
             <ul class="cp-list" id="cp-list-container"></ul>
         </div>
         <div style="width:100%;text-align:center;font-size:11px;color:#4a6b4a;letter-spacing:1px;margin-bottom:10px;padding:6px 0;border-top:1px solid #1a2f1a;">
           본 시스템은 모바일에서 작동 가능합니다.
         </div>
-        
     </div>
 
     <div id="certificate-wrapper">
@@ -295,24 +250,36 @@
 </div>
 
 <script>
-    const OWM_API_KEY = 'YOUR_API_KEY_HERE'; 
+    const OWM_API_KEY = 'YOUR_API_KEY_HERE';
 
     const WAYPOINTS = [
-        { id: 1, name: "용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 }, { id: 2, name: "박달나무쉼터", lat: 38.2050, lon: 128.3900 },
-        { id: 3, name: "미시령옛길", lat: 38.2100, lon: 128.4200 }, { id: 4, name: "금강산성인대", lat: 38.2200, lon: 128.4500 },
-        { id: 5, name: "금강산화암사", lat: 38.2300, lon: 128.4800 }, { id: 6, name: "신평골길 8", lat: 38.2400, lon: 128.5000 },
-        { id: 7, name: "천진해수욕장", lat: 38.2500, lon: 128.5300 }, { id: 8, name: "청간정", lat: 38.2600, lon: 128.5400 },
-        { id: 9, name: "아야진해수욕장", lat: 38.2700, lon: 128.5500 }, { id: 10, name: "교암항", lat: 38.2800, lon: 128.5450 },
-        { id: 11, name: "교암리해수욕장", lat: 38.2850, lon: 128.5400 }, { id: 12, name: "능파대 (지질공원)", lat: 38.2900, lon: 128.5350 },
-        { id: 13, name: "문암항", lat: 38.3000, lon: 128.5300 }, { id: 14, name: "삼포해수욕장", lat: 38.3100, lon: 128.5250 },
-        { id: 15, name: "송지호철새도래지", lat: 38.3300, lon: 128.5150 }, { id: 16, name: "왕곡마을", lat: 38.3400, lon: 128.5100 },
-        { id: 17, name: "수뭇개바위", lat: 38.3500, lon: 128.5050 }, { id: 18, name: "동호리해변", lat: 38.3800, lon: 128.4900 },
-        { id: 19, name: "거진해수욕장", lat: 38.4400, lon: 128.4600 }, { id: 20, name: "화진포", lat: 38.4700, lon: 128.4400 },
-        { id: 21, name: "화진포의성", lat: 38.4750, lon: 128.4450 }, { id: 22, name: "화진포소나무숲", lat: 38.4800, lon: 128.4500 },
-        { id: 23, name: "마차진 (수송)", lat: 38.5000, lon: 128.4300 }, { id: 24, name: "고성통일전망타워", lat: 38.5833, lon: 128.3833 }
+        { id: 1,  name: "용대자연휴양림캠핑장", lat: 38.2045, lon: 128.3842 },
+        { id: 2,  name: "박달나무쉼터",          lat: 38.2050, lon: 128.3900 },
+        { id: 3,  name: "미시령옛길",             lat: 38.2100, lon: 128.4200 },
+        { id: 4,  name: "금강산성인대",           lat: 38.2200, lon: 128.4500 },
+        { id: 5,  name: "금강산화암사",           lat: 38.2300, lon: 128.4800 },
+        { id: 6,  name: "신평골길 8",             lat: 38.2400, lon: 128.5000 },
+        { id: 7,  name: "천진해수욕장",           lat: 38.2500, lon: 128.5300 },
+        { id: 8,  name: "청간정",                 lat: 38.2600, lon: 128.5400 },
+        { id: 9,  name: "아야진해수욕장",         lat: 38.2700, lon: 128.5500 },
+        { id: 10, name: "교암항",                 lat: 38.2800, lon: 128.5450 },
+        { id: 11, name: "교암리해수욕장",         lat: 38.2850, lon: 128.5400 },
+        { id: 12, name: "능파대 (지질공원)",      lat: 38.2900, lon: 128.5350 },
+        { id: 13, name: "문암항",                 lat: 38.3000, lon: 128.5300 },
+        { id: 14, name: "삼포해수욕장",           lat: 38.3100, lon: 128.5250 },
+        { id: 15, name: "송지호철새도래지",       lat: 38.3300, lon: 128.5150 },
+        { id: 16, name: "왕곡마을",               lat: 38.3400, lon: 128.5100 },
+        { id: 17, name: "수뭇개바위",             lat: 38.3500, lon: 128.5050 },
+        { id: 18, name: "동호리해변",             lat: 38.3800, lon: 128.4900 },
+        { id: 19, name: "거진해수욕장",           lat: 38.4400, lon: 128.4600 },
+        { id: 20, name: "화진포",                 lat: 38.4700, lon: 128.4400 },
+        { id: 21, name: "화진포의성",             lat: 38.4750, lon: 128.4450 },
+        { id: 22, name: "화진포소나무숲",         lat: 38.4800, lon: 128.4500 },
+        { id: 23, name: "마차진 (수송)",          lat: 38.5000, lon: 128.4300 },
+        { id: 24, name: "고성통일전망타워",       lat: 38.5833, lon: 128.3833 }
     ];
-    
-    const RADIUS_METER = 50; 
+
+    const RADIUS_METER = 50;
     const trackingUI = document.getElementById('tracking-ui');
     const certWrapper = document.getElementById('certificate-wrapper');
     const miniBubble = document.getElementById('mini-bubble');
@@ -320,13 +287,12 @@
     const levelStatusText = document.getElementById('level-status-text');
     const gpsBadge = document.getElementById('gps-status-badge');
 
-    let isTracking = false; 
+    let isTracking = false;
     let lastWeatherUpdate = 0;
     let currentHeading = null;
     let currentTargetBearing = null;
     let isRadarActive = false;
 
-    // [신규] 철통 복구를 위한 로컬스토리지 연동 변수
     let savedName = localStorage.getItem('apex_operator_name');
     let currentCpIndex = parseInt(localStorage.getItem('apex_cp_index')) || 0;
     let totalDistance = parseFloat(localStorage.getItem('apex_total_dist')) || 0;
@@ -334,83 +300,164 @@
     const lastPosStr = localStorage.getItem('apex_last_pos');
     if (lastPosStr) { lastPos = JSON.parse(lastPosStr); }
 
-    // [신규] 10초 단위 자동 세이브 (Auto-Save Background Engine)
     setInterval(() => {
         if (isTracking && savedName) {
             localStorage.setItem('apex_total_dist', totalDistance);
             localStorage.setItem('apex_cp_index', currentCpIndex);
             if (lastPos) localStorage.setItem('apex_last_pos', JSON.stringify(lastPos));
         }
-    }, 10000); // 10000ms = 10초
+    }, 10000);
 
-    function formatDistance(meters) { return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m'; }
+    function formatDistance(meters) {
+        return meters >= 1000 ? (meters / 1000).toFixed(2) + ' km' : Math.round(meters) + ' m';
+    }
 
-    // 부팅 시 저장된 총 거리 화면 표시 (Recovery)
     document.getElementById('dist-total').innerText = formatDistance(totalDistance);
 
-    // [신규] 보안 경보 사운드 (ACCESS DENIED)
+    // =============================================
+    // 🔊 사운드 엔진 (군사 전자장비 / 무전기 계열)
+    // =============================================
+
+    // ACCESS DENIED : 경보 버저 3연타
     function playErrorSound() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const playBeep = (time) => {
-                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+            [0, 0.35, 0.70].forEach(offset => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
                 osc.connect(gain); gain.connect(ctx.destination);
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(800, time);
-                gain.gain.setValueAtTime(0.2, time); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.2);
-                osc.start(time); osc.stop(time + 0.2);
-            };
-            playBeep(ctx.currentTime); playBeep(ctx.currentTime + 0.3); playBeep(ctx.currentTime + 0.6);
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, ctx.currentTime + offset);
+                osc.frequency.setValueAtTime(220, ctx.currentTime + offset + 0.12);
+                gain.gain.setValueAtTime(0.25, ctx.currentTime + offset);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.28);
+                osc.start(ctx.currentTime + offset);
+                osc.stop(ctx.currentTime + offset + 0.28);
+            });
         } catch(e) {}
     }
 
-    // [신규] 해킹 성공 + 잠금 해제 사운드 (ACCESS GRANTED)
+    // ACCESS GRANTED : 군사 잠금해제 비프
     function playSuccessSound() {
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            // 1. 정보국 서버 접속 비프음
-            const osc1 = ctx.createOscillator(); const gain1 = ctx.createGain();
-            osc1.connect(gain1); gain1.connect(ctx.destination);
-            osc1.type = 'sine'; osc1.frequency.setValueAtTime(1200, ctx.currentTime);
-            gain1.gain.setValueAtTime(0.1, ctx.currentTime); gain1.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.1);
-            osc1.start(ctx.currentTime); osc1.stop(ctx.currentTime + 0.1);
-            
-            // 2. 잠금 해제 (철컥) 사운드
+            // 상승 비프 3단
+            [[600,0],[900,0.12],[1200,0.24]].forEach(([freq, offset]) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + offset);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime + offset);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.1);
+                osc.start(ctx.currentTime + offset);
+                osc.stop(ctx.currentTime + offset + 0.1);
+            });
+            // 잠금해제 클릭음
             setTimeout(() => {
-                const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain();
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
                 osc2.connect(gain2); gain2.connect(ctx.destination);
-                osc2.type = 'square'; osc2.frequency.setValueAtTime(150, ctx.currentTime);
-                osc2.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.3);
-                gain2.gain.setValueAtTime(0.2, ctx.currentTime); gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                osc2.start(ctx.currentTime); osc2.stop(ctx.currentTime + 0.3);
-            }, 150);
+                osc2.type = 'square';
+                osc2.frequency.setValueAtTime(180, ctx.currentTime);
+                osc2.frequency.exponentialRampToValueAtTime(60, ctx.currentTime + 0.25);
+                gain2.gain.setValueAtTime(0.18, ctx.currentTime);
+                gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+                osc2.start(ctx.currentTime);
+                osc2.stop(ctx.currentTime + 0.25);
+            }, 400);
+        } catch(e) {}
+    }
+
+    // ✅ SYSTEM ENGAGE : 군사 무전기 통신 개시음
+    // PTT 누르는 느낌 → 잡음 버스트 → 통신 채널 오픈 비프
+    function playEngageSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+            // 1단계: PTT 클릭 (짧은 노이즈 버스트)
+            const bufferSize = ctx.sampleRate * 0.06;
+            const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) { data[i] = (Math.random() * 2 - 1) * 0.6; }
+            const noiseSource = ctx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            const noiseFilter = ctx.createBiquadFilter();
+            noiseFilter.type = 'bandpass';
+            noiseFilter.frequency.value = 1200;
+            noiseFilter.Q.value = 0.8;
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.4, ctx.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+            noiseSource.connect(noiseFilter);
+            noiseFilter.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+            noiseSource.start(ctx.currentTime);
+            noiseSource.stop(ctx.currentTime + 0.06);
+
+            // 2단계: 무전기 채널 오픈 비프 (1000Hz 단음)
+            const beep1 = ctx.createOscillator();
+            const beepGain1 = ctx.createGain();
+            beep1.connect(beepGain1); beepGain1.connect(ctx.destination);
+            beep1.type = 'sine';
+            beep1.frequency.setValueAtTime(1000, ctx.currentTime + 0.1);
+            beepGain1.gain.setValueAtTime(0.0, ctx.currentTime + 0.1);
+            beepGain1.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.13);
+            beepGain1.gain.setValueAtTime(0.2, ctx.currentTime + 0.22);
+            beepGain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.30);
+            beep1.start(ctx.currentTime + 0.1);
+            beep1.stop(ctx.currentTime + 0.30);
+
+            // 3단계: 전자장비 부팅 스윕 (저→고 주파수)
+            const sweep = ctx.createOscillator();
+            const sweepGain = ctx.createGain();
+            sweep.connect(sweepGain); sweepGain.connect(ctx.destination);
+            sweep.type = 'sawtooth';
+            sweep.frequency.setValueAtTime(80, ctx.currentTime + 0.35);
+            sweep.frequency.exponentialRampToValueAtTime(520, ctx.currentTime + 0.90);
+            sweepGain.gain.setValueAtTime(0.0, ctx.currentTime + 0.35);
+            sweepGain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.45);
+            sweepGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.90);
+            sweepGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.10);
+            sweep.start(ctx.currentTime + 0.35);
+            sweep.stop(ctx.currentTime + 1.10);
+
+            // 4단계: 시스템 준비 확인음 (2중 비프)
+            [[1.15, 880], [1.28, 1100]].forEach(([offset, freq]) => {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.connect(g); g.connect(ctx.destination);
+                o.type = 'sine';
+                o.frequency.setValueAtTime(freq, ctx.currentTime + offset);
+                g.gain.setValueAtTime(0.15, ctx.currentTime + offset);
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.10);
+                o.start(ctx.currentTime + offset);
+                o.stop(ctx.currentTime + offset + 0.10);
+            });
+
         } catch(e) {}
     }
 
     function checkLogin() {
-        if (savedName) { 
-            document.getElementById('login-screen').style.display = 'none'; 
-            document.getElementById('main-app').style.display = 'flex'; 
-            document.getElementById('display-op-name').innerText = savedName; 
-            renderCPList(); 
+        if (savedName) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('display-op-name').innerText = savedName;
+            renderCPList();
         }
     }
 
-    // [신규] TACTICAL ACCESS 로그인 로직 통합
     document.getElementById('btn-login').addEventListener('click', () => {
         const name = document.getElementById('participant-name').value.trim();
         const key = document.getElementById('access-key').value.trim();
-        
         if (name.length < 2) { alert("CHALLENGER 성명을 정확히 입력해주십시오."); return; }
-        
         const loginScreen = document.getElementById('login-screen');
         const overlay = document.getElementById('system-overlay');
         const overlayText = document.getElementById('overlay-text');
 
         if (key !== "202606") {
-            // [실패] ACCESS DENIED (글리치 및 경고)
             playErrorSound();
             if(navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 100]);
-            
             loginScreen.classList.add('glitch-active');
             overlay.style.display = 'flex';
             overlay.style.background = 'rgba(255, 0, 0, 0.3)';
@@ -418,50 +465,43 @@
             overlayText.style.fontSize = '24px';
             overlayText.style.textShadow = '0 0 15px rgba(255, 63, 52, 0.8)';
             overlayText.innerHTML = "[ACCESS DENIED : 미인가 접속]";
-            
             setTimeout(() => {
                 loginScreen.classList.remove('glitch-active');
                 overlay.style.display = 'none';
             }, 1200);
             return;
         }
-        
-        // [성공] ACCESS GRANTED (매트릭스 텍스트 효과)
+
         playSuccessSound();
         if(navigator.vibrate) navigator.vibrate([50, 100, 200]);
-        
         overlay.style.display = 'flex';
         overlay.style.background = 'rgba(5, 10, 5, 0.95)';
         overlayText.style.color = '#39FF14';
         overlayText.style.fontSize = '18px';
         overlayText.style.textShadow = '0 0 10px #39FF14';
-        
+
         const msg = "[ACCESS GRANTED : 참가 팀원 신원 확인 완료.\n 보안 시스템을 해제 합니다.]";
-        let textSoFar = "";
-        let i = 0;
-        
+        let textSoFar = ""; let i = 0;
         const typeInterval = setInterval(() => {
             textSoFar += msg.charAt(i);
             overlayText.innerHTML = textSoFar + "<span class='blink-cursor'>_</span>";
             i++;
             if (i >= msg.length) {
                 clearInterval(typeInterval);
-                overlayText.innerHTML = textSoFar; // 깜빡이 제거
-                
-                // 로그인 완료 처리
+                overlayText.innerHTML = textSoFar;
                 setTimeout(() => {
                     overlay.style.opacity = '0';
                     overlay.style.transition = 'opacity 1s';
                     setTimeout(() => {
                         overlay.style.display = 'none';
                         overlay.style.opacity = '1';
-                        localStorage.setItem('apex_operator_name', name); 
-                        savedName = name; 
+                        localStorage.setItem('apex_operator_name', name);
+                        savedName = name;
                         checkLogin();
                     }, 1000);
                 }, 1500);
             }
-        }, 50); // 타이핑 속도
+        }, 50);
     });
 
     function calculateBearing(lat1, lon1, lat2, lon2) {
@@ -488,31 +528,27 @@
     document.getElementById('radar-btn').addEventListener('click', function() {
         isRadarActive = !isRadarActive;
         if (isRadarActive) {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const morse = [1,0,1,0,0,1,1,1,0,1]; // -·- 패턴
-    let t = ctx.currentTime + 0.05;
-    let freq = 600;
-    morse.forEach(function(on){
-      if(on){
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(freq, t);
-        g.gain.setValueAtTime(0.2, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
-        o.start(t); o.stop(t + 0.1);
-        freq += 40;
-      }
-      t += 0.13;
-    });
-  } catch(e) {}
-}
-        if(isRadarActive) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const morse = [1,0,1,0,0,1,1,1,0,1];
+                let t = ctx.currentTime + 0.05; let freq = 600;
+                morse.forEach(on => {
+                    if(on) {
+                        const o = ctx.createOscillator(); const g = ctx.createGain();
+                        o.connect(g); g.connect(ctx.destination);
+                        o.type = 'sine';
+                        o.frequency.setValueAtTime(freq, t);
+                        g.gain.setValueAtTime(0.2, t);
+                        g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+                        o.start(t); o.stop(t + 0.1);
+                        freq += 40;
+                    }
+                    t += 0.13;
+                });
+            } catch(e) {}
             this.classList.add('active'); this.innerText = 'TACTICAL RADAR : ON (추적 중)';
             document.getElementById('radar-spot-container').style.display = 'block';
-            if(navigator.vibrate) navigator.vibrate([100, 50, 100]); 
+            if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
             updateRadarUI();
         } else {
             this.classList.remove('active'); this.innerText = 'TACTICAL RADAR : OFF';
@@ -529,21 +565,17 @@
 
     function updateWeather(lat, lon) {
         const now = Date.now();
-        if (now - lastWeatherUpdate < 10 * 60 * 1000) return; 
-        if(OWM_API_KEY === 'YOUR_API_KEY_HERE') return; 
-
+        if (now - lastWeatherUpdate < 10 * 60 * 1000) return;
+        if(OWM_API_KEY === 'YOUR_API_KEY_HERE') return;
         fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OWM_API_KEY}&units=metric&lang=kr`)
         .then(res => res.json())
         .then(data => {
             lastWeatherUpdate = now; const wSpeed = data.wind.speed;
-            
             document.getElementById('wx-cond').innerText = getWeatherKor(data.weather[0].id, data.weather[0].description);
             document.getElementById('wx-temp').innerText = `${Math.round(data.main.feels_like)} °C`;
-            
             const speedTextEl = document.getElementById('wind-speed-text');
-            if (wSpeed > 10) { speedTextEl.innerHTML = `🚨 강풍주의 (${wSpeed.toFixed(1)} m/s)`; speedTextEl.classList.add('wind-warning'); } 
+            if (wSpeed > 10) { speedTextEl.innerHTML = `🚨 강풍주의 (${wSpeed.toFixed(1)} m/s)`; speedTextEl.classList.add('wind-warning'); }
             else { speedTextEl.innerHTML = `${wSpeed.toFixed(1)} m/s`; speedTextEl.classList.remove('wind-warning'); }
-
             document.getElementById('wind-arrow-icon').style.transform = `rotate(${data.wind.deg}deg)`;
             const d = new Date(); document.getElementById('wx-update-time').innerText = `UPDATED: ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         }).catch(e => console.error("Weather API Error"));
@@ -553,7 +585,8 @@
         trackingUI.style.display = 'none'; certWrapper.style.display = 'flex';
         document.getElementById('cert-op-name').innerText = savedName;
         document.getElementById('cert-total-dist').innerText = totalDistance > 0 ? formatDistance(totalDistance) : "108.00 km (완주)";
-        const now = new Date(); document.getElementById('cert-time').innerText = now.getFullYear() + "." + String(now.getMonth()+1).padStart(2,'0') + "." + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0');
+        const now = new Date();
+        document.getElementById('cert-time').innerText = now.getFullYear() + "." + String(now.getMonth()+1).padStart(2,'0') + "." + String(now.getDate()).padStart(2,'0') + " " + String(now.getHours()).padStart(2,'0') + ":" + String(now.getMinutes()).padStart(2,'0');
         const certGrid = document.getElementById('cert-grid-container'); certGrid.innerHTML = '';
         WAYPOINTS.forEach(wp => { certGrid.innerHTML += `<div class="cert-item"><span class="cert-check">✔</span> <span>${wp.name}</span></div>`; });
     }
@@ -569,12 +602,14 @@
 
     let topClickCount = 0;
     document.getElementById('main-title-header').addEventListener('click', () => {
-        topClickCount++; if(topClickCount >= 3) { showCertificate(); topClickCount = 0; } setTimeout(() => { topClickCount = 0; }, 1000); 
+        topClickCount++; if(topClickCount >= 3) { showCertificate(); topClickCount = 0; }
+        setTimeout(() => { topClickCount = 0; }, 1000);
     });
 
     let resetClickCount = 0;
     document.getElementById('hidden-reset-footer').addEventListener('click', () => {
-        resetClickCount++; if(resetClickCount >= 5) { if(confirm("시스템을 초기화합니다.")) { localStorage.clear(); location.reload(); } resetClickCount = 0; } setTimeout(() => { resetClickCount = 0; }, 1500);
+        resetClickCount++; if(resetClickCount >= 5) { if(confirm("시스템을 초기화합니다.")) { localStorage.clear(); location.reload(); } resetClickCount = 0; }
+        setTimeout(() => { resetClickCount = 0; }, 1500);
     });
 
     function renderCPList() {
@@ -582,38 +617,29 @@
         const cpListContainer = document.getElementById('cp-list-container'); cpListContainer.innerHTML = '';
         WAYPOINTS.forEach((wp, index) => {
             let statusClass = 'text-pending'; let dotClass = ''; let statusText = 'PENDING';
-            if (index < currentCpIndex) { statusClass = 'text-cleared'; dotClass = 'cleared'; statusText = 'PASSED'; } 
+            if (index < currentCpIndex) { statusClass = 'text-cleared'; dotClass = 'cleared'; statusText = 'PASSED'; }
             else if (index === currentCpIndex) { statusClass = 'text-active'; dotClass = 'active'; statusText = 'TRACKING..'; }
-            const li = document.createElement('li'); li.className = 'cp-item'; if(index === currentCpIndex) li.id = "current-target-cp";
+            const li = document.createElement('li'); li.className = 'cp-item';
+            if(index === currentCpIndex) li.id = "current-target-cp";
             li.innerHTML = `<div class="cp-name"><div class="status-dot ${dotClass}"></div>${wp.name}</div><div class="cp-status-text ${statusClass}">${statusText}</div>`;
             cpListContainer.appendChild(li);
         });
-        const targetEl = document.getElementById("current-target-cp"); if(targetEl) cpListContainer.scrollTop = targetEl.offsetTop - 50;
-        document.getElementById('mission-status').innerText = `TARGET: ${currentCpIndex + 1} / 24`; document.getElementById('mission-status').style.color = "#fbc02d";
+        const targetEl = document.getElementById("current-target-cp");
+        if(targetEl) cpListContainer.scrollTop = targetEl.offsetTop - 50;
+        document.getElementById('mission-status').innerText = `TARGET: ${currentCpIndex + 1} / 24`;
+        document.getElementById('mission-status').style.color = "#fbc02d";
     }
 
     document.getElementById('activate-btn').addEventListener('click', () => {
-        try {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain); gain.connect(ctx.destination);
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(40, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(180, ctx.currentTime + 1.2);
-  osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 2.0);
-  gain.gain.setValueAtTime(0.0, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(0.35, ctx.currentTime + 0.3);
-  gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 2.0);
-  gain.gain.linearRampToValueAtTime(0.0, ctx.currentTime + 2.4);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 2.4);
-} catch(e) {}
+        // ✅ 군사 무전기 통신 개시음 재생
+        playEngageSound();
+
         if (isTracking || currentCpIndex >= WAYPOINTS.length) return;
-        
-        // (기존 오토바이 배기음 삭제 완료)
+
         const btnActivate = document.getElementById('activate-btn');
-        btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)'; btnActivate.classList.add('active'); isTracking = true;
+        btnActivate.innerText = 'SYSTEM ACTIVE (작동 중)';
+        btnActivate.classList.add('active');
+        isTracking = true;
         document.getElementById('radar-btn').style.display = 'block';
 
         gpsBadge.className = 'gps-status-badge scanning';
@@ -621,87 +647,82 @@
 
         const handleCompassAndLevel = (e) => {
             let heading = null;
-            
-            if (e.webkitCompassHeading !== undefined) { heading = e.webkitCompassHeading; } 
+            if (e.webkitCompassHeading !== undefined) { heading = e.webkitCompassHeading; }
             else if (e.absolute === true || e.alpha !== null) {
                 heading = 360 - e.alpha;
                 let screenOrientation = 0;
-                if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) { screenOrientation = window.screen.orientation.angle; } 
+                if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) { screenOrientation = window.screen.orientation.angle; }
                 else if (typeof window.orientation !== "undefined") { screenOrientation = window.orientation; }
                 heading = (heading + screenOrientation) % 360;
             }
-
             if (heading !== null) {
                 currentHeading = heading;
                 document.getElementById('heading-value').innerText = Math.round(heading).toString().padStart(3, '0');
                 compassFace.style.transform = `rotate(${-heading}deg)`;
                 if (isRadarActive) updateRadarUI();
             }
-
-            let b = e.beta || 0; let g = e.gamma || 0; const maxTilt = 30; 
-            let moveX = Math.max(-1, Math.min(1, g / maxTilt)) * 23; let moveY = Math.max(-1, Math.min(1, b / maxTilt)) * 23;
+            let b = e.beta || 0; let g = e.gamma || 0; const maxTilt = 30;
+            let moveX = Math.max(-1, Math.min(1, g / maxTilt)) * 23;
+            let moveY = Math.max(-1, Math.min(1, b / maxTilt)) * 23;
             miniBubble.style.transform = `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px))`;
-
             if (Math.abs(b) < 3 && Math.abs(g) < 3) {
-                miniBubble.style.background = "#39FF14"; miniBubble.style.boxShadow = "inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 8px #39FF14";
+                miniBubble.style.background = "#39FF14";
+                miniBubble.style.boxShadow = "inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 8px #39FF14";
                 levelStatusText.innerText = "LEVEL OK"; levelStatusText.style.color = "#39FF14";
             } else {
-                miniBubble.style.background = "#ff3f34"; miniBubble.style.boxShadow = "inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 5px #ff3f34";
+                miniBubble.style.background = "#ff3f34";
+                miniBubble.style.boxShadow = "inset -2px -2px 4px rgba(0,0,0,0.5), 0 0 5px #ff3f34";
                 levelStatusText.innerText = "TILT WARNING"; levelStatusText.style.color = "#ff3f34";
             }
         };
 
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission().then(state => { 
+            DeviceOrientationEvent.requestPermission().then(state => {
                 if (state === 'granted') {
                     window.addEventListener('deviceorientationabsolute', handleCompassAndLevel, true);
-                    window.addEventListener('deviceorientation', handleCompassAndLevel, true); 
+                    window.addEventListener('deviceorientation', handleCompassAndLevel, true);
                 }
             }).catch(console.error);
         } else { window.addEventListener('deviceorientationabsolute', handleCompassAndLevel, true); }
 
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(updatePosition, (err) => {
-                console.warn('GPS Error'); gpsBadge.className = 'gps-status-badge'; gpsBadge.innerText = 'GPS OFFLINE';
+                console.warn('GPS Error');
+                gpsBadge.className = 'gps-status-badge';
+                gpsBadge.innerText = 'GPS OFFLINE';
             }, { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 });
         }
     });
 
     function updatePosition(pos) {
         if(gpsBadge.innerText !== 'GPS LOCK') {
-            gpsBadge.className = 'gps-status-badge locked'; gpsBadge.innerText = 'GPS LOCK';
+            gpsBadge.className = 'gps-status-badge locked';
+            gpsBadge.innerText = 'GPS LOCK';
             if(navigator.vibrate) navigator.vibrate(50);
         }
-
-        if (currentCpIndex >= WAYPOINTS.length) return; 
+        if (currentCpIndex >= WAYPOINTS.length) return;
         const lat = pos.coords.latitude; const lon = pos.coords.longitude; const alt = pos.coords.altitude;
         const targetWP = WAYPOINTS[currentCpIndex];
-        
         const distToTarget = calculateDistance(lat, lon, targetWP.lat, targetWP.lon);
         currentTargetBearing = calculateBearing(lat, lon, targetWP.lat, targetWP.lon);
         if (isRadarActive) updateRadarUI();
-        
         document.getElementById('dist-to-target').innerText = formatDistance(distToTarget);
         if (alt !== null) document.getElementById('alt-current').innerText = Math.round(alt) + ' m';
-
         if (!lastPos) { lastPos = { lat, lon }; }
         const distStep = calculateDistance(lastPos.lat, lastPos.lon, lat, lon);
-        if (distStep > 1) { 
-            totalDistance += distStep; 
-            lastPos = { lat, lon }; 
-        }
+        if (distStep > 1) { totalDistance += distStep; lastPos = { lat, lon }; }
         document.getElementById('dist-total').innerText = formatDistance(totalDistance);
-
         updateWeather(lat, lon);
-
         if (distToTarget <= RADIUS_METER) {
             if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 500]);
             alert(`[인증 완료] ${targetWP.name} 통과!\n다음 목표 지점으로 타겟을 변경합니다.`);
-            if(isRadarActive) document.getElementById('radar-btn').click(); 
-            currentCpIndex++; localStorage.setItem('apex_cp_index', currentCpIndex); renderCPList();
+            if(isRadarActive) document.getElementById('radar-btn').click();
+            currentCpIndex++;
+            localStorage.setItem('apex_cp_index', currentCpIndex);
+            renderCPList();
         }
     }
-    
+
     checkLogin();
 </script>
 </body>
